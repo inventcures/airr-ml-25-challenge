@@ -1,0 +1,21 @@
+# Data
+data/
+!data/.gitkeep
+
+# Models
+models/
+!models/.gitkeep
+
+# Outputs
+outputs/
+!outputs/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+.DS_Store
+
+#random
+misc.md

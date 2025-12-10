@@ -9,9 +9,6 @@ It implements, in a modular way, a multi-model ensemble inspired by:
 - **Meta-ensemble**: a logistic regression layer on top of model outputs.
 - Full support for **Task 1 (repertoire-level classification)** and **Task 2 (sequence ranking)**.
 
-> ⚠️ **Important:** All Python files in this ZIP are **stubs**.
-> Replace each stub with the full script code from your ChatGPT session.
-> The directory structure and filenames are already correct.
 
 ---
 

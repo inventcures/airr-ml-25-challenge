@@ -101,6 +101,16 @@ def download_split(ds, split, current_count, expected_count):
     else:
         # Full Directory Download
         print(f"⬇️  Downloading folder {ds}/{split}...", flush=True)
+        
+        # Safety check: If local_dir_path exists as a file, delete it!
+        local_path_obj = Path(local_dir_path)
+        if local_path_obj.is_file():
+            print(f"  ⚠️  Found file at {local_dir_path} where directory should be. Deleting...", flush=True)
+            local_path_obj.unlink()
+            
+        # Ensure directory exists
+        local_path_obj.mkdir(parents=True, exist_ok=True)
+        
         cmd = [
             "uv", "run", "modal", "volume", "get", 
             "--force",

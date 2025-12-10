@@ -20,6 +20,9 @@ EMBEDDINGS_DIR = Path("data/embeddings")
 
 def train(args):
     dataset_name = args.dataset
+    
+    Path("logs").mkdir(exist_ok=True)
+    
     # Setup logging
     logging.basicConfig(
         level=logging.INFO,
@@ -29,7 +32,6 @@ def train(args):
             logging.FileHandler(f"logs/deeprc_train_{dataset_name}.log")
         ]
     )
-    Path("logs").mkdir(exist_ok=True)
     
     logging.info(f"[DeepRC] Training on {dataset_name}...")
     

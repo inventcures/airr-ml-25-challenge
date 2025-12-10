@@ -99,7 +99,18 @@ def infer_dataset(dataset_name: str, split: str, model: nn.Module, device: torch
 
 def infer_all():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"[DeepRC Inference] Using device: {device}")
+    
+    Path("logs").mkdir(exist_ok=True)
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.StreamHandler(sys.stdout),
+            logging.FileHandler("logs/deeprc_inference.log")
+        ]
+    )
+    
+    logging.info(f"[DeepRC Inference] Using device: {device}")
     
     # We need to know which model to use for which dataset.
     # Assuming one model per training dataset (ds1_deeprc_model.pth for ds1, etc.)

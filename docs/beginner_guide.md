@@ -113,16 +113,16 @@ mkdir -p data/embeddings
 uv run modal volume get airr-ml-25-data-35m embeddings_35m/ data/embeddings/
 ```
 
-### Step 3: Train DeepRC
+### Step 3: Train DeepRC (Cross-Validation)
 Inside your RunPod terminal:
 ```bash
-# Run the training loop for all datasets
+# Run the CV training loop for all datasets
 for i in {1..8}; do
-    echo "Training ds$i..."
-    python deeprc/train_mil.py --dataset "ds$i" --epochs 20 --batch-size 4
+    echo "Training ds$i (CV)..."
+    python deeprc/train_mil_cv.py --dataset "ds$i" --folds 5 --epochs 20 --batch-size 4
 done
 ```
-*   **What it does**: Trains a model for each dataset and saves it to `models/deeprc/`.
+*   **What it does**: Trains 5 models per dataset (Cross-Validation) and saves them to `models/deeprc_cv/`. It is auto-resumable!
 
 ### Step 4: Run DeepRC Inference (Still on RunPod!)
 After training completes, we need to generate predictions using the trained models.
@@ -130,20 +130,20 @@ After training completes, we need to generate predictions using the trained mode
 
 ```bash
 # Generate predictions for all datasets (train + test)
-python -m deeprc.infer_mil_all
+python deeprc/infer_mil_cv.py --folds 5
 ```
-*   **What it does**: Loads each trained model and predicts on both train and test sets.
-*   **Output**: Prediction CSVs saved to `outputs/deeprc_preds/` (e.g., `ds1_train_deeprc_preds.csv`, `ds1_test_deeprc_preds.csv`).
+*   **What it does**: Loads each ensemble of 5 models and predicts on both train and test sets.
+*   **Output**: Prediction CSVs saved to `outputs/deeprc_cv_preds/`.
 
 ### Step 5: Push Results to GitHub
 Now we save our work (models + predictions) to GitHub so we can access them on our laptop.
 ```bash
 # Add models and predictions
-git add -f models/deeprc/*_deeprc_model.pth
-git add -f outputs/deeprc_preds/
+git add -f models/deeprc_cv/
+git add -f outputs/deeprc_cv_preds/
 
 # Commit and push
-git commit -m "Add trained DeepRC models and predictions"
+git commit -m "Add trained DeepRC CV models and predictions"
 git push origin main
 ```
 

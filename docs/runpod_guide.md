@@ -93,9 +93,9 @@ ls -R data/embeddings/ds7/test | head
 
 ---
 
-## 🧠 Step 4: Train DeepRC
+## 🧠 Step 4: Train DeepRC (CV)
 
-Now the fun part. We train the AI.
+Now the fun part. We train the AI using Cross-Validation for robustness.
 
 ### 1. Install Dependencies
 ```bash
@@ -103,23 +103,31 @@ Now the fun part. We train the AI.
 uv pip install torch numpy pandas scikit-learn tqdm fair-esm --system
 ```
 
-*   **Time**: ~30-60 mins per dataset.
-*   **Output**: Models saved to `models/deeprc/`.
+### 2. Run Training Loop
+```bash
+for i in {1..8}; do
+    echo "Training ds$i (CV)..."
+    python deeprc/train_mil_cv.py --dataset "ds$i" --folds 5 --epochs 20 --batch-size 4
+done
+```
+*   **Time**: ~2-3 hours per dataset (for 5 folds).
+*   **Output**: Models saved to `models/deeprc_cv/`.
+*   **Resumable**: If stopped, just run it again! It picks up where it left off.
 
-### 2. Run Inference
+### 3. Run Inference
 After training, run inference to generate predictions for the meta-ensemble:
 ```bash
-python -m deeprc.infer_mil_all
+python deeprc/infer_mil_cv.py --folds 5
 ```
-*   **What it does**: Uses the trained models to predict on both train (for meta-ensemble) and test sets.
-*   **Output**: Prediction CSVs in `outputs/deeprc_preds/`.
+*   **What it does**: Uses the trained ensembles to predict on both train (for meta-ensemble) and test sets.
+*   **Output**: Prediction CSVs in `outputs/deeprc_cv_preds/`.
 
-### 3. Push Results to GitHub
+### 4. Push Results to GitHub
 Save your models and predictions to Git so you can access them on your laptop:
 ```bash
-git add -f models/deeprc/*_deeprc_model.pth
-git add -f outputs/deeprc_preds/
-git commit -m "Add DeepRC models and predictions"
+git add -f models/deeprc_cv/
+git add -f outputs/deeprc_cv_preds/
+git commit -m "Add DeepRC CV models and predictions"
 git push origin main
 ```
 
@@ -132,7 +140,8 @@ Once training finishes, we need to save the brains (models) to your laptop.
 **Open a NEW terminal on your Laptop:**
 ```bash
 # Replace IP and PORT with your Pod's details
-scp -P PORT -r root@IP:/workspace/airr_ml_project_templatail -f logs/deeprc_train_ds1.log
+scp -P PORT -r root@IP:/workspace/airr_ml_project_template/models/deeprc_cv .
+scp -P PORT -r root@IP:/workspace/airr_ml_project_template/outputs/deeprc_cv_preds .
 ```
 
 ### 5. Detached Mode (Resilience) 🛡️
@@ -147,7 +156,8 @@ To keep training running even if your laptop sleeps or disconnects, use `tmux`:
     ```
 2.  **Run Training**:
     ```bash
-    ./scripts/train_robust.sh
+    # Run the CV training loop
+    for i in {1..8}; do python deeprc/train_mil_cv.py --dataset "ds$i" --folds 5; done
     ```
 3.  **Detach**: Press `Ctrl+B`, then `D`. You can now close the terminal.
 4.  **Re-attach**:
@@ -158,14 +168,13 @@ To keep training running even if your laptop sleeps or disconnects, use `tmux`:
 ### 6. Monitoring 📱
 RunPod doesn't have a mobile app, but you can monitor via SSH or Web:
 
-*   **Script**: Run `./scripts/monitor_training.sh` to see live logs.
 *   **Web Dashboard**: Check GPU utilization on [runpod.io](https://runpod.io).
-*   **Mobile SSH**: Use an app like **Termius** (iOS/Android) to SSH in and run `tail -f logs/deeprc_train_ds*.log`.
+*   **Mobile SSH**: Use an app like **Termius** (iOS/Android) to SSH in and run `tail -f logs/deeprc_train_cv_*.log`.
 
 ### 7. Resuming Interrupted Runs 🔄
 The scripts are **auto-resumable**:
-*   **Checkpoints**: Saved every epoch to `models/deeprc/dsX_checkpoint.pth`.
-*   **Resume**: Just run `./scripts/train_robust.sh` again. It will detect the checkpoint and resume from the last epoch!
+*   **Checkpoints**: Saved every epoch inside `models/deeprc_cv/`.
+*   **Resume**: Just run the python training loop again. It will detect the checkpoint and resume from the exact fold and epoch!
 
 ---
 

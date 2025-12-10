@@ -59,6 +59,24 @@ def train_cv(args):
     
     logging.info(f"[DeepRC CV] Training on {dataset_name} with {n_folds} folds...")
     
+    # Check if final OOF predictions already exist. If so, this dataset is fully processed.
+    final_oof_csv = OUTPUTS_CV_DIR / f"{dataset_name}_oof.csv"
+    if final_oof_csv.exists():
+        logging.info(f"[DeepRC CV] ✅ Final OOF predictions already exist for {dataset_name}. Skipping full training.")
+        # For full robustness, one might also check if all fold models exist:
+        # all_folds_exist = True
+        # for fold in range(n_folds):
+        #     if not (model_ds_dir / f"fold{fold}_model.pth").exists():
+        #         all_folds_exist = False
+        #         break
+        # if all_folds_exist:
+        #     logging.info(f"[DeepRC CV] ✅ All fold models also exist for {dataset_name}. Skipping.")
+        #     return
+        # else:
+        #     logging.warning(f"[DeepRC CV] ⚠️ OOF predictions exist, but not all fold models for {dataset_name}. Proceeding to ensure completion.")
+        return
+    
+    
     # Load repertoires
     pkl_path = PROCESSED_DIR / f"{dataset_name}_train.pkl"
     if not pkl_path.exists():

@@ -9,12 +9,6 @@ import logging
 from tqdm import tqdm
 import sys
 
-# NumPy 2.0 Compatibility Patch
-try:
-    import numpy._core
-except ImportError:
-    if hasattr(np, 'core'):
-        sys.modules['numpy._core'] = np.core
 from data.load_all_datasets import load_repertoires_pickle, PROCESSED_DIR, TRAIN_DATASETS, TEST_DATASETS
 from deeprc.dataset import DeepRCDataset, collate_mil
 from deeprc.mil_model import AttentionMIL

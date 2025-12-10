@@ -1,14 +1,18 @@
+import sys
+import os
+from pathlib import Path
+
+# Add project root to path to allow importing 'data' module
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 import argparse
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Subset
-from pathlib import Path
 import numpy as np
 import pandas as pd
 import logging
 from tqdm import tqdm
-import sys
-import os
 
 from data.load_all_datasets import load_repertoires_pickle, PROCESSED_DIR, TEST_DATASETS
 from deeprc.dataset import DeepRCDataset, collate_mil

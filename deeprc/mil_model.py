@@ -6,7 +6,7 @@ from typing import List, Tuple
 class AttentionMIL(nn.Module):
     def __init__(
         self, 
-        input_dim: int = 1280, 
+        input_dim: int = 480, 
         hidden_dim: int = 128, 
         n_classes: int = 1, 
         dropout: float = 0.2

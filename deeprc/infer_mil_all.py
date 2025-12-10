@@ -5,7 +5,9 @@ from torch.utils.data import DataLoader
 from pathlib import Path
 import numpy as np
 import pandas as pd
-
+import logging
+from tqdm import tqdm
+import sys
 from data.load_all_datasets import load_repertoires_pickle, PROCESSED_DIR, TRAIN_DATASETS, TEST_DATASETS
 from deeprc.dataset import DeepRCDataset, collate_mil
 from deeprc.mil_model import AttentionMIL
@@ -23,7 +25,6 @@ def infer_dataset(dataset_name: str, split: str, model: nn.Module, device: torch
         print(f"    Pickle not found: {pkl_path}")
         return
         
-    reps = load_repertoires_pickle(pkl_path)
     reps = load_repertoires_pickle(pkl_path)
     
     # Map ds7_1 -> ds7 for embeddings
@@ -48,7 +49,14 @@ def infer_dataset(dataset_name: str, split: str, model: nn.Module, device: torch
         print("    No embeddings found.")
         return
         
-    loader = DataLoader(ds, batch_size=8, shuffle=False, collate_fn=collate_mil)
+    loader = DataLoader(
+        ds, 
+        batch_size=8, 
+        shuffle=False, 
+        collate_fn=collate_mil,
+        num_workers=4,
+        pin_memory=True
+    )
     
     model.eval()
     all_preds = []
@@ -59,7 +67,7 @@ def infer_dataset(dataset_name: str, split: str, model: nn.Module, device: torch
     valid_reps = [reps[i] for i in valid_indices]
     
     with torch.no_grad():
-        for bags, labels in loader:
+        for bags, labels in tqdm(loader, desc="Inferring"):
             bags = [b.to(device) for b in bags]
             
             logits, _ = model(bags)

@@ -7,7 +7,9 @@ from pathlib import Path
 import numpy as np
 from sklearn.metrics import roc_auc_score
 import copy
-
+import logging
+from tqdm import tqdm
+import sys
 from data.load_all_datasets import load_repertoires_pickle, PROCESSED_DIR
 from deeprc.dataset import DeepRCDataset, collate_mil
 from deeprc.mil_model import AttentionMIL
@@ -18,7 +20,18 @@ EMBEDDINGS_DIR = Path("data/embeddings")
 
 def train(args):
     dataset_name = args.dataset
-    print(f"[DeepRC] Training on {dataset_name}...")
+    # Setup logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.StreamHandler(sys.stdout),
+            logging.FileHandler(f"logs/deeprc_train_{dataset_name}.log")
+        ]
+    )
+    Path("logs").mkdir(exist_ok=True)
+    
+    logging.info(f"[DeepRC] Training on {dataset_name}...")
     
     # Load repertoires
     pkl_path = PROCESSED_DIR / f"{dataset_name}_train.pkl"
@@ -74,8 +87,22 @@ def train(args):
     # collate_fn=collate_mil is crucial here!
     # It handles "bags" of sequences that have different sizes (e.g., one rep has 100 seqs, another 500).
     # Standard PyTorch default_collate assumes all items are the same size.
-    train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, collate_fn=collate_mil)
-    val_loader = DataLoader(val_ds, batch_size=args.batch_size, shuffle=False, collate_fn=collate_mil)
+    train_loader = DataLoader(
+        train_ds, 
+        batch_size=args.batch_size, 
+        shuffle=True, 
+        collate_fn=collate_mil,
+        num_workers=4,
+        pin_memory=True
+    )
+    val_loader = DataLoader(
+        val_ds, 
+        batch_size=args.batch_size, 
+        shuffle=False, 
+        collate_fn=collate_mil,
+        num_workers=4,
+        pin_memory=True
+    )
     
     # Model
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -108,7 +135,8 @@ def train(args):
         all_labels = []
         all_preds = []
         
-        for bags, labels in train_loader:
+        pbar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{args.epochs}")
+        for bags, labels in pbar:
             bags = [b.to(device) for b in bags]
             labels = labels.to(device).unsqueeze(1) # (B, 1)
             
@@ -120,6 +148,9 @@ def train(args):
             optimizer.step()
             
             running_loss += loss.item() * len(bags)
+            
+            # Update pbar
+            pbar.set_postfix({"loss": f"{loss.item():.4f}"})
             
             probs = torch.sigmoid(logits).detach().cpu().numpy()
             all_labels.extend(labels.cpu().numpy())
@@ -156,7 +187,7 @@ def train(args):
         except:
             val_auc = 0.5
             
-        print(f"Epoch {epoch+1}/{args.epochs} - Train Loss: {epoch_loss:.4f} AUC: {train_auc:.4f} | Val Loss: {val_loss:.4f} AUC: {val_auc:.4f}")
+        logging.info(f"Epoch {epoch+1}/{args.epochs} - Train Loss: {epoch_loss:.4f} AUC: {train_auc:.4f} | Val Loss: {val_loss:.4f} AUC: {val_auc:.4f}")
         
         if val_auc > best_auc:
             best_auc = val_auc

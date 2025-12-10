@@ -123,6 +123,9 @@ To keep training running even if your laptop sleeps or disconnects, use `tmux`:
 
 1.  **Start a Session**:
     ```bash
+    # Install tmux if missing (takes 10s)
+    apt-get update && apt-get install -y tmux
+    
     tmux new -s training
     ```
 2.  **Run Training**:

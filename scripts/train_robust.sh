@@ -23,6 +23,7 @@ for i in {1..8}; do
     # Run training
     # If it crashes, the loop will stop (unless we add '|| true')
     # But since we have checkpointing in python, we can just re-run this script to resume!
+    export PYTHONPATH=$PYTHONPATH:.
     uv run python deeprc/train_mil.py --dataset "$DATASET" --epochs 20 --batch-size 4
     
     if [ $? -eq 0 ]; then

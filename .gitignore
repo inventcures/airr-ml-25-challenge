@@ -1,6 +1,7 @@
 # Data
 data/
 !data/.gitkeep
+!data/__init__.py
 
 # Models
 models/

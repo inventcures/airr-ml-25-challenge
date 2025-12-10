@@ -88,6 +88,8 @@ def train(args):
     # Checkpoint path
     checkpoint_path = MODELS_DIR / f"{dataset_name}_checkpoint.pth"
     start_epoch = 0
+    best_auc = 0.0
+    best_model_wts = copy.deepcopy(model.state_dict())
     
     # Resume from checkpoint if exists
     if checkpoint_path.exists():
@@ -96,8 +98,8 @@ def train(args):
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         start_epoch = checkpoint['epoch'] + 1
-        best_auc = checkpoint['best_auc']
-        best_model_wts = checkpoint['best_model_wts']
+        best_auc = checkpoint.get('best_auc', 0.0)
+        best_model_wts = checkpoint.get('best_model_wts', copy.deepcopy(model.state_dict()))
         print(f"Resuming from epoch {start_epoch}")
     
     for epoch in range(start_epoch, args.epochs):

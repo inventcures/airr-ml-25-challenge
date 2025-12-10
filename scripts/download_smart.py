@@ -46,11 +46,10 @@ def count_local_files(ds, split):
         return 0
     return len(list(target_dir.glob("*.npy")))
 
-def download_split(ds, split):
-    remote_path = f"embeddings_35m/{ds}/{split}"
-    local_path = f"data/embeddings/{ds}/{split}"
+def download_file(ds, split, index):
+    remote_path = f"embeddings_35m/{ds}/{split}/{index}.npy"
+    local_path = f"data/embeddings/{ds}/{split}/{index}.npy"
     
-    print(f"⬇️  Downloading {ds}/{split}...")
     cmd = [
         "uv", "run", "modal", "volume", "get", 
         "--force",
@@ -59,21 +58,72 @@ def download_split(ds, split):
         local_path
     ]
     
-    # Retry loop
-    max_retries = 5
-    for i in range(max_retries):
-        try:
-            # Capture output to silence the generic "✓ Finished" messages
-            subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            print(f"  ✅ Downloaded successfully.", flush=True)
+    try:
+        subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+def download_split(ds, split, current_count, expected_count):
+    remote_dir_path = f"embeddings_35m/{ds}/{split}"
+    local_dir_path = f"data/embeddings/{ds}/{split}"
+    
+    # Strategy:
+    # 1. If 0 files, download entire directory (Fastest)
+    # 2. If > 50% missing, download entire directory (Likely faster than 100s of individual calls)
+    # 3. If < 50% missing, download individually (Saves bandwidth/time on existing files)
+    
+    missing_indices = []
+    if current_count > 0:
+        for i in range(expected_count):
+            if not (Path(local_dir_path) / f"{i}.npy").exists():
+                missing_indices.append(i)
+    
+    is_partial_repair = current_count > 0 and len(missing_indices) < (expected_count * 0.5)
+    
+    if is_partial_repair:
+        print(f"🔧 Repairing {ds}/{split}: Downloading {len(missing_indices)} missing files...", flush=True)
+        success_count = 0
+        for idx in missing_indices:
+            print(f"  ⬇️  Downloading {idx}.npy ({success_count+1}/{len(missing_indices)})...", end="\r", flush=True)
+            if download_file(ds, split, idx):
+                success_count += 1
+            else:
+                print(f"\n  ❌ Failed to download {idx}.npy", flush=True)
+        
+        if success_count == len(missing_indices):
+            print(f"\n  ✅ Repair complete.", flush=True)
             return True
-        except subprocess.CalledProcessError as e:
-            print(f"  ⚠️  Attempt {i+1} failed. Error: {e.stderr.decode().strip()}", flush=True)
-            print(f"  Retrying in 5 seconds...", flush=True)
-            time.sleep(5)
+        else:
+            print(f"\n  ⚠️  Repair incomplete. {len(missing_indices) - success_count} files failed.", flush=True)
+            return False
             
-    print(f"❌ Failed to download {ds}/{split} after {max_retries} attempts.", flush=True)
-    return False
+    else:
+        # Full Directory Download
+        print(f"⬇️  Downloading folder {ds}/{split}...", flush=True)
+        cmd = [
+            "uv", "run", "modal", "volume", "get", 
+            "--force",
+            "airr-ml-25-data-35m", 
+            remote_dir_path, 
+            local_dir_path
+        ]
+        
+        # Retry loop
+        max_retries = 5
+        for i in range(max_retries):
+            try:
+                # Capture output to silence the generic "✓ Finished" messages
+                subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                print(f"  ✅ Downloaded successfully.", flush=True)
+                return True
+            except subprocess.CalledProcessError as e:
+                print(f"  ⚠️  Attempt {i+1} failed. Error: {e.stderr.decode().strip()}", flush=True)
+                print(f"  Retrying in 5 seconds...", flush=True)
+                time.sleep(5)
+                
+        print(f"❌ Failed to download {ds}/{split} after {max_retries} attempts.", flush=True)
+        return False
 
 def main():
     print("🚀 Starting Smart Download...", flush=True)
@@ -90,7 +140,7 @@ def main():
             print(f"[{timestamp}] ✅ {ds}/{split}: Complete ({current}/{expected})", flush=True)
         else:
             print(f"[{timestamp}] ⏳ {ds}/{split}: Incomplete ({current}/{expected}) - Starting Download...", flush=True)
-            download_split(ds, split)
+            download_split(ds, split, current, expected)
             
     print("\n🎉 All downloads checked!", flush=True)
 

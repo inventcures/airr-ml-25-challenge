@@ -53,6 +53,7 @@ def download_split(ds, split):
     print(f"⬇️  Downloading {ds}/{split}...")
     cmd = [
         "uv", "run", "modal", "volume", "get", 
+        "--force",
         "airr-ml-25-data-35m", 
         remote_path, 
         local_path

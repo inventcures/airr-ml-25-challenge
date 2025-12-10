@@ -135,19 +135,37 @@ python deeprc/infer_mil_cv.py --folds 5
 *   **What it does**: Loads each ensemble of 5 models and predicts on both train and test sets.
 *   **Output**: Prediction CSVs saved to `outputs/deeprc_cv_preds/`.
 
-### Step 5: Push Results to GitHub
+### Step 5: Run Other Models (Clustering & ESM)
+While we are on RunPod (where the data is), let's run the other models that need the embeddings.
+**Note**: You can run `train_stats_all.py` now too, even though it doesn't need embeddings.
+
+```bash
+# 1. Stats Model (Fast)
+python malid/train_stats_all.py
+
+# 2. ESM Sequence Model (Needs Embeddings)
+python malid/train_esm_seq_all.py
+
+# 3. Clustering Model (Needs Embeddings)
+python malid/run_clustering_all.py
+```
+
+### Step 6: Push Results to GitHub
 Now we save our work (models + predictions) to GitHub so we can access them on our laptop.
 ```bash
 # Add models and predictions
 git add -f models/deeprc_cv/
 git add -f outputs/deeprc_cv_preds/
+git add -f outputs/esm_seq_preds/
+git add -f outputs/cluster_preds/
+git add -f outputs/stats_preds/
 
 # Commit and push
-git commit -m "Add trained DeepRC CV models and predictions"
+git commit -m "Add all trained models and predictions"
 git push origin main
 ```
 
-### Step 6: Pull Results to Laptop
+### Step 7: Pull Results to Laptop
 Back on your **Laptop**:
 ```bash
 git pull
@@ -157,27 +175,15 @@ git pull
 
 ## 🏁 Phase 4: The Finish Line (Local)
 
-You have the embeddings (on cloud) and the trained models (now on your laptop). Let's finish this!
+You have the predictions from all models (DeepRC, Stats, Clustering, ESM) on your laptop now. Let's combine them!
 
-### Step 1: Run the Stats Model (MalID)
-This runs a fast statistical model based on V-gene usage. It's a key part of our ensemble.
-```bash
-uv run python malid/train_stats_all.py
-```
-
-### Step 2: Run the Clustering Model (MalID Model 2)
-This groups similar sequences to find disease-associated motifs.
-```bash
-uv run python malid/run_clustering_all.py
-```
-
-### Step 3: Run the Meta-Ensemble
-This script combines DeepRC with other models (Stats, ESM) for maximum accuracy.
+### Step 1: Run the Meta-Ensemble
+This script combines the CSVs from DeepRC, Stats, and Clustering/ESM to make the final decision.
 ```bash
 uv run python malid/train_meta_and_predict.py
 ```
 
-### Step 4: Submit!
+### Step 2: Submit!
 The script generates `outputs/submission/submission.csv`.
 Upload this file to the competition platform.
 

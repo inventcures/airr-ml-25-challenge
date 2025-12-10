@@ -1,9 +1,12 @@
 import pandas as pd
 from pathlib import Path
+from datetime import datetime
+import shutil
 
 TASK1_SUBMISSION = Path("outputs/submission/submission.csv")
 TASK2_DIR = Path("outputs/task2_ranking")
 OUTPUT_CSV = Path("submission.csv")
+SUBMISSIONS_ROOT = Path("outputs/submissions")
 
 def build_submission():
     print("[Build Submission] Generating final submission file...")
@@ -48,42 +51,11 @@ def build_submission():
     # ID,dataset,label_positive_probability,junction_aa,v_call,j_call
     
     # We need 'dataset' column.
-    # We don't have it in df_task1 directly, but we can infer or we should have saved it.
-    # `train_meta_and_predict.py` didn't save dataset name.
-    # But we can look it up if we load the pickle metadata? Too slow.
-    # Or we can just parse it from the input files if we had them.
-    # Actually, `sample_submissions.csv` has it.
-    # Maybe we should load `sample_submissions.csv` and fill it?
-    # But we don't have the full sample submission (it's 34MB).
-    # We can try to infer from `repertoire_id` if unique?
-    # Or just leave it empty if not strictly required for scoring (but usually it is).
-    
-    # Better approach: In `train_meta_and_predict.py`, we iterated datasets.
-    # We should have included dataset name in the output.
-    # But we didn't.
-    
     # Let's try to map repertoire_id -> dataset using the pickles.
-    # We can load all test pickles and build a map.
-    # This is reasonably fast (pickles are loaded quickly).
-    
     from data.load_all_datasets import TEST_DATASETS, PROCESSED_DIR, load_repertoires_pickle
     
-    rep_to_dataset = {}
-    print("  Mapping repertoires to datasets...")
-    for ds_name, _ in TEST_DATASETS.items():
-        pkl_path = PROCESSED_DIR / f"{ds_name}_test.pkl"
-        if pkl_path.exists():
-            reps = load_repertoires_pickle(pkl_path)
-            for r in reps:
-                rep_to_dataset[r.rep_id] = ds_name # or the actual directory name?
-                # sample_submissions.csv had "test_dataset_1".
-                # TEST_DATASETS values are directory names like "test_dataset_1".
-                # So we should use the value from TEST_DATASETS.
-                
-    # Actually, TEST_DATASETS is Dict[str, str]. Key=ds1, Value=test_dataset_1.
-    # We want the Value.
-    
     rep_to_dataset_real = {}
+    print("  Mapping repertoires to datasets...")
     for ds_name, dir_name in TEST_DATASETS.items():
         pkl_path = PROCESSED_DIR / f"{ds_name}_test.pkl"
         if pkl_path.exists():
@@ -109,8 +81,38 @@ def build_submission():
     final_cols = ["ID", "dataset", "label_positive_probability", "junction_aa", "v_call", "j_call"]
     final_df = merged[final_cols]
     
+    # 5. Save & Versioning
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    version_dir = SUBMISSIONS_ROOT / f"submission_{timestamp}"
+    version_dir.mkdir(parents=True, exist_ok=True)
+    
+    out_path = version_dir / "submission.csv"
+    final_df.to_csv(out_path, index=False)
+    
+    # Also save to root for convenience
     final_df.to_csv(OUTPUT_CSV, index=False)
-    print(f"Saved final submission to {OUTPUT_CSV} with {len(final_df)} rows.")
+    
+    # 6. Generate Summary Log
+    log_path = version_dir / "summary.log"
+    with open(log_path, "w") as f:
+        f.write(f"Submission Generated: {timestamp}\n")
+        f.write("=" * 40 + "\n")
+        f.write(f"Total Rows: {len(final_df)}\n")
+        f.write(f"Columns: {list(final_df.columns)}\n\n")
+        
+        f.write("Dataset Breakdown:\n")
+        f.write(str(final_df["dataset"].value_counts()) + "\n\n")
+        
+        f.write("Missing Values:\n")
+        f.write(str(final_df.isnull().sum()) + "\n\n")
+        
+        f.write("Task 2 Coverage:\n")
+        f.write(f"Repertoires with Task 2 sequences: {len(df_task2)}\n")
+        f.write(f"Repertoires missing Task 2 sequences: {len(final_df) - len(df_task2)}\n")
+        
+    print(f"Saved final submission to {out_path}")
+    print(f"Saved summary log to {log_path}")
+    print(f"Also saved to {OUTPUT_CSV}")
 
 if __name__ == "__main__":
     build_submission()

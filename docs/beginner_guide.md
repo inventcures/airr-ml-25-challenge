@@ -137,13 +137,25 @@ scp -r root@<RUNPOD_IP>:/workspace/airr_ml_project_template/models/deeprc models
 
 You have the embeddings (on cloud) and the trained models (now on your laptop). Let's finish this!
 
-### Step 1: Run the Meta-Ensemble
+### Step 1: Run the Stats Model (MalID)
+This runs a fast statistical model based on V-gene usage. It's a key part of our ensemble.
+```bash
+uv run python malid/train_stats_all.py
+```
+
+### Step 2: Run the Clustering Model (MalID Model 2)
+This groups similar sequences to find disease-associated motifs.
+```bash
+uv run python malid/run_clustering_all.py
+```
+
+### Step 3: Run the Meta-Ensemble
 This script combines DeepRC with other models (Stats, ESM) for maximum accuracy.
 ```bash
 uv run python malid/train_meta_and_predict.py
 ```
 
-### Step 2: Submit!
+### Step 4: Submit!
 The script generates `outputs/submission/submission.csv`.
 Upload this file to the competition platform.
 

@@ -66,10 +66,10 @@ def deep_verify():
         for f in sample_files:
             try:
                 data = np.load(f)
-                # Check shape: Should be (N_sequences, 1280)
-                if len(data.shape) != 2 or data.shape[1] != 1280:
+                # Check shape: Should be (N_sequences, 480) for ESM-2 35M
+                if len(data.shape) != 2 or data.shape[1] != 480:
                     split_ok = False
-                    error_msg = f"Bad shape: {data.shape}"
+                    error_msg = f"Bad shape: {data.shape} (Expected N, 480)"
                     break
                 # Check for NaNs
                 if np.isnan(data).any():

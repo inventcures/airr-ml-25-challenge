@@ -109,7 +109,7 @@ def infer_all():
             continue
             
         print(f"Loading model for {ds_name}...")
-        model = AttentionMIL(input_dim=1280, hidden_dim=128).to(device)
+        model = AttentionMIL(input_dim=480, hidden_dim=128).to(device)
         model.load_state_dict(torch.load(model_path, map_location=device))
         
         # Infer on Train (for meta-ensemble CV? No, we need CV preds for that)
@@ -169,7 +169,7 @@ def infer_all():
             continue
             
         print(f"Inferring {test_ds} using model from {model_ds}...")
-        model = AttentionMIL(input_dim=1280, hidden_dim=128).to(device)
+        model = AttentionMIL(input_dim=480, hidden_dim=128).to(device)
         model.load_state_dict(torch.load(model_path, map_location=device))
         
         infer_dataset(test_ds, "test", model, device)

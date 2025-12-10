@@ -81,7 +81,7 @@ def train(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
     
-    model = AttentionMIL(input_dim=1280, hidden_dim=128).to(device)
+    model = AttentionMIL(input_dim=480, hidden_dim=128).to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     criterion = nn.BCEWithLogitsLoss()
     

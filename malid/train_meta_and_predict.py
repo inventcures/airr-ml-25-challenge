@@ -131,8 +131,13 @@ def train_meta_and_predict():
             continue
             
         # Predict
-        X_test = test_df[feature_cols] # Will fill missing with 0.5 inside predict_proba if needed
-        # But we should ensure columns match what was trained
+        # Ensure all feature columns exist in test_df
+        for col in feature_cols:
+            if col not in test_df.columns:
+                print(f"  Warning: {col} missing in test set. Filling with 0.5.")
+                test_df[col] = 0.5
+                
+        X_test = test_df[feature_cols].fillna(0.5)
         
         probs = clf.predict_proba(X_test)[:, 1]
         

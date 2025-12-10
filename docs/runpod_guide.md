@@ -45,10 +45,16 @@ We will pull data directly from Modal to RunPod. This is fast because it uses da
 
 **Run these commands inside your RunPod SSH terminal:**
 
-### 1. Setup Environment
+### 1. Setup Environment (The Fast Way ⚡️)
 ```bash
 cd /workspace
-pip install modal
+
+# Install uv (it's much faster than pip!)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source $HOME/.local/bin/env
+
+# Install Modal using uv
+uv pip install modal --system
 ```
 
 ### 2. Authenticate with Modal
@@ -70,7 +76,8 @@ cd airr_ml_project_template
 mkdir -p data/processed data/embeddings
 
 # 1. Download Labels (Small)
-uv run modal volume get airr-ml-25-data processed/ data/processed/
+# Note: The pickles are inside the 'data' folder on the volume
+uv run modal volume get airr-ml-25-data data/ data/processed/
 
 # 2. Download Embeddings (Huge - 900GB)
 # This will take 1-2 hours. Do not close your terminal!
@@ -92,7 +99,8 @@ Now the fun part. We train the AI.
 
 ### 1. Install Dependencies
 ```bash
-pip install torch numpy pandas scikit-learn tqdm fair-esm
+# Use uv for lightning-fast installs
+uv pip install torch numpy pandas scikit-learn tqdm fair-esm --system
 ```
 
 ### 2. Run Training Loop

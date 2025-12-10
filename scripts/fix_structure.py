@@ -66,6 +66,10 @@ def fix_structure():
                             target_dir.mkdir(parents=True, exist_ok=True)
                             break
             
+            # Move it (Force Overwrite)
+            if target_file.exists():
+                target_file.unlink()
+            
             shutil.move(str(file_path), str(target_file))
             moved_count += 1
             

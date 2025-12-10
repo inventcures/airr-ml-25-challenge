@@ -103,16 +103,6 @@ Now the fun part. We train the AI.
 uv pip install torch numpy pandas scikit-learn tqdm fair-esm --system
 ```
 
-### 2. Run Training Loop
-Copy-paste this entire block:
-```bash
-for i in {1..8}; do
-    echo "========================================"
-    echo "Training DeepRC on ds$i..."
-    echo "========================================"
-    python deeprc/train_mil.py --dataset "ds$i" --epochs 20 --batch-size 4
-done
-```
 *   **Time**: ~30-60 mins per dataset.
 *   **Output**: Models saved to `models/deeprc/`.
 
@@ -125,8 +115,37 @@ Once training finishes, we need to save the brains (models) to your laptop.
 **Open a NEW terminal on your Laptop:**
 ```bash
 # Replace IP and PORT with your Pod's details
-scp -P PORT -r root@IP:/workspace/airr_ml_project_template/models/deeprc models/
+scp -P PORT -r root@IP:/workspace/airr_ml_project_templatail -f logs/deeprc_train_ds1.log
 ```
+
+### 5. Detached Mode (Resilience) 🛡️
+To keep training running even if your laptop sleeps or disconnects, use `tmux`:
+
+1.  **Start a Session**:
+    ```bash
+    tmux new -s training
+    ```
+2.  **Run Training**:
+    ```bash
+    ./scripts/train_robust.sh
+    ```
+3.  **Detach**: Press `Ctrl+B`, then `D`. You can now close the terminal.
+4.  **Re-attach**:
+    ```bash
+    tmux attach -t training
+    ```
+
+### 6. Monitoring 📱
+RunPod doesn't have a mobile app, but you can monitor via SSH or Web:
+
+*   **Script**: Run `./scripts/monitor_training.sh` to see live logs.
+*   **Web Dashboard**: Check GPU utilization on [runpod.io](https://runpod.io).
+*   **Mobile SSH**: Use an app like **Termius** (iOS/Android) to SSH in and run `tail -f logs/deeprc_train_ds*.log`.
+
+### 7. Resuming Interrupted Runs 🔄
+The scripts are **auto-resumable**:
+*   **Checkpoints**: Saved every epoch to `models/deeprc/dsX_checkpoint.pth`.
+*   **Resume**: Just run `./scripts/train_robust.sh` again. It will detect the checkpoint and resume from the last epoch!
 
 ---
 

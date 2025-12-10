@@ -41,7 +41,31 @@ def fix_structure():
                 continue
                 
             # Move it
-            target_dir.mkdir(parents=True, exist_ok=True)
+            try:
+                target_dir.mkdir(parents=True, exist_ok=True)
+            except FileExistsError:
+                # This happens if a parent component is a file
+                # Check if target_dir itself is a file
+                if target_dir.is_file():
+                    print(f"⚠️  Conflict: {target_dir} is a file but should be a directory.")
+                    backup_name = target_dir.with_name(target_dir.name + "_CONFLICT_BACKUP")
+                    print(f"   Renaming to {backup_name}")
+                    target_dir.rename(backup_name)
+                    target_dir.mkdir(parents=True, exist_ok=True)
+                else:
+                    # Check parents
+                    for parent in target_dir.parents:
+                        if parent == BASE_DIR:
+                            break
+                        if parent.is_file():
+                            print(f"⚠️  Conflict: Parent {parent} is a file.")
+                            backup_name = parent.with_name(parent.name + "_CONFLICT_BACKUP")
+                            print(f"   Renaming to {backup_name}")
+                            parent.rename(backup_name)
+                            # Retry mkdir
+                            target_dir.mkdir(parents=True, exist_ok=True)
+                            break
+            
             shutil.move(str(file_path), str(target_file))
             moved_count += 1
             

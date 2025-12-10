@@ -106,6 +106,23 @@ uv pip install torch numpy pandas scikit-learn tqdm fair-esm --system
 *   **Time**: ~30-60 mins per dataset.
 *   **Output**: Models saved to `models/deeprc/`.
 
+### 2. Run Inference
+After training, run inference to generate predictions for the meta-ensemble:
+```bash
+python -m deeprc.infer_mil_all
+```
+*   **What it does**: Uses the trained models to predict on both train (for meta-ensemble) and test sets.
+*   **Output**: Prediction CSVs in `outputs/deeprc_preds/`.
+
+### 3. Push Results to GitHub
+Save your models and predictions to Git so you can access them on your laptop:
+```bash
+git add -f models/deeprc/*_deeprc_model.pth
+git add -f outputs/deeprc_preds/
+git commit -m "Add DeepRC models and predictions"
+git push origin main
+```
+
 ---
 
 ## ⬇️ Step 5: Bring Models Home

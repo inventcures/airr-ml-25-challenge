@@ -124,11 +124,33 @@ done
 ```
 *   **What it does**: Trains a model for each dataset and saves it to `models/deeprc/`.
 
-### Step 4: Download Models
+### Step 4: Run DeepRC Inference (Still on RunPod!)
+After training completes, we need to generate predictions using the trained models.
+**Why on RunPod?** The inference script needs access to the 900GB of embeddings. It's much faster to run it here than to download all that data.
+
+```bash
+# Generate predictions for all datasets (train + test)
+python -m deeprc.infer_mil_all
+```
+*   **What it does**: Loads each trained model and predicts on both train and test sets.
+*   **Output**: Prediction CSVs saved to `outputs/deeprc_preds/` (e.g., `ds1_train_deeprc_preds.csv`, `ds1_test_deeprc_preds.csv`).
+
+### Step 5: Push Results to GitHub
+Now we save our work (models + predictions) to GitHub so we can access them on our laptop.
+```bash
+# Add models and predictions
+git add -f models/deeprc/*_deeprc_model.pth
+git add -f outputs/deeprc_preds/
+
+# Commit and push
+git commit -m "Add trained DeepRC models and predictions"
+git push origin main
+```
+
+### Step 6: Pull Results to Laptop
 Back on your **Laptop**:
 ```bash
-# Download the trained models
-scp -r root@<RUNPOD_IP>:/workspace/airr_ml_project_template/models/deeprc models/
+git pull
 ```
 
 ---

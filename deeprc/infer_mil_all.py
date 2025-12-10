@@ -21,6 +21,11 @@ EMBEDDINGS_DIR = Path("data/embeddings")
 def infer_dataset(dataset_name: str, split: str, model: nn.Module, device: torch.device):
     print(f"  Inferring {dataset_name} ({split})...")
     
+    out_csv = PREDS_DIR / f"{dataset_name}_{split}_deeprc_preds.csv"
+    if out_csv.exists():
+        print(f"    ✅ Output already exists: {out_csv}. Skipping.")
+        return
+    
     pkl_path = PROCESSED_DIR / f"{dataset_name}_{split}.pkl"
     if not pkl_path.exists():
         print(f"    Pickle not found: {pkl_path}")

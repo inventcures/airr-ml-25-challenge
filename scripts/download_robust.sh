@@ -18,6 +18,7 @@ echo "Starting Smart Download (skips existing files)..."
 
 # Run the smart python script
 # It handles retries and skipping internally
-python3 scripts/download_smart.py
+# -u: Unbuffered output so you see logs immediately
+python3 -u scripts/download_smart.py
 
 echo "SUCCESS: Smart Download finished!"

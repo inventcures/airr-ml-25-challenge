@@ -73,7 +73,7 @@ def download_split(ds, split):
     return False
 
 def main():
-    print("🚀 Starting Smart Download...")
+    print("🚀 Starting Smart Download...", flush=True)
     
     for item in EXPECTED_COUNTS:
         ds = item["dataset"]
@@ -81,14 +81,15 @@ def main():
         expected = item["reps"]
         
         current = count_local_files(ds, split)
+        timestamp = time.strftime("%H:%M:%S")
         
         if current >= expected:
-            print(f"✅ {ds}/{split}: Complete ({current}/{expected})")
+            print(f"[{timestamp}] ✅ {ds}/{split}: Complete ({current}/{expected})", flush=True)
         else:
-            print(f"⏳ {ds}/{split}: Incomplete ({current}/{expected})")
+            print(f"[{timestamp}] ⏳ {ds}/{split}: Incomplete ({current}/{expected}) - Starting Download...", flush=True)
             download_split(ds, split)
             
-    print("\n🎉 All downloads checked!")
+    print("\n🎉 All downloads checked!", flush=True)
 
 if __name__ == "__main__":
     main()

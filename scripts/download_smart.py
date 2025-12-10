@@ -63,13 +63,16 @@ def download_split(ds, split):
     max_retries = 5
     for i in range(max_retries):
         try:
-            subprocess.run(cmd, check=True)
+            # Capture output to silence the generic "✓ Finished" messages
+            subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print(f"  ✅ Downloaded successfully.", flush=True)
             return True
-        except subprocess.CalledProcessError:
-            print(f"⚠️  Download failed for {ds}/{split}. Retrying ({i+1}/{max_retries})...")
+        except subprocess.CalledProcessError as e:
+            print(f"  ⚠️  Attempt {i+1} failed. Error: {e.stderr.decode().strip()}", flush=True)
+            print(f"  Retrying in 5 seconds...", flush=True)
             time.sleep(5)
             
-    print(f"❌ Failed to download {ds}/{split} after {max_retries} attempts.")
+    print(f"❌ Failed to download {ds}/{split} after {max_retries} attempts.", flush=True)
     return False
 
 def main():

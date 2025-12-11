@@ -194,7 +194,28 @@ def main():
     
     datasets_to_run = args.datasets if args.datasets else list(TEST_DATASETS.keys())
     
-    for test_ds in datasets_to_run:
+    final_list = []
+    for ds in datasets_to_run:
+        # If user says "ds7", check if we need to run "ds7_1", "ds7_2"
+        # However, TEST_DATASETS should already contain the correct keys like "ds1", "ds7_1", etc.
+        # But if the user passed "ds7" manually, we need to handle it.
+        found_sub = False
+        for k in TEST_DATASETS.keys():
+            if k == ds:
+                final_list.append(k)
+                found_sub = True
+            elif k.startswith(ds + "_"):
+                final_list.append(k)
+                found_sub = True
+        
+        if not found_sub:
+             # Fallback if it's not in TEST_DATASETS for some reason
+             final_list.append(ds)
+             
+    # Deduplicate
+    final_list = sorted(list(set(final_list)))
+
+    for test_ds in final_list:
         train_ds = test_ds.split("_")[0] # ds1 -> ds1, ds7_1 -> ds7
         
         infer_dataset_cv(test_ds, "test", train_ds, args.folds, device, batch_size=args.batch_size)

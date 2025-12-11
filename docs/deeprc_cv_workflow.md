@@ -32,12 +32,31 @@ done
 ```
 **Output:** Test predictions saved to `outputs/deeprc_cv_preds/{dataset}_test_deeprc_preds.csv`.
 
-### 3. Sync Results via Git (Easy Option)
+### 3. Run Downstream Models (ESM, Stats, Task 2)
+Since we are on RunPod with access to the embeddings, we must run the other models now.
+
+```bash
+# 1. Stats Model
+uv run python malid/train_stats_all.py
+
+# 2. ESM Sequence Model
+uv run python malid/train_esm_seq_all.py
+
+# 3. Task 2 Sequence Ranking
+uv run python scripts/rank_sequences_task2_all.py
+```
+
+### 4. Sync Results via Git (Easy Option)
 Push the results to your git repository so you can easily pull them locally.
 
 ```bash
 # Add the new predictions
+# Add the new predictions
 git add outputs/deeprc_cv_preds/*.csv
+git add outputs/cluster_preds/*.csv
+git add outputs/esm_seq_preds/*.csv
+git add outputs/stats_preds/*.csv
+git add outputs/task2_ranking/*.csv
 
 # Commit and Push
 git commit -m "Add DeepRC CV predictions from RunPod"

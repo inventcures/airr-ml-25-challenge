@@ -135,20 +135,23 @@ python deeprc/infer_mil_cv.py --folds 5
 *   **What it does**: Loads each ensemble of 5 models and predicts on both train and test sets.
 *   **Output**: Prediction CSVs saved to `outputs/deeprc_cv_preds/`.
 
-### Step 5: Run Other Models (Clustering & ESM)
-While we are on RunPod (where the data is), let's run the other models that need the embeddings.
-**Note**: You can run `train_stats_all.py` now too, even though it doesn't need embeddings.
+### Step 5: Run Downstream Models (Still on RunPod!)
+While we are on RunPod (where the data is), we **must** run the other models that need embeddings.
 
 ```bash
 # 1. Stats Model (Fast)
-python malid/train_stats_all.py
+uv run python malid/train_stats_all.py
 
 # 2. ESM Sequence Model (Needs Embeddings)
-python malid/train_esm_seq_all.py
+uv run python malid/train_esm_seq_all.py
 
 # 3. Clustering Model (Needs Embeddings)
-python malid/run_clustering_all.py
+uv run python malid/run_clustering_all.py
+
+# 4. Task 2 Sequence Ranking (Needs Embeddings)
+uv run python scripts/rank_sequences_task2_all.py
 ```
+**Why?** Scripts 2, 3, and 4 require reading the 900GB embedding files. This is instant on RunPod but would take days to download to your laptop.
 
 ### Step 6: Push Results to GitHub
 Now we save our work (models + predictions) to GitHub so we can access them on our laptop.
@@ -159,6 +162,7 @@ git add -f outputs/deeprc_cv_preds/
 git add -f outputs/esm_seq_preds/
 git add -f outputs/cluster_preds/
 git add -f outputs/stats_preds/
+git add -f outputs/task2_ranking/
 
 # Commit and push
 git commit -m "Add all trained models and predictions"

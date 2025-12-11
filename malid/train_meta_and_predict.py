@@ -8,7 +8,7 @@ from malid.meta_ensemble import MetaEnsembleClassifier
 
 STATS_PREDS_DIR = Path("outputs/stats_preds")
 ESM_PREDS_DIR = Path("outputs/esm_seq_preds")
-DEEPRC_PREDS_DIR = Path("outputs/deeprc_preds")
+DEEPRC_PREDS_DIR = Path("outputs/deeprc_cv_preds")
 CLUSTER_PREDS_DIR = Path("outputs/cluster_preds")
 
 MODELS_DIR = Path("models/meta")
@@ -34,11 +34,20 @@ def load_preds(dataset_name: str, split: str) -> pd.DataFrame:
         df = pd.read_csv(esm_path)
         dfs.append(df.set_index("repertoire_id")[["p_esm"]])
         
-    # 3. DeepRC
-    deeprc_path = DEEPRC_PREDS_DIR / f"{dataset_name}_{split}_deeprc_preds.csv"
+    # 3. DeepRC (Updated for CV)
+    if split == "train":
+        # For training, we use Out-Of-Fold (OOF) predictions
+        deeprc_path = DEEPRC_PREDS_DIR / f"{dataset_name}_oof.csv"
+    else:
+        # For test, we use the ensemble predictions
+        deeprc_path = DEEPRC_PREDS_DIR / f"{dataset_name}_{split}_deeprc_preds.csv"
+        
     if deeprc_path.exists():
         df = pd.read_csv(deeprc_path)
+        # OOF and Infer scripts output 'p_deeprc' column
         dfs.append(df.set_index("repertoire_id")[["p_deeprc"]])
+    else:
+        print(f"Warning: DeepRC file missing: {deeprc_path}")
         
     # 4. Cluster (TODO)
     cluster_path = CLUSTER_PREDS_DIR / f"{dataset_name}_{split}_cluster_preds.csv"

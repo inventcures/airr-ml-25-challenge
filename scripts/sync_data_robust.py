@@ -58,12 +58,33 @@ def run_modal_command(args, retries=3):
             # Capture output so we can control what the user sees
             result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             return True
-        except subprocess.CalledProcessError:
+        except subprocess.CalledProcessError as e:
+            error_output = e.stderr.decode().strip()
+            if "AuthenticationError" in error_output or "Missing credentials" in error_output:
+                print("\n❌ Modal Authentication Error: Please run 'modal token set ...' first.", file=sys.stderr)
+                sys.exit(1)
             if attempt < retries - 1:
                 time.sleep(2)
             else:
                 return False
     return False
+
+# =============================================================================
+# Authentication Check
+# =============================================================================
+def check_modal_authentication():
+    print("🔑 Checking Modal authentication...")
+    # Attempt a simple modal command that requires authentication
+    # to confirm credentials are set. Using 'modal volume list' as it's safe.
+    try:
+        subprocess.run(["uv", "run", "modal", "volume", "list"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print("  ✅ Authenticated with Modal.")
+    except subprocess.CalledProcessError:
+        print("\n❌ Modal Authentication Required!")
+        print("Please run the following command with your credentials:")
+        print("  modal token set --token-id <YOUR_TOKEN_ID> --token-secret <YOUR_TOKEN_SECRET>")
+        print("You can find these at: https://modal.com/settings/tokens")
+        sys.exit(1)
 
 # =============================================================================
 # Part 1: Download Pickles
@@ -130,8 +151,15 @@ def download_embeddings():
                 local_dir.unlink()
             local_dir.mkdir(parents=True, exist_ok=True)
             
+            # Fix: Download to PARENT directory because modal volume get creates the leaf directory
+            # if we target '.../train', it creates '.../train/train' if '.../train' exists.
+            # Targeting '.../ds1' (parent) will create '.../ds1/train' correctly.
+            
+            # However, we must be careful. if we download 'embeddings_35m/ds1/train' to 'data/embeddings/ds1', 
+            # it will create 'data/embeddings/ds1/train'.
+            
             success = run_modal_command(
-                ["volume", "get", "--force", "airr-ml-25-data-35m", remote_dir, str(local_dir)], 
+                ["volume", "get", "--force", "airr-ml-25-data-35m", remote_dir, str(local_dir.parent)], 
                 retries=5
             )
             if not success:
@@ -153,11 +181,58 @@ def download_embeddings():
                     tqdm.write(f"  ❌ Failed to download {idx}.npy")
 
 # =============================================================================
-# Part 3: Enforce Structure
+# Part 3: Enforce Structure & Fix Nesting
 # =============================================================================
 
+def fix_nested_structure():
+    """
+    Detects and fixes 'Russian doll' nested directories like:
+    data/embeddings/ds1/train/train/*.npy
+    Moves them to:
+    data/embeddings/ds1/train/*.npy
+    """
+    print("\n🧹 [3/4] Checking for nested 'Russian Doll' directories...")
+    if not EMBEDDINGS_LOCAL_DIR.exists():
+        return
+
+    # iterate ds1, ds2...
+    for ds_dir in EMBEDDINGS_LOCAL_DIR.iterdir():
+        if not ds_dir.is_dir(): continue
+        
+        # iterate train, test...
+        for split_dir in ds_dir.iterdir():
+            if not split_dir.is_dir(): continue
+            
+            # Check for nested same-name dir: e.g. ds1/train/train
+            nested_same = split_dir / split_dir.name
+            
+            if nested_same.exists() and nested_same.is_dir():
+                print(f"  ⚠️  Found nested dir: {nested_same}")
+                
+                # Move files up
+                moved_count = 0
+                for f in nested_same.iterdir():
+                    if f.is_file():
+                        dest = split_dir / f.name
+                        if not dest.exists():
+                            f.rename(dest)
+                            moved_count += 1
+                        else:
+                            # If dest exists (maybe partial dup), just delete source? 
+                            # Or overwrite? Let's overwrite to be safe we have latest? 
+                            # Actually if they are identical, doesn't matter.
+                            f.replace(dest) 
+                            moved_count += 1
+                
+                # Attempt to remove the empty nested dir
+                try:
+                    nested_same.rmdir()
+                    print(f"  ✅ Fixed {nested_same} (Moved {moved_count} files)")
+                except OSError:
+                    print(f"  ❌ Could not remove {nested_same} (not empty?)")
+
 def enforce_structure():
-    print("\n🛡️  [3/3] Enforcing Clean Structure...")
+    print("\n🛡️  [4/4] Enforcing Clean Structure (Loose files)...")
     if not EMBEDDINGS_LOCAL_DIR.exists():
         return
 
@@ -186,12 +261,13 @@ def enforce_structure():
 # =============================================================================
 
 if __name__ == "__main__":
-    # Ensure uv is installed/available or just assume environment is set
+    check_modal_authentication() # Verify authentication before starting downloads
     try:
-        download_pickles()
-        download_embeddings()
-        enforce_structure()
-        print("\n✨ Sync Complete! All systems go.")
+        # download_pickles()
+        # download_embeddings()
+        fix_nested_structure()
+        # enforce_structure()
+        print("\n✨ Fix Complete! Nested directories repaired.")
     except KeyboardInterrupt:
         print("\n⚠️  Interrupted.")
         sys.exit(1)

@@ -21,3 +21,6 @@ __pycache__/
 
 #random
 misc.md
+
+#dont push keys
+docs/*.sh

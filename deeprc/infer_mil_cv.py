@@ -69,9 +69,9 @@ def infer_dataset_cv(dataset_name: str, split: str, model_ds_name: str, n_folds:
         logging.info(f"  Found checkpoint {checkpoint_path}. Resuming inference...")
         try:
             ckpt = torch.load(checkpoint_path)
-            final_preds = ckpt.get('final_preds', [])
             start_idx = len(final_preds)
-            logging.info(f"  Resuming from index {start_idx} ({len(ds)} total).")
+            pct = (start_idx / len(ds)) * 100
+            logging.info(f"  Resuming from index {start_idx}/{len(ds)} ({pct:.1f}% complete).")
         except Exception as e:
             logging.error(f"  Failed to load checkpoint: {e}. Starting from scratch.")
             final_preds = []
@@ -140,9 +140,11 @@ def infer_dataset_cv(dataset_name: str, split: str, model_ds_name: str, n_folds:
                 # Periodic Checkpoint
                 if batches_processed % save_interval == 0:
                     torch.save({'final_preds': final_preds}, checkpoint_path)
+                    # logging.debug(f"  💾 Checkpoint saved at {batches_processed} batches.") 
                     
             # Final save of checkpoint after loop
             torch.save({'final_preds': final_preds}, checkpoint_path)
+            logging.info(f"  💾 Checkpoint saved. Inference finished for {dataset_name}.")
 
     # Map back to Repertoires
     results = []

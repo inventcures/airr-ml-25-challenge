@@ -1,0 +1,50 @@
+site_name: AIRR ML Pipeline Docs
+site_description: Documentation for the Adaptive Immune Receptor Repertoire (AIRR) Machine Learning Pipeline.
+site_author: Open Source Contributor
+
+theme:
+  name: material
+  features:
+    - navigation.expand
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: teal
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: teal
+      accent: lime
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Cloud Setup: getting-started/cloud-setup.md
+  - User Guide:
+    - Running the Pipeline: usage/running-pipeline.md
+    - CLI Reference: usage/cli-reference.md
+  - Architecture:
+    - Overview: architecture/overview.md
+    - DeepRC (MIL): architecture/deeprc.md
+    - ESM (Sequence): architecture/esm.md
+  - Contributing: contributing.md

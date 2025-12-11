@@ -206,7 +206,7 @@ def train_cv(args):
             running_loss = 0.0
             
             # Using tqdm for progress
-            pbar = tqdm(train_loader, desc=f"Fold {fold} Epoch {epoch+1}/{args.epochs}", leave=False, dynamic_ncols=True)
+            pbar = tqdm(train_loader, desc=f"Fold {fold+1}/{n_folds} | Epoch {epoch+1}/{args.epochs}", leave=False, dynamic_ncols=True)
             for bags, labels in pbar:
                 bags = [b.to(device) for b in bags]
                 labels = labels.to(device).unsqueeze(1)
@@ -243,12 +243,12 @@ def train_cv(args):
             except:
                 val_auc = 0.5
             
-            logging.info(f"  Fold {fold} Epoch {epoch+1} - Loss: {epoch_loss:.4f} - Val AUC: {val_auc:.4f}")
+            logging.info(f"[Fold {fold+1}/{n_folds}] Epoch {epoch+1}/{args.epochs} - Loss: {epoch_loss:.4f} - Val AUC: {val_auc:.4f}")
                 
             if val_auc > best_auc:
                 best_auc = val_auc
                 best_model_wts = copy.deepcopy(model.state_dict())
-                logging.info(f"    New best AUC for fold {fold}: {best_auc:.4f}")
+                logging.info(f"   ⭐️ New best AUC for fold {fold+1}: {best_auc:.4f}")
 
             # Save Checkpoint after every epoch
             # We save the NEXT epoch index so we start there
@@ -261,13 +261,14 @@ def train_cv(args):
                 'best_model_wts': best_model_wts,
                 'oof_results': oof_results
             })
+            # logging.info(f"   💾 Checkpoint saved.") # Optional: too spammy?
             
-        logging.info(f"Fold {fold} Finished. Best Val AUC: {best_auc:.4f}")
+        logging.info(f"Fold {fold+1} Finished. Best Val AUC: {best_auc:.4f}")
         
         # Save best model for this fold
         fold_model_path = model_ds_dir / f"fold{fold}_model.pth"
         torch.save(best_model_wts, fold_model_path)
-        logging.info(f"Saved best model for fold {fold} to {fold_model_path}")
+        logging.info(f"Saved best model for fold {fold+1} to {fold_model_path}")
         
         # Load best weights for OOF inference
         model.load_state_dict(best_model_wts)
@@ -304,6 +305,7 @@ def train_cv(args):
             'oof_results': oof_results
             # No model_state_dict means next load will init fresh
         })
+        logging.info(f"   💾 Fold {fold+1} completed. Checkpoint updated for next fold.")
 
     # Save OOF predictions
     oof_df = pd.DataFrame(oof_results)

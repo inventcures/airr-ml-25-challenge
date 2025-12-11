@@ -122,12 +122,35 @@ python deeprc/infer_mil_cv.py --folds 5
 *   **What it does**: Uses the trained ensembles to predict on both train (for meta-ensemble) and test sets.
 *   **Output**: Prediction CSVs in `outputs/deeprc_cv_preds/`.
 
-### 4. Push Results to GitHub
+### 4. Run Downstream Models (Stats, ESM, Clustering, Task 2)
+Since we are on RunPod with access to the embeddings, we must run the other models now.
+
+```bash
+# 1. Stats Model (Fast)
+uv run python malid/train_stats_all.py
+
+# 2. ESM Sequence Model (Heavy, resumes automatically)
+uv run python malid/train_esm_seq_all.py
+
+# 3. Clustering Model
+uv run python malid/run_clustering_all.py
+
+# 4. Task 2 Sequence Ranking
+uv run python scripts/rank_sequences_task2_all.py
+```
+
+### 5. Push Results to GitHub
 Save your models and predictions to Git so you can access them on your laptop:
 ```bash
+# Add ALL predictions and models
 git add -f models/deeprc_cv/
 git add -f outputs/deeprc_cv_preds/
-git commit -m "Add DeepRC CV models and predictions"
+git add -f outputs/stats_preds/
+git add -f outputs/esm_seq_preds/
+git add -f outputs/cluster_preds/
+git add -f outputs/task2_ranking/
+
+git commit -m "Add valid RunPod results"
 git push origin main
 ```
 

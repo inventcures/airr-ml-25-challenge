@@ -69,6 +69,7 @@ def infer_dataset_cv(dataset_name: str, split: str, model_ds_name: str, n_folds:
         logging.info(f"  Found checkpoint {checkpoint_path}. Resuming inference...")
         try:
             ckpt = torch.load(checkpoint_path)
+            final_preds = ckpt.get('final_preds', [])
             start_idx = len(final_preds)
             pct = (start_idx / len(ds)) * 100
             logging.info(f"  Resuming from index {start_idx}/{len(ds)} ({pct:.1f}% complete).")

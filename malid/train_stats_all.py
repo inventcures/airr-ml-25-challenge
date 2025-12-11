@@ -136,8 +136,7 @@ def train_stats_all():
         else:
             logging.info("  ✅ Final model already exists.")
 
-        else:
-            logging.info("  ✅ Final model already exists.")
+
 
     # ---------------------------------------------------------------------
     # 5. Inference on Test Sets

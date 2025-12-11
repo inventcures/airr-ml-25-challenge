@@ -79,6 +79,9 @@ def train_esm_seq_all():
         ds_iterator.set_description(f"Processing {ds_name}")
         logging.info(f"Processing {ds_name}...")
         
+        # Reset model variable to prevent leakage from previous iteration
+        clf = None
+        
         # Check if TRAINING OOF preds ALREADY EXIST
         train_preds_csv = PREDS_DIR / f"{ds_name}_train_esm_preds.csv"
         model_path = MODELS_DIR / f"{ds_name}_esm_seq_model.joblib"
@@ -203,7 +206,7 @@ def train_esm_seq_all():
             logging.info(f"  Inferring on test dataset: {test_ds}...")
             
             # Load model (make sure it's loaded)
-            if 'clf' not in locals():
+            if clf is None:
                 clf = ESMSequenceClassifier.load(model_path)
             
             # Try likely pickle candidates

@@ -139,6 +139,11 @@ def run_clustering_all():
         for test_ds in test_ds_names:
             if test_ds not in TEST_DATASETS: continue
             
+            out_test_csv = PREDS_DIR / f"{test_ds}_test_cluster_preds.csv"
+            if out_test_csv.exists():
+                logging.info(f"  ✅ Test preds exist for {test_ds}. Skipping.")
+                continue
+
             logging.info(f"Predicting on {test_ds}...")
             test_pkl = PROCESSED_DIR / f"{test_ds}_test.pkl"
             if not test_pkl.exists():

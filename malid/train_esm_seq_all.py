@@ -8,6 +8,9 @@ from typing import Dict, List
 import joblib
 from tqdm import tqdm
 
+# Add project root to path
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 from data.load_all_datasets import load_repertoires_pickle, TRAIN_DATASETS, PROCESSED_DIR, TEST_DATASETS
 from malid.esm_seq_model import ESMSequenceClassifier
 

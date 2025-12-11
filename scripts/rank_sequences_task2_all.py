@@ -6,6 +6,9 @@ import sys
 from pathlib import Path
 from tqdm import tqdm
 
+# Add project root to path
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 from data.load_all_datasets import load_repertoires_pickle, PROCESSED_DIR, TEST_DATASETS
 from malid.esm_seq_model import ESMSequenceClassifier
 from scripts.rank_sequences_task2_core import rank_sequences

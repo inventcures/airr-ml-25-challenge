@@ -6,6 +6,9 @@ import logging
 import sys
 from tqdm import tqdm
 
+# Add project root to path
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 from data.load_all_datasets import load_repertoires_pickle, PROCESSED_DIR, TRAIN_DATASETS, TEST_DATASETS
 from malid.cluster_model import ClusterClassifier
 

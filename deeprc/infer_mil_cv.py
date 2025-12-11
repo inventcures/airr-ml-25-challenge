@@ -25,7 +25,7 @@ EMBEDDINGS_DIR = Path("data/embeddings")
 
 OUTPUTS_CV_DIR.mkdir(parents=True, exist_ok=True)
 
-def infer_dataset_cv(dataset_name: str, split: str, model_ds_name: str, n_folds: int, device: torch.device):
+def infer_dataset_cv(dataset_name: str, split: str, model_ds_name: str, n_folds: int, device: torch.device, batch_size: int = 8):
     logging.info(f"Inferring {dataset_name} ({split}) using models from {model_ds_name} (Ensemble of {n_folds} folds)...")
 
     # Output path
@@ -88,7 +88,7 @@ def infer_dataset_cv(dataset_name: str, split: str, model_ds_name: str, n_folds:
         
         loader = DataLoader(
             subset, 
-            batch_size=8, 
+            batch_size=batch_size, 
             shuffle=False, 
             collate_fn=collate_mil, 
             num_workers=4,
@@ -178,6 +178,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--folds", type=int, default=5)
     parser.add_argument("--datasets", type=str, nargs="+", help="Specific test datasets to infer (e.g. ds1 ds2). If empty, infers ALL test datasets.")
+    parser.add_argument("--batch-size", type=int, default=8, help="Batch size for inference (default: 8)")
     args = parser.parse_args()
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -196,7 +197,7 @@ def main():
     for test_ds in datasets_to_run:
         train_ds = test_ds.split("_")[0] # ds1 -> ds1, ds7_1 -> ds7
         
-        infer_dataset_cv(test_ds, "test", train_ds, args.folds, device)
+        infer_dataset_cv(test_ds, "test", train_ds, args.folds, device, batch_size=args.batch_size)
 
 if __name__ == "__main__":
     main()

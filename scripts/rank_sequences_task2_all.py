@@ -123,9 +123,9 @@ def rank_sequences_task2_all():
             emb = None
             for root in valid_roots:
                  p = root / f"{r.rep_id}.npy"
-                 if p.exists():
+                     if p.exists():
                      try:
-                         emb = np.load(p)
+                         emb = np.load(p, mmap_mode='r')
                          break
                      except:
                          continue

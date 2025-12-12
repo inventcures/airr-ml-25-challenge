@@ -25,7 +25,7 @@ class ESMSequenceClassifier:
         self.clf = SGDClassifier(
             loss='log_loss', # equivalent to logistic regression
             penalty='l2', 
-            class_weight='balanced', 
+            # class_weight='balanced', # Not supported in partial_fit
             random_state=random_state,
             n_jobs=-1 
         )

@@ -181,10 +181,26 @@ class LanceDBClusterClassifierFixed(LanceDBClusterClassifier):
         tbl = db.create_table("vectors", data=df)
         
         logging.info("Building LanceDB IVF-PQ Index on GPU...")
+        
+        # Determine valid num_sub_vectors (must divide d)
+        # 1280 (650M) -> 64 ok (20). 96 bad.
+        # 480 (35M) -> 96 ok (5). 64 bad.
+        # 320 (8M) -> 64 ok (5). 96 bad.
+        
+        valid_sub_vectors = [96, 64, 48, 32, 16]
+        chosen_sub_vectors = 16 # Fallback
+        
+        for sv in valid_sub_vectors:
+            if d % sv == 0:
+                chosen_sub_vectors = sv
+                break
+                
+        logging.info(f"  Dimension d={d}. Chosen num_sub_vectors={chosen_sub_vectors}")
+
         try:
             tbl.create_index(
                 num_partitions=256,
-                num_sub_vectors=64, # 1280 / 64 = 20 sub-vectors (valid)
+                num_sub_vectors=chosen_sub_vectors, 
                 metric="L2",
                 accelerator="cuda"
             )

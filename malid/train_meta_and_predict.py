@@ -24,7 +24,7 @@ Path("logs").mkdir(exist_ok=True)
 STATS_PREDS_DIR = Path("outputs/stats_preds")
 ESM_PREDS_DIR = Path("outputs/esm_seq_preds")
 DEEPRC_PREDS_DIR = Path("outputs/deeprc_cv_preds")
-CLUSTER_PREDS_DIR = Path("outputs/cluster_preds")
+CLUSTER_PREDS_DIR = Path("outputs/cluster_preds_lancedb")
 
 MODELS_DIR = Path("models/meta")
 MODELS_DIR.mkdir(parents=True, exist_ok=True)

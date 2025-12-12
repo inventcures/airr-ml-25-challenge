@@ -177,4 +177,12 @@ class ClusterClassifier:
         # Check for new attributes
         if not hasattr(obj, 'cluster_centroids_') or not hasattr(obj, 'centroid_index_'):
              raise ValueError("Incompatible ClusterClassifier model. Please retrain.")
+        
+        # Check if fitted
+        try:
+            from sklearn.utils.validation import check_is_fitted
+            check_is_fitted(obj.model)
+        except Exception as e:
+            raise ValueError(f"Model components not fitted: {e}")
+            
         return obj

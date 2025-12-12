@@ -86,6 +86,8 @@ class ESMSequenceClassifier:
         # Save both components
         joblib.dump({'scaler': self.scaler, 'clf': self.clf, 'top_k': self.top_k}, path)
 
+from sklearn.utils.validation import check_is_fitted
+
     @staticmethod
     def load(path: Path) -> 'ESMSequenceClassifier':
         data = joblib.load(path)
@@ -94,6 +96,13 @@ class ESMSequenceClassifier:
         if isinstance(data, dict):
             obj.scaler = data['scaler']
             obj.clf = data['clf']
+            
+            # Validate fitted state
+            try:
+                check_is_fitted(obj.scaler)
+                check_is_fitted(obj.clf)
+            except Exception as e:
+                raise ValueError(f"Model components not fitted: {e}")
         else:
             raise ValueError("Incompatible model format found. Please retrain.")
         return obj

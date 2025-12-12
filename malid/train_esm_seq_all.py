@@ -79,7 +79,8 @@ def load_embeddings(dataset_name: str, rep_ids: List[str]) -> Dict[str, np.ndarr
             p = root / f"{rid}.npy"
             if p.exists():
                 try:
-                    emb = np.load(p)
+                    # Use mmap_mode='r' to prevent loading full file into RAM
+                    emb = np.load(p, mmap_mode='r')
                     # Ensure 2D
                     if emb.ndim == 1:
                         if len(emb) == 0:

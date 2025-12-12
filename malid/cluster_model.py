@@ -53,60 +53,20 @@ class ClusterClassifier:
         # So I cannot fully run this until I have embeddings.
         pass
 
-    def fit(self, rep_ids: List[str], y: List[int], sequence_embeddings: Dict[str, np.ndarray]):
+    def fit_clustering(self, X_all: np.ndarray, origin_labels: np.ndarray):
         """
-        sequence_embeddings: dict mapping rep_id -> array [N, D]
+        Step 1: Build graph and find clusters using subsampled sequences.
+        X_all: (N_subsampled, D)
+        origin_labels: (N_subsampled,) 0 or 1
         """
-        logging.info("Fitting ClusterClassifier...")
-        
-        # 1. Subsample sequences
-        # We want a balanced set of sequences from positive and negative repertoires
-        pos_reps = [rid for rid, label in zip(rep_ids, y) if label == 1]
-        neg_reps = [rid for rid, label in zip(rep_ids, y) if label == 0]
-        
-        # Target: 200k total sequences (100k pos, 100k neg)
-        # Or just proportional.
-        total_seqs_target = 200000
-        
-        # Collect all embeddings
-        X_all = []
-        origin_labels = [] # 0 or 1
-        
-        # Helper to sample from a list of reps
-        def sample_from_reps(reps, target_n):
-            if not reps: return
-            n_per_rep = max(1, target_n // len(reps))
-            for rid in reps:
-                if rid not in sequence_embeddings: continue
-                emb = sequence_embeddings[rid]
-                if len(emb) == 0: continue
-                
-                # Sample
-                if len(emb) > n_per_rep:
-                    indices = np.random.choice(len(emb), n_per_rep, replace=False)
-                    sampled = emb[indices]
-                else:
-                    sampled = emb
-                
-                X_all.append(sampled)
-                # Track label for enrichment
-                label = 1 if rid in pos_reps else 0
-                origin_labels.extend([label] * len(sampled))
-
-        logging.info(f"Subsampling sequences (Target: {total_seqs_target})...")
-        sample_from_reps(pos_reps, total_seqs_target // 2)
-        sample_from_reps(neg_reps, total_seqs_target // 2)
-        
-        if not X_all:
-            logging.warning("No sequences found for clustering!")
+        if len(X_all) == 0:
+            logging.warning("No sequences provided for clustering.")
             return self
             
-        X_all = np.vstack(X_all).astype('float32')
-        origin_labels = np.array(origin_labels)
         logging.info(f"Clustering {len(X_all)} sequences...")
+        d = X_all.shape[1]
         
         # 2. Build FAISS Index
-        d = X_all.shape[1]
         index = faiss.IndexFlatL2(d)
         index.add(X_all)
         
@@ -120,10 +80,9 @@ class ClusterClassifier:
         for i in range(len(X_all)):
             for j_idx in range(1, self.k_neighbors + 1): # Skip self (index 0)
                 neighbor = I[i, j_idx]
-                dist = D[i, j_idx]
+                # dist = D[i, j_idx]
                 if neighbor != -1:
                     edges.append((i, neighbor))
-                    # Weight could be exp(-dist) or just 1
                     weights.append(1.0)
         
         g = ig.Graph(edges=edges, directed=False)
@@ -134,10 +93,6 @@ class ClusterClassifier:
         clusters = np.array(partition.membership)
         
         # 6. Calculate Enrichment
-        # P(Cluster | Disease) vs P(Cluster | Healthy)
-        # We use log odds ratio or similar.
-        # Simple enrichment: (Count_Pos / Total_Pos) / (Count_Neg / Total_Neg)
-        
         cluster_counts = defaultdict(lambda: {'pos': 0, 'neg': 0})
         for i, cluster_id in enumerate(clusters):
             if origin_labels[i] == 1:
@@ -164,7 +119,6 @@ class ClusterClassifier:
         logging.info(f"Selected {len(self.top_clusters_)} enriched clusters.")
         
         # Store representative centroids for inference mapping
-        # For each top cluster, compute mean embedding
         self.cluster_centroids_ = {}
         for cid_str in self.top_clusters_:
             cid = int(cid_str)
@@ -176,53 +130,44 @@ class ClusterClassifier:
         self.centroid_matrix_ = np.vstack([self.cluster_centroids_[c] for c in self.top_clusters_]).astype('float32')
         self.centroid_index_ = faiss.IndexFlatL2(d)
         self.centroid_index_.add(self.centroid_matrix_)
-        
-        # 7. Featurize Training Data
-        # We need to map ALL sequences (not just subsampled) to these clusters.
-        # But for training speed, maybe we just use the subsampled ones?
-        # No, we need one vector per repertoire.
-        # We must map all sequences in the repertoires to the centroids.
-        
-        X_features = self._featurize_repertoires(rep_ids, sequence_embeddings)
-        
-        # 8. Train Classifier
-        logging.info("Training Logistic Regression on cluster features...")
-        self.model.fit(X_features, y)
-        
         return self
 
-    def _featurize_repertoires(self, rep_ids, sequence_embeddings):
-        X_feat = np.zeros((len(rep_ids), len(self.top_clusters_)))
+    def transform_repertoire(self, emb: np.ndarray) -> np.ndarray:
+        """
+        Map a single repertoire embedding to cluster feature vector.
+        emb: (N_seqs, D)
+        Returns: (N_clusters,) vector (frequencies)
+        """
+        if len(emb) == 0:
+            return np.zeros(len(self.top_clusters_))
+            
+        emb = emb.astype('float32')
+        _, I = self.centroid_index_.search(emb, 1)
+        counts = Counter(I.flatten())
         
-        for i, rid in enumerate(rep_ids):
-            if rid not in sequence_embeddings: continue
-            emb = sequence_embeddings[rid]
-            if len(emb) == 0: continue
-            
-            emb = emb.astype('float32')
-            
-            # Find nearest cluster centroid for each sequence
-            # D: [N_seqs, 1], I: [N_seqs, 1]
-            _, I = self.centroid_index_.search(emb, 1)
-            
-            # Count occurrences of each cluster index (0 to K-1)
-            counts = Counter(I.flatten())
-            
-            for idx, count in counts.items():
-                if idx < len(self.top_clusters_):
-                    X_feat[i, idx] = count
-                    
-        # Normalize (frequency instead of counts)
-        # Or let StandardScaler handle it?
-        # Counts are better for "burden", but frequency handles varying repertoire size.
-        # Let's use frequency.
-        row_sums = X_feat.sum(axis=1, keepdims=True)
-        row_sums[row_sums == 0] = 1
-        X_feat = X_feat / row_sums
-        
-        return X_feat
+        feat = np.zeros(len(self.top_clusters_))
+        for idx, count in counts.items():
+            if idx < len(self.top_clusters_):
+                feat[idx] = count
+                
+        # Normalize
+        total = feat.sum()
+        if total > 0:
+            feat = feat / total
+        return feat
 
-    def predict_proba(self, rep_ids: List[str], sequence_embeddings: Dict[str, np.ndarray]):
-        X_feat = self._featurize_repertoires(rep_ids, sequence_embeddings)
-        return self.model.predict_proba(X_feat)
+    def fit_classifier(self, X_features: np.ndarray, y: np.ndarray):
+        """
+        Train the logistic regression on the cluster features.
+        """
+        logging.info("Training Logistic Regression on cluster features...")
+        self.model.fit(X_features, y)
+        return self
+
+    def predict_proba(self, X_features: np.ndarray):
+        """
+        Predict probability from feature vectors.
+        X_features: (N_reps, N_clusters)
+        """
+        return self.model.predict_proba(X_features)
 

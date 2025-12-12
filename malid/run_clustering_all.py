@@ -56,7 +56,9 @@ def load_embedding_single(dataset_name: str, rep_id: str):
     for p in candidates:
         if p.exists():
             try:
-                emb = np.load(p)
+                # Use mmap_mode='r' to avoid loading entire file into RAM.
+                # This is crucial for large embedding files.
+                emb = np.load(p, mmap_mode='r')
                 if emb.ndim == 1:
                     if len(emb) == 0: return None
                     emb = emb.reshape(1, -1)

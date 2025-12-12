@@ -6,6 +6,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import cross_val_predict, StratifiedKFold
+from sklearn.utils.validation import check_is_fitted
 import joblib
 from typing import List, Dict, Optional, Tuple, Set
 from pathlib import Path
@@ -180,7 +181,6 @@ class ClusterClassifier:
         
         # Check if fitted
         try:
-            from sklearn.utils.validation import check_is_fitted
             check_is_fitted(obj.model)
         except Exception as e:
             raise ValueError(f"Model components not fitted: {e}")

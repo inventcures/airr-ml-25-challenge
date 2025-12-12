@@ -8,6 +8,7 @@ from sklearn.pipeline import Pipeline
 # However, StandardScaler needs to know partial_fit.
 # Let's keep the pipeline structure but manage partial_fit manually.
 
+from sklearn.utils.validation import check_is_fitted
 import joblib
 from typing import List, Dict, Optional, Tuple, Union
 from pathlib import Path
@@ -86,7 +87,6 @@ class ESMSequenceClassifier:
         # Save both components
         joblib.dump({'scaler': self.scaler, 'clf': self.clf, 'top_k': self.top_k}, path)
 
-from sklearn.utils.validation import check_is_fitted
 
     @staticmethod
     def load(path: Path) -> 'ESMSequenceClassifier':

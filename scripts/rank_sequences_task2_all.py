@@ -74,36 +74,47 @@ def rank_sequences_task2_all():
             continue
             
         # Load embeddings
-        # Robust embedding finding logic from other scripts
-        emb_dir = EMBEDDINGS_DIR / test_ds
-        if not emb_dir.exists():
-             base_ds = test_ds.split("_")[0]
-             if (EMBEDDINGS_DIR / base_ds).exists():
-                 emb_dir = EMBEDDINGS_DIR / base_ds
-                 
-        if not emb_dir.exists():
-            logging.warning(f"  Embeddings dir not found: {emb_dir}")
-            continue
+        # Load embeddings with robust checking
+        base_ds = test_ds.split("_")[0]
+        
+        # Define candidate roots
+        candidate_roots = [
+            EMBEDDINGS_DIR / test_ds,
+            EMBEDDINGS_DIR / test_ds / "test",
+            EMBEDDINGS_DIR / base_ds,
+            EMBEDDINGS_DIR / base_ds / "test",
+            # Handle multipart if needed
+            EMBEDDINGS_DIR / base_ds / "test" / "1_test",
+            EMBEDDINGS_DIR / base_ds / "test" / "2_test",
+            EMBEDDINGS_DIR / base_ds / "test" / "3_test",
+        ]
+        
+        # Filter existing roots
+        valid_roots = [p for p in candidate_roots if p.exists()]
             
         all_rankings = []
         
         pbar_reps = tqdm(reps, desc=f"  Ranking Reps", leave=False)
         for r in pbar_reps:
-            emb_path = emb_dir / f"{r.rep_id}.npy"
-            # Try subfolder if needed? Assuming flat now.
-            if not emb_path.exists():
-                # Attempt recursive search if flat search fails?
-                # For now assume flat or correct structure.
+            # Find embedding
+            emb = None
+            for root in valid_roots:
+                 p = root / f"{r.rep_id}.npy"
+                 if p.exists():
+                     try:
+                         emb = np.load(p)
+                         break
+                     except:
+                         continue
+            
+            if emb is None:
                 continue
                 
-            try:
-                emb = np.load(emb_path)
-                if emb.ndim == 1:
+            if emb.ndim == 1:
                     if len(emb) == 0:
                         continue
                     emb = emb.reshape(1, -1)
-            except:
-                continue
+
                 
             # Filter valid sequences
             valid_seqs = [s for s in r.junction_aa if len(s) > 0]

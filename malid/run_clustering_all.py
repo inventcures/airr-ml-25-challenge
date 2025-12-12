@@ -33,15 +33,26 @@ PREDS_DIR.mkdir(parents=True, exist_ok=True)
 def load_embedding_single(dataset_name: str, rep_id: str):
     """
     Load a single embedding file.
+    Scanning multiple probable paths.
     """
-    emb_ds_name = dataset_name.split("_")[0]
+    base_ds = dataset_name.split("_")[0]
     
-    # Try direct matches first
     candidates = [
+        # Base matches
         EMBEDDINGS_DIR / dataset_name / f"{rep_id}.npy",
-        EMBEDDINGS_DIR / emb_ds_name / f"{rep_id}.npy"
+        EMBEDDINGS_DIR / base_ds / f"{rep_id}.npy",
+        # Nested Matches
+        EMBEDDINGS_DIR / base_ds / "train" / f"{rep_id}.npy",
+        EMBEDDINGS_DIR / base_ds / "test" / f"{rep_id}.npy",
+        EMBEDDINGS_DIR / dataset_name / "train" / f"{rep_id}.npy",
+        EMBEDDINGS_DIR / dataset_name / "test" / f"{rep_id}.npy",
+        # Multipart Test Matches
+        EMBEDDINGS_DIR / base_ds / "test" / "1_test" / f"{rep_id}.npy",
+        EMBEDDINGS_DIR / base_ds / "test" / "2_test" / f"{rep_id}.npy",
+        EMBEDDINGS_DIR / base_ds / "test" / "3_test" / f"{rep_id}.npy",
     ]
     
+    # Just iterate and try to load first one found
     for p in candidates:
         if p.exists():
             try:

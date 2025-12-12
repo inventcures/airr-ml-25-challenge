@@ -37,40 +37,66 @@ BATCH_SIZE = 50
 def load_embeddings(dataset_name: str, rep_ids: List[str]) -> Dict[str, np.ndarray]:
     """
     Load embeddings for a list of repertoires.
+    Handles nested structures: ds1/train, ds1/test, ds7/test/1_test, etc.
     Returns dict: rep_id -> embedding array (N, D)
     """
-    emb_dir = EMBEDDINGS_DIR / dataset_name
+    base_ds = dataset_name.split("_")[0]
+    
+    # Define search candidates
+    # We prioritize specific {dataset_name} matches, then {base_ds}
+    candidate_roots = [
+        EMBEDDINGS_DIR / dataset_name,
+        EMBEDDINGS_DIR / dataset_name / "train",
+        EMBEDDINGS_DIR / dataset_name / "test",
+        EMBEDDINGS_DIR / base_ds,
+        EMBEDDINGS_DIR / base_ds / "train",
+        EMBEDDINGS_DIR / base_ds / "test",
+    ]
+    
+    # Specific handling for multipart test sets if applicable (ds7, ds8)
+    # User mentioned "1_test", "2_test" inside "test" folder
+    if base_ds in ["ds7", "ds8"]:
+        base_test = EMBEDDINGS_DIR / base_ds / "test"
+        if base_test.exists():
+            # Add subfolders generic check is tricky without glob
+            # We explicitly add likely ones
+            candidate_roots.append(base_test / "1_test")
+            candidate_roots.append(base_test / "2_test")
+            candidate_roots.append(base_test / "3_test")
+            # Also "1_train"? Unlikely based on description but harmless to add
+            # candidate_roots.append(EMBEDDINGS_DIR / base_ds / "train" / "1_train")
+
+    # Filter non-existent to save IO checks
+    valid_roots = [p for p in candidate_roots if p.exists()]
+    
     embeddings = {}
     
-    # Map ds7_1 -> ds7 if needed
-    if not emb_dir.exists():
-        base_ds = dataset_name.split("_")[0]
-        if (EMBEDDINGS_DIR / base_ds).exists():
-            emb_dir = EMBEDDINGS_DIR / base_ds
-    
-    if not emb_dir.exists():
-        logging.warning(f"  Embeddings dir not found: {emb_dir}")
-        return {}
-        
-    # We do NOT want to scan all files. That takes time and maybe OS resources.
-    # Just assume file names match rep_ids.
+    # Optimization: Cache logic would be nice, but simple path checking is okay for batch=50
     
     for rid in rep_ids:
-        path = emb_dir / f"{rid}.npy"
-        if path.exists():
-            try:
-                emb = np.load(path)
-                # Ensure 2D
-                if emb.ndim == 1:
-                    if len(emb) == 0:
-                        emb = np.zeros((0, 1280)) # ESM2-650M dim is 1280
-                    else:
-                        emb = emb.reshape(1, -1)
-                embeddings[rid] = emb
-            except Exception as e:
-                logging.error(f"  Failed to load {path}: {e}")
-        else:
-            # Try recursive search only if direct fail? No, assumes flat for speed.
+        found = False
+        for root in valid_roots:
+            p = root / f"{rid}.npy"
+            if p.exists():
+                try:
+                    emb = np.load(p)
+                    # Ensure 2D
+                    if emb.ndim == 1:
+                        if len(emb) == 0:
+                            emb = np.zeros((0, 1280)) 
+                        else:
+                            emb = emb.reshape(1, -1)
+                    embeddings[rid] = emb
+                    found = True
+                    break
+                except Exception as e:
+                    logging.error(f"  Failed to load {path}: {e}")
+                    # Continue searching other paths? No, if found but corrupt, break? 
+                    # Usually if found, it's the one.
+                    break
+        
+        if not found:
+            # logging.warning(f"Embedding not found for {rid} in {dataset_name}")
             pass
             
     return embeddings

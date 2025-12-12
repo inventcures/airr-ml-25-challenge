@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import logging
 import sys
+import joblib
 from pathlib import Path
 from tqdm import tqdm
 
@@ -115,64 +116,96 @@ def rank_sequences_task2_all():
         # Filter existing roots
         valid_roots = [p for p in candidate_roots if p.exists()]
             
+        # Checkpoint Setup
+        ckpt_path = OUTPUT_DIR / f"{test_ds}_checkpoint.pkl"
+        processed_ids = set()
         all_rankings = []
         
-        pbar_reps = tqdm(reps, desc=f"  Ranking Reps", leave=False)
-        for r in pbar_reps:
+        if ckpt_path.exists():
+            try:
+                data = joblib.load(ckpt_path)
+                processed_ids = data['processed_ids']
+                all_rankings = data['all_rankings']
+                logging.info(f"  🔄 Resuming from checkpoint: {len(processed_ids)} repertoires already processed.")
+            except Exception as e:
+                logging.warning(f"  Failed to load checkpoint: {e}. Starting from scratch.")
+        
+        # Filter reps
+        reps_to_process = [r for r in reps if r.rep_id not in processed_ids]
+        if not reps_to_process and not all_rankings:
+            logging.warning("  No repertoires to process (and no checkpoint data). Skipping.")
+            continue
+            
+        if not reps_to_process:
+            logging.info("  All repertoires processed in checkpoint. assembling final CSV.")
+        
+        pbar_reps = tqdm(reps_to_process, desc=f"  Ranking {test_ds}", leave=False)
+        
+        for i, r in enumerate(pbar_reps):
             # Find embedding
             emb = None
             for root in valid_roots:
                  p = root / f"{r.rep_id}.npy"
-                     if p.exists():
+                 if p.exists():
                      try:
                          emb = np.load(p, mmap_mode='r')
                          break
                      except:
                          continue
             
-            if emb is None:
-                continue
+            if emb is not None:
+                if emb.ndim == 1:
+                    if len(emb) > 0:
+                        emb = emb.reshape(1, -1)
+                    else:
+                        emb = None # Skip empty
                 
-            if emb.ndim == 1:
-                    if len(emb) == 0:
-                        continue
-                    emb = emb.reshape(1, -1)
-
-                
-            # Filter valid sequences
-            valid_seqs = [s for s in r.junction_aa if len(s) > 0]
-            if len(valid_seqs) == 0:
-                continue
-                
-            # Truncate mismatch
-            if len(valid_seqs) != len(emb):
-                min_len = min(len(valid_seqs), len(emb))
-                valid_seqs = valid_seqs[:min_len]
-                emb = emb[:min_len]
+                if emb is not None:
+                    # Filter valid sequences
+                    valid_seqs = [s for s in r.junction_aa if len(s) > 0]
+                    
+                    if len(valid_seqs) > 0:
+                        # Truncate mismatch
+                        if len(valid_seqs) != len(emb):
+                            min_len = min(len(valid_seqs), len(emb))
+                            valid_seqs = valid_seqs[:min_len]
+                            emb = emb[:min_len]
+                        
+                        # Rank
+                        df_rank = rank_sequences(valid_seqs, emb, model, top_k=100)
+                        df_rank["repertoire_id"] = r.rep_id
+                        
+                        # Merge V/J info
+                        rep_df = pd.DataFrame({
+                            "sequence": r.junction_aa,
+                            "v_call": r.v_call,
+                            "j_call": r.j_call
+                        })
+                        rep_df = rep_df[rep_df["sequence"].str.len() > 0]
+                        
+                        # Merge (left join on rank to keep only top k)
+                        merged = df_rank.merge(rep_df, on="sequence", how="left")
+                        merged = merged.drop_duplicates(subset=["sequence"])
+                        
+                        all_rankings.append(merged)
             
-            # Rank
-            df_rank = rank_sequences(valid_seqs, emb, model, top_k=100)
-            df_rank["repertoire_id"] = r.rep_id
+            # Update State
+            processed_ids.add(r.rep_id)
             
-            # Merge V/J info
-            rep_df = pd.DataFrame({
-                "sequence": r.junction_aa,
-                "v_call": r.v_call,
-                "j_call": r.j_call
-            })
-            rep_df = rep_df[rep_df["sequence"].str.len() > 0]
-            
-            # Merge (left join on rank to keep only top k)
-            merged = df_rank.merge(rep_df, on="sequence", how="left")
-            merged = merged.drop_duplicates(subset=["sequence"])
-            
-            all_rankings.append(merged)
+            # Checkpoint every 50 reps
+            if (i + 1) % 50 == 0:
+                joblib.dump({'processed_ids': processed_ids, 'all_rankings': all_rankings}, ckpt_path)
+                pbar_reps.set_postfix({'saved': len(processed_ids)})
             
         if all_rankings:
             final_df = pd.concat(all_rankings)
             final_df = final_df[["repertoire_id", "sequence", "score", "v_call", "j_call"]]
             final_df.to_csv(out_csv, index=False)
             logging.info(f"  Saved rankings to {out_csv}")
+            
+            # Clean up checkpoint
+            if ckpt_path.exists():
+                ckpt_path.unlink()
         else:
             logging.warning("  No rankings generated.")
 

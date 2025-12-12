@@ -32,7 +32,7 @@ logging.basicConfig(
 )
 Path("logs").mkdir(exist_ok=True)
 
-BATCH_SIZE = 50 
+BATCH_SIZE = 5 # Reduced from 50 to 5 to prevent OOM on large datasets (ds7) 
 
 def load_embeddings(dataset_name: str, rep_ids: List[str]) -> Dict[str, np.ndarray]:
     """

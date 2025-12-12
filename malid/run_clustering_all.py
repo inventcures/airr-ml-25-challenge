@@ -122,48 +122,61 @@ def run_clustering_all():
         
         clf = None
         if not skip_training:
-            # We need to perform subsampling first to build the clusters
-            logging.info("  Phase 1: Subsampling sequences for clustering...")
+            # Checkpoint Paths
+            ckpt_phase1 = MODELS_DIR / f"{ds_name}_phase1_subsampled.npz"
+            ckpt_phase3 = MODELS_DIR / f"{ds_name}_phase3_features.npz"
             
-            # Target: 200k sequences
-            TOTAL_TARGET = 200000
-            n_per_rep = max(1, TOTAL_TARGET // len(labeled_reps))
+            # --- PHASE 1: SUBSAMPLING ---
+            X_sub = None
+            y_origin = None
             
-            X_subsampled = []
-            origin_labels = []
-            
-            # List of rep_ids and labels for later
-            rep_ids = []
-            y_labels = []
-            
-            for r in tqdm(labeled_reps, desc="  Subsampling"):
-                rep_ids.append(r.rep_id)
-                y_labels.append(r.label)
+            if ckpt_phase1.exists():
+                logging.info(f"  ✅ Phase 1 checkpoint found at {ckpt_phase1}. Loading...")
+                with np.load(ckpt_phase1) as data:
+                    X_sub = data['X_sub']
+                    y_origin = data['y_origin']
+            else:
+                logging.info("  Phase 1: Subsampling sequences for clustering...")
                 
-                emb = load_embedding_single(ds_name, r.rep_id)
-                if emb is not None and len(emb) > 0:
-                    # Sample
-                    n = len(emb)
-                    if n > n_per_rep:
-                        idx = np.random.choice(n, n_per_rep, replace=False)
-                        sampled = emb[idx]
-                    else:
-                        sampled = emb
-                    X_subsampled.append(sampled)
-                    origin_labels.extend([r.label] * len(sampled))
-                    
-                    del emb
-                    
-            if not X_subsampled:
-                logging.warning("  No embeddings found. Skipping.")
-                continue
+                # Target: 200k sequences
+                TOTAL_TARGET = 200000
+                n_per_rep = max(1, TOTAL_TARGET // len(labeled_reps))
                 
-            X_sub = np.vstack(X_subsampled).astype('float32')
-            y_origin = np.array(origin_labels)
-            del X_subsampled
-            gc.collect()
+                X_subsampled = []
+                origin_labels_accum = []
+                
+                for r in tqdm(labeled_reps, desc="  Subsampling"):
+                    emb = load_embedding_single(ds_name, r.rep_id)
+                    if emb is not None and len(emb) > 0:
+                        # Sample
+                        n = len(emb)
+                        if n > n_per_rep:
+                            idx = np.random.choice(n, n_per_rep, replace=False)
+                            sampled = emb[idx]
+                        else:
+                            sampled = emb
+                        X_subsampled.append(sampled)
+                        origin_labels_accum.extend([r.label] * len(sampled))
+                        
+                        del emb
+                        
+                if not X_subsampled:
+                    logging.warning("  No embeddings found. Skipping.")
+                    continue
+                    
+                X_sub = np.vstack(X_subsampled).astype('float32')
+                y_origin = np.array(origin_labels_accum)
+                
+                # Save Checkpoint
+                np.savez_compressed(ckpt_phase1, X_sub=X_sub, y_origin=y_origin)
+                logging.info(f"  Saved Phase 1 checkpoint to {ckpt_phase1}")
+                
+                del X_subsampled, origin_labels_accum
+                gc.collect()
             
-            # Initialize and Cluster
+            # --- PHASE 2: CLUSTERING ---
+            # Clustering depends on Phase 1 data.
+            # We don't checkpoint the model loop internally, but we save the model at the end.
             logging.info("  Phase 2: Running Clustering (FAISS + Louvain)...")
             clf = ClusterClassifier(k_neighbors=10, resolution=1.0, n_clusters_to_keep=50)
             clf.fit_clustering(X_sub, y_origin)
@@ -171,30 +184,65 @@ def run_clustering_all():
             del X_sub, y_origin
             gc.collect()
             
-            # Phase 3: Featurize all repertoires
-            logging.info("  Phase 3: Featurizing repertoires...")
-            X_features = []
-            valid_indices = [] # keep track of which reps had embeddings
+            # --- PHASE 3: FEATURIZATION ---
+            X_train_feat = None
+            y_train = None
             
-            for i, r in enumerate(tqdm(labeled_reps, desc="  Featurizing")):
-                emb = load_embedding_single(ds_name, r.rep_id)
-                if emb is not None:
-                    feat = clf.transform_repertoire(emb)
-                    X_features.append(feat)
-                    valid_indices.append(i)
-                    del emb
+            if ckpt_phase3.exists():
+                logging.info(f"  ✅ Phase 3 checkpoint found at {ckpt_phase3}. Loading...")
+                with np.load(ckpt_phase3) as data:
+                    X_train_feat = data['X_train_feat']
+                    y_train = data['y_train']
+                    
+                # We need valid_indices to match rep_ids for predictions later.
+                # If loading from checkpoint, we assume y_train is aligned with SOMETHING.
+                # Use rep_ids from labeled_reps filtering validation?
+                # Actually, filtering might be tricky if we don't save valid_indices.
+                # Let's save rep_ids in checkpoint too? Or just assume 1:1 if we are careful.
+                # Current code filters `valid_indices`.
+                # Let's verify valid_indices is saved or re-derived.
+                # Re-deriving is fast (check file existence).
+                # Better: Save 'valid_rep_ids' in checkpoint.
+                if 'valid_rep_ids' in data:
+                   saved_ids = data['valid_rep_ids'] # Array of strings
+                   # Reconstruct valid_indices? No need if we have the IDs for the dataframe.
+                   train_rep_ids_for_pred = saved_ids
                 else:
+                    # Fallback or error?
                     pass
+            else:
+                logging.info("  Phase 3: Featurizing repertoires...")
+                X_features = []
+                valid_ids_accum = []
+                y_labels_accum = []
+                
+                for i, r in enumerate(tqdm(labeled_reps, desc="  Featurizing")):
+                    emb = load_embedding_single(ds_name, r.rep_id)
+                    if emb is not None:
+                        # NEW: Explicit batch_size for memory safety
+                        feat = clf.transform_repertoire(emb, batch_size=10000)
+                        X_features.append(feat)
+                        valid_ids_accum.append(r.rep_id)
+                        y_labels_accum.append(r.label)
+                        del emb
+                    else:
+                        pass
+                
+                y_train = np.array(y_labels_accum)
+                X_train_feat = np.vstack(X_features)
+                train_rep_ids_for_pred = np.array(valid_ids_accum)
+                
+                # Save Checkpoint
+                np.savez_compressed(ckpt_phase3, 
+                                    X_train_feat=X_train_feat, 
+                                    y_train=y_train,
+                                    valid_rep_ids=train_rep_ids_for_pred)
+                logging.info(f"  Saved Phase 3 checkpoint to {ckpt_phase3}")
+                
+                del X_features, valid_ids_accum, y_labels_accum
+                gc.collect()
             
-            # Filter y to match X_features
-            y_train = np.array([y_labels[i] for i in valid_indices])
-            X_train_feat = np.vstack(X_features)
-            
-            # Explicitly release the list of features
-            del X_features
-            gc.collect()
-            
-            # Phase 4: Train Classifier
+            # --- PHASE 4: CLASSIFICATION ---
             logging.info("  Phase 4: Training Classifier...")
             clf.fit_classifier(X_train_feat, y_train)
             
@@ -202,16 +250,19 @@ def run_clustering_all():
             logging.info(f"  Saved cluster model to {model_path}")
             
             # Generate Train Preds (Overfitted)
-            logging.info("  Generating train preds...")
+            # Need rep_ids aligned with X_train_feat
+            # If we loaded from checkpoint, we used 'valid_rep_ids'
+            
+            # Predict
             probs = clf.predict_proba(X_train_feat)[:, 1]
             
-            train_rep_ids = [rep_ids[i] for i in valid_indices]
             df_preds = pd.DataFrame({
-                "repertoire_id": train_rep_ids,
+                "repertoire_id": train_rep_ids_for_pred,
                 "label": y_train,
                 "p_cluster": probs
             })
             df_preds.to_csv(train_preds_csv, index=False)
+
         else:
            # Load if skipped
            clf = ClusterClassifier.load(model_path)

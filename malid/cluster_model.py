@@ -192,9 +192,12 @@ class ClusterClassifier:
         self.model.fit(X_features, y)
         return self
 
-    def predict_proba(self, rep_ids: List[str], sequence_embeddings: Dict[str, np.ndarray]):
-        X_feat = self._featurize_repertoires(rep_ids, sequence_embeddings)
-        return self.model.predict_proba(X_feat)
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:
+        """
+        Predict class probabilities for feature vectors X.
+        X: (N_samples, N_features)
+        """
+        return self.model.predict_proba(X)
 
     def save(self, path: Path):
         joblib.dump(self, path)

@@ -440,8 +440,73 @@ def run_clustering_lancedb():
         else:
             clf = LanceDBClusterClassifierFixed.load(model_path)
             
-        # Inference (Same logic as manual script, simplified loop)
-        # ...
+        # Predict on Test Sets (Ported from run_clustering_all.py)
+        # Identify related test sets (e.g., ds1 -> ds1_test)
+        current_base = ds_name.split("_")[0]
+        targets = []
+        for k in TEST_DATASETS.keys():
+            if k == ds_name or k == current_base:
+                targets.append(k)
+            elif k.startswith(current_base + "_"):
+                targets.append(k)
+        
+        targets = sorted(list(set(targets)))
+            
+        for test_ds in targets:
+            out_test_csv = PREDS_DIR / f"{test_ds}_test_cluster_preds.csv"
+            if out_test_csv.exists():
+                logging.info(f"    ✅ Test preds exist for {test_ds}. Skipping.")
+                continue
+
+            logging.info(f"  Predicting on {test_ds}...")
+            # Load Pickle
+            # Test datasets might be named ds7_1_test.pkl or ds7_test.pkl
+            # We try standard paths
+            candidates = [
+                PROCESSED_DIR / f"{test_ds}_test.pkl",
+                PROCESSED_DIR / f"{test_ds}.pkl", # Fallback
+            ]
+            # Special case for sub-parts like ds7_1
+            # If test_ds is "ds7_1", pickle is "ds7_1_test.pkl" usually
+            
+            test_reps = None
+            for p in candidates:
+                if p.exists():
+                    test_reps = load_repertoires_pickle(p)
+                    break 
+            
+            if not test_reps:
+                 # Try matching part explicitly
+                 p = PROCESSED_DIR / f"{test_ds}_test.pkl"
+                 if p.exists(): test_reps = load_repertoires_pickle(p)
+
+            if not test_reps: 
+                logging.warning(f"    Could not load test pickle for {test_ds}")
+                continue
+            
+            test_feats = []
+            test_ids = []
+            
+            for r in tqdm(test_reps, desc=f"    Featurizing {test_ds}"):
+                emb = load_embedding_single(test_ds, r.rep_id)
+                if emb is not None:
+                    feat = clf.transform_repertoire(emb)
+                    test_feats.append(feat)
+                    test_ids.append(r.rep_id)
+                    del emb
+            
+            if test_feats:
+                X_test_feat = np.vstack(test_feats)
+                probs_test = clf.predict_proba(X_test_feat)[:, 1]
+                
+                df_test = pd.DataFrame({
+                    "repertoire_id": test_ids,
+                    "p_cluster": probs_test
+                })
+                df_test.to_csv(out_test_csv, index=False)
+                logging.info(f"    Saved test preds to {out_test_csv}")
+            else:
+                logging.warning("    No test features generated.")
         
 if __name__ == "__main__":
     run_clustering_lancedb()

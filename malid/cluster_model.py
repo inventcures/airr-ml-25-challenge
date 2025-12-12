@@ -146,29 +146,43 @@ class ClusterClassifier:
         self.centroid_index_.add(self.centroid_matrix_)
         return self
 
-    def transform_repertoire(self, emb: np.ndarray) -> np.ndarray:
+    def transform_repertoire(self, emb: np.ndarray, batch_size: int = 10000) -> np.ndarray:
         """
         Map a single repertoire embedding to cluster feature vector.
-        emb: (N_seqs, D)
+        emb: (N_seqs, D) - Can be a memory-mapped array.
         Returns: (N_clusters,) vector (frequencies)
         """
         if len(emb) == 0:
             return np.zeros(len(self.top_clusters_))
             
-        emb = emb.astype('float32')
-        _, I = self.centroid_index_.search(emb, 1)
-        counts = Counter(I.flatten())
+        N = len(emb)
+        counts = Counter()
         
-        feat = np.zeros(len(self.top_clusters_))
-        for idx, count in counts.items():
-            if idx < len(self.top_clusters_):
-                feat[idx] = count
-                
+        # Process in batches to avoid loading full mmap array into RAM
+        for i in range(0, N, batch_size):
+            # Slice: accessing mmap reads this chunk into RAM
+            chunk = emb[i : i + batch_size].astype('float32')
+            
+            # FAISS search
+            _, I = self.centroid_index_.search(chunk, 1)
+            counts.update(I.flatten())
+            
+            # Explicit delete for safety
+            del chunk
+            
+        # Create feature vector
+        freqs = np.zeros(len(self.top_clusters_))
+        for idx, cid_str in enumerate(self.top_clusters_):
+            # FAISS index corresponds to the order in centroid_matrix_ 
+            # which was built from self.top_clusters_ order.
+            # So I[i] == k means it belongs to the k-th cluster in our list.
+            freqs[idx] = counts[idx]
+            
         # Normalize
-        total = feat.sum()
-        if total > 0:
-            feat = feat / total
-        return feat
+        if freqs.sum() > 0:
+            freqs = freqs / freqs.sum()
+            
+        return freqs
 
     def fit_classifier(self, X_features: np.ndarray, y: np.ndarray):
         """

@@ -190,6 +190,7 @@ def run_clustering_all():
             y_train = np.array([y_labels[i] for i in valid_indices])
             X_train_feat = np.vstack(X_features)
             
+            # Explicitly release the list of features
             del X_features
             gc.collect()
             

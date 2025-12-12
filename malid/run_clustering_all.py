@@ -66,6 +66,26 @@ def load_embedding_single(dataset_name: str, rep_id: str):
     return None
 
 def run_clustering_all():
+    """
+    Main execution loop for Clustering-Based MIL Model.
+    
+    STRATEGY: Memory-Safe Streaming
+    -------------------------------
+    To avoid OOM errors when processing massive embedding datasets, we do NOT load all data at once.
+    Instead, we break the process into 4 distinct phases:
+    
+    1. Subsampling: Iterate repertoires one-by-one, load their embeddings, sample a small fraction, 
+       and discard the rest. We collect ~200k sequences total across the dataset.
+       
+    2. Clustering: Use FAISS to build a k-NN graph of the subsampled sequences and run Louvain clustering.
+       This defines our "visual words" or sequence motifs.
+       
+    3. Featurization: Iterate repertoires one-by-one again. For each repertoire, map all its sequences 
+       to the nearest cluster centroids found in Phase 2. This converts a repertoire of N sequences 
+       into a single fixed-size vector (histogram of cluster counts).
+       
+    4. Classification: Train a standard Logistic Regression on these fixed-size feature vectors.
+    """
     # Train datasets
     for ds_name in TRAIN_DATASETS.keys():
         logging.info(f"\nProcessing {ds_name}...")

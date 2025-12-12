@@ -11,6 +11,7 @@ import joblib
 from typing import List, Dict, Optional, Tuple, Set
 from pathlib import Path
 from collections import Counter, defaultdict
+import logging
 
 from data.load_data import Repertoire
 

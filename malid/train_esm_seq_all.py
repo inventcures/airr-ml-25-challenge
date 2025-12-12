@@ -119,9 +119,18 @@ def train_esm_seq_all():
         train_preds_csv = PREDS_DIR / f"{ds_name}_train_esm_preds.csv"
         model_path = MODELS_DIR / f"{ds_name}_esm_seq_model.joblib"
         
-        # We need both the model and the OOF preds.
+        skip_training = False
         if train_preds_csv.exists() and model_path.exists():
-            logging.info(f"  ✅ Training artifacts (Model + OOF Preds) exist for {ds_name}. Skipping training.")
+            try:
+                # Validate model format
+                ESMSequenceClassifier.load(model_path)
+                logging.info(f"  ✅ Training artifacts (Model + OOF Preds) exist and are valid for {ds_name}. Skipping training.")
+                skip_training = True
+            except Exception as e:
+                logging.warning(f"  ⚠️ Found existing model for {ds_name} but it is invalid/old ({e}). Retraining...")
+        
+        if skip_training:
+             pass
         else:
             # --- TRAINING PHASE (STREAMING) ---
             pkl_path = PROCESSED_DIR / f"{ds_name}_train.pkl"
@@ -144,7 +153,7 @@ def train_esm_seq_all():
             # fold_map: rep_id -> fold_index
             fold_map = {}
             for fold_idx, (train_idx, val_idx) in enumerate(skf.split(labeled_reps, y_all)):
-                 for i in val_idx:
+                 for i in val_idx: # Correction: loop over val_idx to assign fold ID
                      fold_map[labeled_reps[i].rep_id] = fold_idx
             
             # Initialize Models

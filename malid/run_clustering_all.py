@@ -86,99 +86,112 @@ def run_clustering_all():
             
         model_path = MODELS_DIR / f"{ds_name}_cluster_model.joblib"
         
-        # We need to perform subsampling first to build the clusters
-        logging.info("  Phase 1: Subsampling sequences for clustering...")
+        # Check if already done and valid
+        train_preds_csv = PREDS_DIR / f"{ds_name}_train_cluster_preds.csv"
+        skip_training = False
         
-        # Target: 200k sequences
-        TOTAL_TARGET = 200000
-        n_per_rep = max(1, TOTAL_TARGET // len(labeled_reps))
+        if train_preds_csv.exists() and model_path.exists():
+            try:
+                ClusterClassifier.load(model_path)
+                logging.info(f"  ✅ Clustering artifacts (Model + Train Preds) exist and are valid for {ds_name}. Skipping training.")
+                skip_training = True
+            except Exception as e:
+                logging.warning(f"  ⚠️ Found existing cluster model for {ds_name} but it is invalid/old ({e}). Retraining...")
         
-        X_subsampled = []
-        origin_labels = []
-        
-        # List of rep_ids and labels for later
-        rep_ids = []
-        y_labels = []
-        
-        for r in tqdm(labeled_reps, desc="  Subsampling"):
-            rep_ids.append(r.rep_id)
-            y_labels.append(r.label)
+        clf = None
+        if not skip_training:
+            # We need to perform subsampling first to build the clusters
+            logging.info("  Phase 1: Subsampling sequences for clustering...")
             
-            emb = load_embedding_single(ds_name, r.rep_id)
-            if emb is not None and len(emb) > 0:
-                # Sample
-                n = len(emb)
-                if n > n_per_rep:
-                    idx = np.random.choice(n, n_per_rep, replace=False)
-                    sampled = emb[idx]
+            # Target: 200k sequences
+            TOTAL_TARGET = 200000
+            n_per_rep = max(1, TOTAL_TARGET // len(labeled_reps))
+            
+            X_subsampled = []
+            origin_labels = []
+            
+            # List of rep_ids and labels for later
+            rep_ids = []
+            y_labels = []
+            
+            for r in tqdm(labeled_reps, desc="  Subsampling"):
+                rep_ids.append(r.rep_id)
+                y_labels.append(r.label)
+                
+                emb = load_embedding_single(ds_name, r.rep_id)
+                if emb is not None and len(emb) > 0:
+                    # Sample
+                    n = len(emb)
+                    if n > n_per_rep:
+                        idx = np.random.choice(n, n_per_rep, replace=False)
+                        sampled = emb[idx]
+                    else:
+                        sampled = emb
+                    X_subsampled.append(sampled)
+                    origin_labels.extend([r.label] * len(sampled))
+                    
+                    del emb
+                    
+            if not X_subsampled:
+                logging.warning("  No embeddings found. Skipping.")
+                continue
+                
+            X_sub = np.vstack(X_subsampled).astype('float32')
+            y_origin = np.array(origin_labels)
+            del X_subsampled
+            gc.collect()
+            
+            # Initialize and Cluster
+            logging.info("  Phase 2: Running Clustering (FAISS + Louvain)...")
+            clf = ClusterClassifier(k_neighbors=10, resolution=1.0, n_clusters_to_keep=50)
+            clf.fit_clustering(X_sub, y_origin)
+            
+            del X_sub, y_origin
+            gc.collect()
+            
+            # Phase 3: Featurize all repertoires
+            logging.info("  Phase 3: Featurizing repertoires...")
+            X_features = []
+            valid_indices = [] # keep track of which reps had embeddings
+            
+            for i, r in enumerate(tqdm(labeled_reps, desc="  Featurizing")):
+                emb = load_embedding_single(ds_name, r.rep_id)
+                if emb is not None:
+                    feat = clf.transform_repertoire(emb)
+                    X_features.append(feat)
+                    valid_indices.append(i)
+                    del emb
                 else:
-                    sampled = emb
-                X_subsampled.append(sampled)
-                origin_labels.extend([r.label] * len(sampled))
-                
-                del emb
-                
-        if not X_subsampled:
-            logging.warning("  No embeddings found. Skipping.")
-            continue
+                    pass
             
-        X_sub = np.vstack(X_subsampled).astype('float32')
-        y_origin = np.array(origin_labels)
-        del X_subsampled
-        gc.collect()
-        
-        # Initialize and Cluster
-        logging.info("  Phase 2: Running Clustering (FAISS + Louvain)...")
-        clf = ClusterClassifier(k_neighbors=10, resolution=1.0, n_clusters_to_keep=50)
-        clf.fit_clustering(X_sub, y_origin)
-        
-        del X_sub, y_origin
-        gc.collect()
-        
-        # Phase 3: Featurize all repertoires
-        logging.info("  Phase 3: Featurizing repertoires...")
-        X_features = []
-        valid_indices = [] # keep track of which reps had embeddings
-        
-        for i, r in enumerate(tqdm(labeled_reps, desc="  Featurizing")):
-            emb = load_embedding_single(ds_name, r.rep_id)
-            if emb is not None:
-                feat = clf.transform_repertoire(emb)
-                X_features.append(feat)
-                valid_indices.append(i)
-                del emb
-            else:
-                # If missing, maybe zero vector? or skip?
-                # If we skip, we lose alignment with y.
-                # Let's clean y.
-                pass
-        
-        # Filter y to match X_features
-        y_train = np.array([y_labels[i] for i in valid_indices])
-        X_train_feat = np.vstack(X_features)
-        
-        del X_features
-        gc.collect()
-        
-        # Phase 4: Train Classifier
-        logging.info("  Phase 4: Training Classifier...")
-        clf.fit_classifier(X_train_feat, y_train)
-        
-        joblib.dump(clf, model_path)
-        logging.info(f"  Saved cluster model to {model_path}")
-        
-        # Generate Train Preds (Overfitted)
-        logging.info("  Generating train preds...")
-        probs = clf.predict_proba(X_train_feat)[:, 1]
-        
-        train_rep_ids = [rep_ids[i] for i in valid_indices]
-        df_preds = pd.DataFrame({
-            "repertoire_id": train_rep_ids,
-            "label": y_train,
-            "p_cluster": probs
-        })
-        out_csv = PREDS_DIR / f"{ds_name}_train_cluster_preds.csv"
-        df_preds.to_csv(out_csv, index=False)
+            # Filter y to match X_features
+            y_train = np.array([y_labels[i] for i in valid_indices])
+            X_train_feat = np.vstack(X_features)
+            
+            del X_features
+            gc.collect()
+            
+            # Phase 4: Train Classifier
+            logging.info("  Phase 4: Training Classifier...")
+            clf.fit_classifier(X_train_feat, y_train)
+            
+            clf.save(model_path)
+            logging.info(f"  Saved cluster model to {model_path}")
+            
+            # Generate Train Preds (Overfitted)
+            logging.info("  Generating train preds...")
+            probs = clf.predict_proba(X_train_feat)[:, 1]
+            
+            train_rep_ids = [rep_ids[i] for i in valid_indices]
+            df_preds = pd.DataFrame({
+                "repertoire_id": train_rep_ids,
+                "label": y_train,
+                "p_cluster": probs
+            })
+            df_preds.to_csv(train_preds_csv, index=False)
+        else:
+           # Load if skipped
+           clf = ClusterClassifier.load(model_path)
         
         # Predict on Test Sets
         test_ds_names = [k for k in TEST_DATASETS.keys() if k.startswith(ds_name.split("_")[0])] 

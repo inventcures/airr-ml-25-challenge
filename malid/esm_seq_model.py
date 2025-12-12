@@ -90,16 +90,12 @@ class ESMSequenceClassifier:
     def load(path: Path) -> 'ESMSequenceClassifier':
         data = joblib.load(path)
         obj = ESMSequenceClassifier(top_k=data.get('top_k', 10))
-        # Handle backward compatibility if possible, or just assume new format
+        
         if isinstance(data, dict):
             obj.scaler = data['scaler']
             obj.clf = data['clf']
         else:
-            # Old format was the object itself with self.model
-            # This is tricky. If we reload old models, they will break.
-            # But the user is re-training everything on RunPod.
-            # So we can assume fresh models.
-            pass
+            raise ValueError("Incompatible model format found. Please retrain.")
         return obj
 
 

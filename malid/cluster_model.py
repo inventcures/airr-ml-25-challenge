@@ -164,10 +164,17 @@ class ClusterClassifier:
         self.model.fit(X_features, y)
         return self
 
-    def predict_proba(self, X_features: np.ndarray):
-        """
-        Predict probability from feature vectors.
-        X_features: (N_reps, N_clusters)
-        """
-        return self.model.predict_proba(X_features)
+    def predict_proba(self, rep_ids: List[str], sequence_embeddings: Dict[str, np.ndarray]):
+        X_feat = self._featurize_repertoires(rep_ids, sequence_embeddings)
+        return self.model.predict_proba(X_feat)
 
+    def save(self, path: Path):
+        joblib.dump(self, path)
+
+    @staticmethod
+    def load(path: Path) -> 'ClusterClassifier':
+        obj = joblib.load(path)
+        # Check for new attributes
+        if not hasattr(obj, 'cluster_centroids_') or not hasattr(obj, 'centroid_index_'):
+             raise ValueError("Incompatible ClusterClassifier model. Please retrain.")
+        return obj

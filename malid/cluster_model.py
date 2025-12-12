@@ -68,8 +68,10 @@ class ClusterClassifier:
         logging.info(f"Clustering {len(X_all)} sequences...")
         d = X_all.shape[1]
         
-        # 2. Build FAISS Index
-        index = faiss.IndexFlatL2(d)
+        # 2. Build FAISS Index (HNSW for speed)
+        # IndexFlatL2 is O(N^2) for graph building which is too slow for 200k sequences.
+        # HNSW is O(N log N) approximately.
+        index = faiss.IndexHNSWFlat(d, 32) 
         index.add(X_all)
         
         # 3. Find Neighbors for Graph

@@ -69,24 +69,45 @@ def load_embedding_single(dataset_name: str, rep_id: str):
 
 def run_clustering_all():
     """
-    Main execution loop for Clustering-Based MIL Model.
+    Main execution loop for Clustering-Based MIL Model (Bag-of-Motifs).
     
-    STRATEGY: Memory-Safe Streaming
-    -------------------------------
-    To avoid OOM errors when processing massive embedding datasets, we do NOT load all data at once.
-    Instead, we break the process into 4 distinct phases:
+    SYSTEM ARCHITECTURE
+    -------------------
+    This script implements the "Stream 3" component of our solution: Structural Clustering.
+    It treats the repertoire as a distribution of common sequence motifs ("Visual Words").
     
-    1. Subsampling: Iterate repertoires one-by-one, load their embeddings, sample a small fraction, 
-       and discard the rest. We collect ~200k sequences total across the dataset.
+    PIPELINE STAGES (Phases):
+    -------------------------
+    1. Subsampling (Phase 1):
+       - Goal: Discover common motifs across the population without loading all data.
+       - Logic: We stream each repertoire (using mmap) and sample a small fraction of sequences.
+       - Output: A pool of ~200k representative sequences (X_sub).
+       - Checkpoint: `dsX_phase1_subsampled.npz`.
        
-    2. Clustering: Use FAISS to build a k-NN graph of the subsampled sequences and run Louvain clustering.
-       This defines our "visual words" or sequence motifs.
+    2. Clustering (Phase 2):
+       - Goal: Group similar sequences into distinct "motifs" or clusters.
+       - Logic:
+         a. FAISS Indexing: Build an HNSW or FlatL2 index (GPU transparently used if available).
+         b. Graph Construction: Find k=10 nearest neighbors for every sequence.
+         c. Community Detection: Use Louvain algorithm to discover dense clusters.
+       - Output: A trained ClusterClassifier with centroids.
        
-    3. Featurization: Iterate repertoires one-by-one again. For each repertoire, map all its sequences 
-       to the nearest cluster centroids found in Phase 2. This converts a repertoire of N sequences 
-       into a single fixed-size vector (histogram of cluster counts).
+    3. Featurization (Phase 3):
+       - Goal: Convert every patient's repertoire into a fixed-size histogram of motifs.
+       - Logic: We re-scan every repertoire. For each sequence, we find the nearest cluster centroid.
+       - Optimization: Uses `BATCH_SIZE=10000` chunking to ensure large repertoires never exceed RAM.
+       - Output: A matrix X_features (N_patients x N_clusters).
+       - Checkpoint: `dsX_phase3_features.npz`.
        
-    4. Classification: Train a standard Logistic Regression on these fixed-size feature vectors.
+    4. Classification (Phase 4):
+       - Goal: Predict disease status from the motif histogram.
+       - Logic: Standard Logistic Regression on the features.
+       - Output: Probability scores for Stream 3.
+       
+    MEMORY SAFETY FEATURES:
+    - uses `mmap_mode='r'` for all embedding loads.
+    - Explicit `gc.collect()` between phases.
+    - Granular checkpointing allows resumability after preemption.
     """
     # Train datasets
     for ds_name in TRAIN_DATASETS.keys():

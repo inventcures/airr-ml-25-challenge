@@ -29,8 +29,17 @@ uv run python malid/train_stats_all.py
 # B. ESM Sequence Model (Generates outputs/esm_seq_preds/)
 uv run python malid/train_esm_seq_all.py
 
-# C. Clustering Model (Generates outputs/cluster_preds/)
+# C. Clustering Model (Choose ONE)
+# FAISS (Standard)
 uv run python malid/run_clustering_all.py
+
+# OR Voyager (Fastest - Recommended)
+# pip install voyager
+uv run python malid/run_clustering_voyager.py
+
+# OR LanceDB (GPU Accelerated)
+# pip install lancedb
+uv run python malid/run_clustering_lancedb.py
 
 # D. Task 2 Ranking (Generates outputs/task2_ranking/)
 uv run python scripts/rank_sequences_task2_all.py

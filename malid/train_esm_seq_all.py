@@ -32,7 +32,34 @@ logging.basicConfig(
 )
 Path("logs").mkdir(exist_ok=True)
 
-BATCH_SIZE = 5 # Reduced from 50 to 5 to prevent OOM on large datasets (ds7) 
+"""
+Stream 2: ESM-2 Embedding Classifier (MIL via Pooling/Instance Classification)
+
+SYSTEM ARCHITECTURE
+-------------------
+This script implements "Stream 2" of our solution.
+1. Feature Extraction: Uses pre-computed ESM-2 embeddings (Layer 33, 1280-dim) for every sequence.
+2. MIL Strategy: We treat this as an instance-level classification problem with aggregation. 
+   Currently, we simply train robust classifiers on the sequences themselves (or aggregated reps).
+   The `ESMSequenceClassifier` typically uses SGDClassifier (linear SVM/Logistic) to scale to millions of sequences.
+
+KEY INNOVATIONS:
+1. STREAMING & MEMORY MAPPING:
+   We never load the full dataset. `load_embeddings` uses `mmap_mode='r'` to treat disk files as array views.
+   We iterate in loose batches to feed the `partial_fit` method of the classifier.
+
+2. 5-FOLD OOF GENERATION:
+   We train 6 models in parallel streams:
+   - 1 Main Model (All data) -> For Final Test Prediction.
+   - 5 Fold Models (Train on 4, Val on 1) -> For generating unbiased OOF predictions for the Meta-Ensemble.
+
+3. MEMORY OPTIMIZATION:
+   `BATCH_SIZE = 5` is intentional and critical.
+   Since we virtually stack 5 folds of data, a large batch size explodes in RAM (copying mmap data to real RAM).
+   By keeping batches tiny (5 repertoires), we ensure peak RAM usage stays low, allowing `ds7` (Terabyte scale) to train on 48GB nodes.
+"""
+
+BATCH_SIZE = 5 # Reduced from 50 to 5 to prevent OOM on large datasets (ds7) - CRITICAL OPTIMIZATION 
 
 def load_embeddings(dataset_name: str, rep_ids: List[str]) -> Dict[str, np.ndarray]:
     """

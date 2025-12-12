@@ -145,8 +145,17 @@ uv run python malid/train_stats_all.py
 # 2. ESM Sequence Model (Needs Embeddings)
 uv run python malid/train_esm_seq_all.py
 
-# 3. Clustering Model (Needs Embeddings)
+# 3. Clustering Model (Choose ONE)
+# Option A: Standard (CPU FAISS) - Stable
 uv run python malid/run_clustering_all.py
+
+# Option B: Voyager (Flash Fast CPU) - RECOMMENDED 🚀
+# pip install voyager
+uv run python malid/run_clustering_voyager.py
+
+# Option C: LanceDB (GPU Accelerated)
+# pip install lancedb
+uv run python malid/run_clustering_lancedb.py
 
 # 4. Task 2 Sequence Ranking (Needs Embeddings)
 uv run python scripts/rank_sequences_task2_all.py

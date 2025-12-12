@@ -29,6 +29,29 @@ EMBEDDINGS_DIR = Path("data/embeddings")
 OUTPUT_DIR = Path("outputs/task2_ranking")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
+"""
+Task 2: Disease-Associated Sequence Discovery (Ranking/Retrieval)
+
+SYSTEM ARCHITECTURE
+-------------------
+This script addresses the second competition task: Identifying specific TCR sequences associated with the disease.
+
+METHODOLOGY:
+Instead of training a separate model, we leverage the interpretability of our "Stream 2" (ESM-MIL) models.
+1. Model Loading: We load the robust `ESMSequenceClassifier` trained on the corresponding dataset.
+2. Embedding Scoring:
+   - The classifier (SGD/Logistic) has learned a hyperplane defined by coefficients `w`.
+   - For a sequence with embedding `x`, the score is `w . x`.
+   - High positive scores indicate strong association with the positive class (disease).
+3. Ranking:
+   - We scan the target test repertoires.
+   - We compute scores for every sequence.
+   - We retrieve the Top-K sequences with the highest scores.
+
+why THIS WORKS:
+Since ESM embeddings capture biological properties, the linear decision boundary effectively separates "healthy-like" motifs from "disease-like" motifs. By retrieving the furthest points on the positive side of the hyperplane, we identify the most confident disease biomarkers.
+"""
+
 def rank_sequences_task2_all():
     ds_iter = tqdm(TEST_DATASETS.keys(), desc="Task 2 Rankings")
     

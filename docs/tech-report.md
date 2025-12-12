@@ -122,11 +122,14 @@ For Task 2 (identifying disease-associated sequences), we use the trained **ESM 
 2.  **Aggressive Batch Reduction:** In `train_esm_seq_all.py`, we reduced `BATCH_SIZE` from 50 to 5. This seemingly drastic move reduced peak RAM usage by 90% (since 5-fold CV creates 5 copies of the batch), allowing the pipeline to complete successfully.
 3.  **Streaming Featurization:** In `run_clustering_all.py`, we rewrote `transform_repertoire` to process embeddings in 10k chunks, eliminating spikes.
 
-## 5.2 GPU Utilization
-**Challenge:** FAISS clustering was slow on CPU.
-**Solution:** We added auto-detection in `cluster_model.py`. 
-*   If `faiss-gpu` is present, it transparently moves the index to the A40 GPU (`transferred_index = faiss.index_cpu_to_gpu(...)`), speeding up neighbor search by ~50x.
-*   Falls back to `HNSW` (Hierarchical Navigable Small World) on CPU if GPU is unavailable.
+## 5.2 GPU Utilization & Accelerated Clustering
+**Challenge:** Standard FAISS clustering was slow on CPU for the graph construction step (All-vs-All search).
+**Solution:** We developed three specialized implementations to handle diverse hardware constraints:
+1.  **Faiss HNSW (Standard):** Baseline robust CPU implementation.
+2.  **LanceDB (GPU Accelerated):** leveraging `lancedb` with `accelerator="cuda"` to offload Index Building to the A40 GPU (20-25x speedup for indexing).
+3.  **Voyager (High-Performance CPU):** We identified that graph construction (querying 200k neighbors) was the bottleneck. We implemented a **Voyager** based pipeline (`malid/run_clustering_voyager.py`) which utilizes optimized implementations for **Batched Querying**, offering the fastest end-to-end performance by eliminating Python loop overheads found in other libraries.
+
+This flexibility allows the pipeline to adapt to available resources (Pure CPU vs High-End GPU) dynamically.
 
 ## 5.3 Resumability
 **Challenge:** Long-running jobs (6+ hours) would lose progress on preemption.

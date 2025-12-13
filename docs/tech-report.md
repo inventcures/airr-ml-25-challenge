@@ -109,7 +109,9 @@ The signals from the three streams are combined using a **Logistic Regression St
 
 For Task 2 (identifying disease-associated sequences), we use the trained **ESM Models**.
 *   We extract the decision function coefficients (or attention weights) to score individual sequences.
-*   Top-k sequences are selected based on their contribution to the positive class probability.
+*   We extract the decision function coefficients (or attention weights) to score individual sequences.
+*   **Test Sets:** We select the **Top 1** sequence per repertoire.
+*   **Training Sets:** We utilize a **Dynamic Top-K** strategy (approx 125 per repertoire) to reach exactly 50,000 sequences per dataset, ensuring global coverage of high-scoring motifs.
 
 ---
 

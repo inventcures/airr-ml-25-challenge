@@ -178,10 +178,28 @@ git commit -m "Add all trained models and predictions"
 git push origin main
 ```
 
-### Step 7: Pull Results to Laptop
-Back on your **Laptop**:
+### Step 7: Transfer Results to Laptop 🔄
+**Crucial Step:** We need to get the models and especially the **Task 2 Rankings** back to your laptop to build the submission.
+
+**1. Compress Task 2 Results (On RunPod):**
 ```bash
-git pull
+cd /workspace/airr-ml-25-challenge
+tar -czf task2_rankings.tar.gz outputs/task2_ranking/*.csv
+```
+
+**2. Download to Laptop:**
+*   **VS Code:** Right-click `task2_rankings.tar.gz` -> Download.
+*   **SCP (Terminal):** `scp -P <PORT> root@<IP>:/workspace/airr-ml-25-challenge/task2_rankings.tar.gz ./`
+
+**3. Extract on Laptop:**
+```bash
+# In your project root
+tar -xvf task2_rankings.tar.gz
+```
+
+**4. Pull Code Changes:**
+```bash
+git pull origin main
 ```
 
 ---
@@ -190,10 +208,16 @@ git pull
 
 You have the predictions from all models (DeepRC, Stats, Clustering, ESM) on your laptop now. Let's combine them!
 
-### Step 1: Run the Meta-Ensemble
-This script combines the CSVs from DeepRC, Stats, and Clustering/ESM to make the final decision.
+### Step 1: Run the Meta-Ensemble & Build Submission
+This script merges Task 1 predictions (Meta-Ensemble) and Task 2 Rankings (from RunPod) into the final CSV.
+
 ```bash
+# 1. Train Meta-Ensemble (Task 1)
 uv run python malid/train_meta_and_predict.py
+
+# 2. Build Final Submission (Combines Task 1 & Task 2)
+# Ensure you have extracted task2_rankings.tar.gz first!
+uv run python scripts/build_submission.py
 ```
 
 ### Step 2: Submit!

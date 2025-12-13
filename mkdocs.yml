@@ -42,6 +42,7 @@ nav:
     - Cloud Setup: getting-started/cloud-setup.md
   - User Guide:
     - Running the Pipeline: usage/running-pipeline.md
+    - Submission Workflow: submission_workflow.md
     - CLI Reference: usage/cli-reference.md
   - Architecture:
     - Overview: architecture/overview.md

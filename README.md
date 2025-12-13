@@ -121,8 +121,10 @@ Conceptually, the pipeline is:
      - Cluster enrichment `cluster_score`
    - Compute a combined score:
      - `score = w_attn * attn + w_esm * p_seq_esm + w_cluster * cluster_score`
-   - Rank sequences per training dataset and take top 50k.
-   - Save per-dataset files under `outputs/task2_top/`.
+    - Rank sequences:
+      - **Test:** Top 1 sequence per repertoire.
+      - **Train:** Dynamic Top-K (approx 125) to reach exactly 50,000 sequences per dataset.
+    - Save per-dataset files under `outputs/task2_ranking/`.
 
 8. **Final Submission**
    - Task 1 block: test repertoires + probabilities, AIRR fields as `-999.0`.

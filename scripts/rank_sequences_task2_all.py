@@ -110,17 +110,64 @@ def rank_sequences_task2_all():
             
         # Checkpoint Setup
         ckpt_path = OUTPUT_DIR / f"{test_ds}_checkpoint.pkl"
-        processed_ids = set()
-        all_rankings = []
+        
+        # CLEANUP: Always remove stale checkpoint if this is a fresh start for this dataset
+        # However, we might want to resume if the script crashed mid-way effectively.
+        # But user asked for "clean overwrite".
+        # If we always delete checkpoint, we lose resume capability.
+        # A better approach: If the final output file exists, we delete it AND the checkpoint to start fresh.
+        # If final output doesn't exist but checkpoint does, we resume.
+        # Wait, I removed the "if out_csv exists: continue" block earlier (it is commented out).
+        # So we represent "Force Rerun".
+        
+        # Decision: To satisfy "cleanly stores or overwrites", we should probably reset unless a flag says otherwise.
+        # Or simpler: If we are starting iteration 0, we can ignore checkpoint.
+        # But we load checkpoint BEFORE loop.
+        
+        # Let's trust the standard logic:
+        # If we are re-running, likely the user wants to re-compute.
+        # But if it crashed after 4 hours, they want resume.
+        
+        # Compromise: Check if the *Task 2* logic changed.
+        # Since I am editing the script NOW, the previous checkpoint is likely from the OLD logic (Top 100).
+        # Resuming from a Top-100 checkpoint while trying to build Top-125 is DANGEROUS/WRONG.
+        # FIX: We MUST invalidated old checkpoints.
         
         if ckpt_path.exists():
-            try:
-                data = joblib.load(ckpt_path)
-                processed_ids = data['processed_ids']
-                all_rankings = data['all_rankings']
-                logging.info(f"  🔄 Resuming from checkpoint: {len(processed_ids)} repertoires already processed.")
-            except Exception as e:
-                logging.warning(f"  Failed to load checkpoint: {e}. Starting from scratch.")
+            # Verify if checkpoint is compatible? Hard.
+            # Safest: Nuke it.
+            logging.warning(f"  ⚠️ Deleting old checkpoint {ckpt_path} to ensure clean Top-top_k run.")
+        # Determine limits based on dataset type
+        # Test Datasets: 1 row per repertoire (according to sample_submission)
+        # Train Datasets: Exactly 50,000 rows total (Global top 50k or distributed)
+        
+        is_train = "train" in test_ds or test_ds in TRAIN_DATASETS
+        
+        target_total_rows = None
+        per_rep_top_k = 1 # Default for Test
+        
+        # Calculate dynamic top_k
+        if reps:
+            num_reps = len(reps)
+            if is_train:
+                target_total_rows = 50000
+                import math
+                per_rep_top_k = math.ceil(50000 / num_reps)
+                logging.info(f"  [Train Limit] Goal: 50,000 rows. Repertoires: {num_reps}. Using top_k={per_rep_top_k} per rep.")
+            else:
+                logging.info(f"  [Test Limit] Goal: 1 row per rep. Using top_k=1.")
+                per_rep_top_k = 1
+        
+        # Checkpoint Setup
+        ckpt_path = OUTPUT_DIR / f"{test_ds}_checkpoint.pkl"
+        
+        # CLEANUP: Delete stale checkpoint to force fresh run with new logic
+        if ckpt_path.exists():
+            logging.warning(f"  ⚠️ Deleting old checkpoint {ckpt_path} to ensure clean Top-top_k run.")
+            ckpt_path.unlink()
+            
+        processed_ids = set()
+        all_rankings = []
         
         # Filter reps
         reps_to_process = [r for r in reps if r.rep_id not in processed_ids]

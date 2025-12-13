@@ -102,32 +102,37 @@ def train_meta_and_predict():
         logging.info(f"Found {len(existing_parts)} existing part files. These will be included in final submission.")
     
     # Process BOTH Test and Train datasets to match Kaggle submission requirements
-    all_target_datasets = list(TEST_DATASETS.keys()) + list(TRAIN_DATASETS.keys())
-    # Sort to keep order consistent
-    all_target_datasets = sorted(all_target_datasets)
-    
-    ds_iter = tqdm(all_target_datasets, desc="Meta-Ensemble")
-    
-    for ds_name in ds_iter:
-        ds_iter.set_description(f"Processing {ds_name}")
+    # We must be careful because keys (e.g. 'ds1') overlap between Train and Test dicts.
+    # We will iterate over explicit (ds_name, split) tuples.
+    targets = []
+    for test_ds in TEST_DATASETS.keys():
+        targets.append((test_ds, "test"))
+    for train_ds in TRAIN_DATASETS.keys():
+        targets.append((train_ds, "train"))
         
-        # Check if part exists
-        part_path = PARTS_DIR / f"{ds_name}_meta_pred.csv"
+    # Sort by ds_name then split
+    targets = sorted(targets, key=lambda x: (x[0], x[1]))
+    
+    ds_iter = tqdm(targets, desc="Meta-Ensemble")
+    
+    for ds_name, split in ds_iter:
+        ds_iter.set_description(f"Processing {ds_name} ({split})")
+        
+        # Check if part exists - MUST include split in filename to avoid collision!
+        part_path = PARTS_DIR / f"{ds_name}_{split}_meta_pred.csv"
         if part_path.exists():
-            logging.info(f"  ✅ Part file exists for {ds_name}. Skipping computation.")
+            logging.info(f"  ✅ Part file exists for {ds_name} ({split}). Skipping computation.")
             all_test_preds.append(pd.read_csv(part_path))
             continue
             
-        logging.info(f"\nProcessing {ds_name}...")
+        logging.info(f"\nProcessing {ds_name} ({split})...")
         
-        # Determine train base and split
-        if ds_name in TRAIN_DATASETS:
+        # Determine train base
+        if split == "train":
             train_ds = ds_name
-            split = "train"
         else:
             # e.g. ds7_1 -> ds7
             train_ds = ds_name.split("_")[0]
-            split = "test"
             
         # 1. Ensure Meta Model Exists (Train if needed)
         meta_model_path = MODELS_DIR / f"{train_ds}_meta_model.joblib"

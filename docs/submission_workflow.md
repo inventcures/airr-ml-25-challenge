@@ -55,7 +55,12 @@ tar -xvf task2_rankings.tar.gz
 # You need 'outputs/submission/submission.csv' from the DeepRC/Task 1 run.
 ls -l outputs/submission/submission.csv
 
-# 4. Run the assembly script
+# 4. Run the Meta-Ensemble (Generates Task 1 Predictions)
+# This step is CRITICAL. It builds the 'submission.csv' skeleton.
+uv run python malid/train_meta_and_predict.py
+
+# 5. Run the Final Assembly
+# This merges Task 2 rankings into the Task 1 file.
 uv run python scripts/build_submission.py
 ```
 

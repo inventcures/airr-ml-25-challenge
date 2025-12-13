@@ -100,7 +100,7 @@ def predict_repertoire_ensemble(ensemble_models: List[ESMSequenceClassifier], em
         
     return float(np.mean(probs))
 
-def generate_train_oof_preds(ds_name: str):
+def generate_train_oof_preds(ds_name: str, force: bool = False):
     logging.info(f"Generating OOF Preds for {ds_name}...")
     
     pkl_path = PROCESSED_DIR / f"{ds_name}_train.pkl"
@@ -109,6 +109,11 @@ def generate_train_oof_preds(ds_name: str):
     if not pkl_path.exists():
         logging.error(f"  ❌ Pickle not found: {pkl_path}")
         return
+
+    out_path = OUTPUT_DIR / f"{ds_name}_train_esm_preds.csv"
+    if force and out_path.exists():
+         logging.info(f"  ⚠️ Force enabled: Deleting existing file {out_path}")
+         out_path.unlink()
 
     reps = load_repertoires_pickle(pkl_path)
     labeled_reps = [r for r in reps if r.label is not None]

@@ -141,8 +141,8 @@ def rank_sequences_task2_all(force=False):
         # Wrap models
         ensemble_wrapper = EnsembleModel(ensemble_models)
         
-        # Run Ranking
-        df_res = rank_sequences(reps, ensemble_wrapper, ds_name, task["base_ds"], task["target_rows"])
+        # Run Ranking (Logic moved to per-repertoire loop below)
+        # df_res = rank_sequences(reps, ensemble_wrapper, ds_name, task["base_ds"], task["target_rows"])
 
         # Load embeddings with robust checking
         base_ds = task["base_ds"]

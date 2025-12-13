@@ -50,6 +50,21 @@ class EnsembleModel:
     def predict(self, X):
         return np.argmax(self.predict_proba(X), axis=1)
 
+    def predict_proba_sequences(self, X_seq):
+        """
+        Average sequence-level probabilities across all models.
+        Values are [0, 1] for class 1 likelihood.
+        """
+        p_sum = None
+        for m in self.models:
+            # Each model returns (N, 2)
+            p = m.predict_proba_sequences(X_seq)
+            if p_sum is None: 
+                p_sum = p
+            else: 
+                p_sum += p
+        return p_sum / len(self.models)
+
 def rank_sequences_task2_all(force=False):
     # Process both Train and Test datasets separately to avoid overwriting files
     # We will generate specific output files: {ds}_train_ranking.csv and {ds}_test_ranking.csv

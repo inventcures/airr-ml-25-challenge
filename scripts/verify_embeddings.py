@@ -56,11 +56,36 @@ def check_dataset(ds_name: str, split: str = "train"):
     # Map ds7_1 -> ds7, ds8_1 -> ds8
     embed_ds_folder = ds_name.split("_")[0]
     
-    # Structure: data/embeddings/{ds_name}/{split}/{rep_id}.npy
-    dataset_embed_dir = EMBEDDINGS_DIR / embed_ds_folder / split
+    # Logic for handling nested test structures (ds7/test/1_test/...)
+    # Split name format in pickles: "1_test", "2_test" etc.
+    # Directory structure: data/embeddings/ds7/test/1_test/
+    
+    # Default path (ds1-ds6) -> data/embeddings/ds1/train or ds1/test
+    candidate_path = EMBEDDINGS_DIR / embed_ds_folder / split
+    
+    # Special handling for ds7/ds8 complex test splits
+    if embed_ds_folder in ["ds7", "ds8"] and "test" in split:
+        # If split is "1_test", we want data/embeddings/ds7/test/1_test
+        # The 'split' var passed here comes from the main loop logic:
+        # for ds_name in TEST_DATASETS: check_dataset(ds_name, split="test") ❌
+        # Wait, the main loop calls check_dataset(ds_name, split="test") for ALL.
+        # But for ds7, ds8, the pickle is ds7_1_test.pkl.
+        # We need to derive the SUBFLOLDER name from the dataset key name if possible?
+        # NO, look at main():
+        #   for ds_name in TEST_DATASETS.keys(): check_dataset(ds_name, split="test")
+        
+        # ds_name is "ds7_1" -> we want subfolder "1_test"?
+        # Let's map ds_name suffix to folder.
+        
+        if "_" in ds_name:
+            suffix = ds_name.split("_")[1] # "1" from "ds7_1"
+            subfolder_name = f"{suffix}_test"
+            candidate_path = EMBEDDINGS_DIR / embed_ds_folder / "test" / subfolder_name
+    
+    dataset_embed_dir = candidate_path
     
     if not dataset_embed_dir.exists():
-        logger.warning(f"   ⚠️ Folder {dataset_embed_dir} does not exist. Assuming all missing.")
+        logger.warning(f"   ⚠️ Folder {dataset_embed_dir} does not exist. Assuming right now.")
         # Fallback check: maybe it's just {ds_name}/{rep_id}.npy?
         if (EMBEDDINGS_DIR / embed_ds_folder / f"{reps[0].rep_id}.npy").exists():
              logger.info("   ℹ️ Found flattened structure (no split folder).")

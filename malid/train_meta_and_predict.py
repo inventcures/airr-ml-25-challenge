@@ -7,6 +7,9 @@ from pathlib import Path
 import joblib
 from tqdm import tqdm
 
+# Add project root to path
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 from data.load_all_datasets import TRAIN_DATASETS, TEST_DATASETS
 from malid.meta_ensemble import MetaEnsembleClassifier
 

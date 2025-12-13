@@ -51,11 +51,19 @@ class PipelineManager:
     def is_completed(self, step_name: str) -> bool:
         return step_name in self.state["completed_steps"]
 
-    def run_step(self, step_name: str, command: List[str], description: str):
+    def run_step(self, step_name: str, command: List[str], description: str, always_run: bool = False):
         """
         Runs a step if it hasn't been completed yet.
         """
-        if self.is_completed(step_name):
+    def run_step(self, step_name: str, command: List[str], description: str, force_rerun: bool = False):
+        """
+        Runs a step.
+        """
+        # 1. Check if we should skip this step entirely? (Handled by caller or here?)
+        # For simplicity, we'll let the caller handle 'only' logic or handle it here if we pass args.
+        
+        # 2. Check completion
+        if self.is_completed(step_name) and not force_rerun:
             logger.info(f"⏭️  Skipping previously completed step: {description}")
             return
 
@@ -132,74 +140,63 @@ class PipelineManager:
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="RunPod Full Pipeline Orchestrator")
+    parser.add_argument("--rerun", nargs="+", help="List of steps to force rerun (e.g. build_datasets)")
+    parser.add_argument("--only", nargs="+", help="Run ONLY these steps (skip others)")
+    parser.add_argument("--list", action="store_true", help="List all available steps")
+    args = parser.parse_args()
+
     manager = PipelineManager()
     
+    # Define steps structure: (name, command, description)
+    steps = [
+        ("build_datasets", ["python", "data/load_all_datasets.py", "--force"], "Build Dataset Pickles"),
+        ("train_stats", ["python", "malid/train_stats_all.py"], "Stats Model (Train & Preds)"),
+        ("train_esm", ["python", "malid/train_esm_seq_all.py"], "ESM Sequence Model"),
+        ("train_deeprc_cv", ["python", "deeprc/train_mil_cv.py"], "DeepRC Training (CV)"),
+        ("infer_deeprc_cv", ["python", "deeprc/infer_mil_cv.py"], "DeepRC Inference"),
+        ("cluster_lancedb", ["python", "malid/run_clustering_lancedb.py"], "Clustering (LanceDB)"),
+        ("rank_task2", ["python", "scripts/rank_sequences_task2_all.py"], "Task 2 Sequence Ranking"),
+        ("meta_ensemble", ["python", "malid/train_meta_and_predict.py"], "Meta-Ensemble Prediction"),
+        ("build_submission", ["python", "scripts/build_submission.py"], "Build Final Submission"),
+    ]
+    
+    if args.list:
+        print("Available steps:")
+        for name, _, desc in steps:
+            print(f"  - {name}: {desc}")
+        return
+
     logger.info("========================================")
     logger.info("   RunPod Full Pipeline Orchestrator    ")
     logger.info("========================================")
     logger.info(f"Current State: {len(manager.state['completed_steps'])} steps completed.")
     
-    # 1. Cleanup
-    manager.clean_partial_outputs()
+    if args.rerun:
+        logger.info(f"🔄 Forcing rerun for: {args.rerun}")
+    if args.only:
+        logger.info(f"🔒 limiting execution to: {args.only}")
+    
+    # 1. Cleanup (Always run unless filtered out by --only?)
+    # Usually cleanup is good. Let's run it unless --only is specific.
+    if not args.only or "cleanup" in args.only:
+        manager.clean_partial_outputs()
     
     # 2. Pipeline Steps
+    for name, cmd, desc in steps:
+        # Check if we should skip
+        if args.only and name not in args.only:
+            continue
+            
+        # Check if we should force rerun
+        force = False
+        if args.rerun and name in args.rerun:
+            force = True
+            
+        manager.run_step(name, cmd, desc, force_rerun=force)
     
-    manager.run_step(
-        "build_datasets",
-        ["python", "data/load_all_datasets.py", "--force"],
-        "Build Dataset Pickles"
-    )
-    
-    manager.run_step(
-        "train_stats",
-        ["python", "malid/train_stats_all.py"],
-        "Stats Model (Train & Preds)"
-    )
-    
-    manager.run_step(
-        "train_esm",
-        ["python", "malid/train_esm_seq_all.py"],
-        "ESM Sequence Model"
-    )
-    
-    manager.run_step(
-        "train_deeprc_cv",
-        ["python", "deeprc/train_mil_cv.py"],
-        "DeepRC Training (CV)"
-    )
-    
-    manager.run_step(
-        "infer_deeprc_cv",
-        ["python", "deeprc/infer_mil_cv.py"],
-        "DeepRC Inference"
-    )
-    
-    manager.run_step(
-        "cluster_lancedb",
-        ["python", "malid/run_clustering_lancedb.py"],
-        "Clustering (LanceDB)"
-    )
-    
-    manager.run_step(
-        "rank_task2",
-        ["python", "scripts/rank_sequences_task2_all.py"],
-        "Task 2 Sequence Ranking"
-    )
-    
-    manager.run_step(
-        "meta_ensemble",
-        ["python", "malid/train_meta_and_predict.py"],
-        "Meta-Ensemble Prediction"
-    )
-    
-    manager.run_step(
-        "build_submission",
-        ["python", "scripts/build_submission.py"],
-        "Build Final Submission"
-    )
-    
-    logger.info("\n🎉 Pipeline Finished Successfully.")
-    logger.info("Now sync 'outputs/' back to your local machine.")
+    logger.info("\n🎉 Pipeline Execution Finished.")
 
 if __name__ == "__main__":
     main()

@@ -6,7 +6,12 @@ import shutil
 import logging
 import sys
 
+# Add project root to path
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 # Logging setup
+# Logging setup
+Path("logs").mkdir(exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -15,7 +20,6 @@ logging.basicConfig(
         logging.FileHandler("logs/build_submission.log")
     ]
 )
-Path("logs").mkdir(exist_ok=True)
 
 TASK1_SUBMISSION = Path("outputs/submission/submission.csv")
 TASK2_DIR = Path("outputs/task2_ranking")

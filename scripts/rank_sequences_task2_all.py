@@ -86,9 +86,9 @@ def rank_sequences_task2_all():
         ds_iter.set_description(f"Ranking {ds_name} ({ds_type})")
         
         out_csv = OUTPUT_DIR / f"{ds_name}{task['out_suffix']}"
-        # if out_csv.exists():
-        #     logging.info(f"  ✅ Ranking file exists for {ds_name}. Skipping.")
-        #     continue
+        if out_csv.exists():
+            logging.info(f"  ✅ Ranking file exists for {ds_name}. Skipping.")
+            continue
 
         logging.info(f"\n[Task 2] Processing {ds_name} ({ds_type})...")
         

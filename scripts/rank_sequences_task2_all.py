@@ -50,7 +50,7 @@ class EnsembleModel:
     def predict(self, X):
         return np.argmax(self.predict_proba(X), axis=1)
 
-def rank_sequences_task2_all():
+def rank_sequences_task2_all(force=False):
     # Process both Train and Test datasets separately to avoid overwriting files
     # We will generate specific output files: {ds}_train_ranking.csv and {ds}_test_ranking.csv
     
@@ -86,7 +86,7 @@ def rank_sequences_task2_all():
         ds_iter.set_description(f"Ranking {ds_name} ({ds_type})")
         
         out_csv = OUTPUT_DIR / f"{ds_name}{task['out_suffix']}"
-        if out_csv.exists():
+        if out_csv.exists() and not force:
             logging.info(f"  ✅ Ranking file exists for {ds_name}. Skipping.")
             continue
 
@@ -265,5 +265,23 @@ def rank_sequences_task2_all():
         else:
             logging.warning("  No rankings generated.")
 
+
 if __name__ == "__main__":
-    rank_sequences_task2_all()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--force", action="store_true", help="Overwrite existing output files")
+    args = parser.parse_args()
+
+    # Pass logic (Hackier than threading it through 5 functions, but effective for this script)
+    # We modify the behavior inside the loop by checking `args.force`
+    # Since rank_sequences_task2_all didn't take args, we can adapt it or just patch the global logic in the loop.
+    # Actually, let's just make the function look at sys.argv or pass it.
+    
+    # Better: Update the global function to accept the flag, but it's hard to change signature without changing call site if imported.
+    # But this is a script.
+    
+    logging.info(f"Arguments: {args}")
+    
+    # We will just redefine the loop logic here? No, let's just use the global 'args' variable since it's a script.
+    # Or cleaner: Modify lines 89-91 to check args.force
+    rank_sequences_task2_all(force=args.force)

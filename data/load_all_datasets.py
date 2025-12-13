@@ -1,7 +1,11 @@
 # data/load_all_datasets.py
 from __future__ import annotations
+import sys
 from pathlib import Path
 from typing import Dict, List
+
+# Add project root to path to allow importing 'data' module
+sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import pickle
 

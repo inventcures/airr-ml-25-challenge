@@ -10,6 +10,7 @@ models/
 
 # Outputs
 outputs/
+!outputs/submissions/FROM-CONTES-ORGANIZERS----sample_submissions.csv
 !outputs/.gitkeep
 
 # Python

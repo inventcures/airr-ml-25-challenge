@@ -96,7 +96,15 @@ def load_preds(dataset_name: str, split: str) -> pd.DataFrame:
 def train_meta_and_predict():
     all_test_preds = []
     
-    # Check for existing parts to resume
+    # FRESH START: User requested no contamination from previous runs.
+    # We clear intermediate parts and models to force re-training and re-prediction.
+    if PARTS_DIR.exists():
+        logging.warning(f"  Cleanup: Removing existing parts directory {PARTS_DIR} to ensure fresh run.")
+        import shutil
+        shutil.rmtree(PARTS_DIR)
+    PARTS_DIR.mkdir(parents=True, exist_ok=True)
+    
+    # Check for existing parts to resume (Now effectively empty unless filesystem race)
     existing_parts = list(PARTS_DIR.glob("*_meta_pred.csv"))
     if existing_parts:
         logging.info(f"Found {len(existing_parts)} existing part files. These will be included in final submission.")

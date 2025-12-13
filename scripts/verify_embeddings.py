@@ -81,7 +81,8 @@ def check_dataset(ds_name: str, split: str = "train"):
         if random.random() < 0.01:
             try:
                 # Just try to load headers/content
-                _ = torch.load(file_path, map_location="cpu")
+                import numpy as np
+                _ = np.load(file_path)
             except Exception as e:
                 logger.error(f"   ❌ Corrupt file found: {file_path} ({e})")
                 corrupt_count += 1

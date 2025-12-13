@@ -146,7 +146,7 @@ def main():
     
     manager.run_step(
         "build_datasets",
-        ["python", "data/load_all_datasets.py"],
+        ["python", "data/load_all_datasets.py", "--force"],
         "Build Dataset Pickles"
     )
     

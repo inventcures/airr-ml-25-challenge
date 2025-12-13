@@ -59,11 +59,11 @@ def load_repertoires_pickle(path: Path) -> List[Repertoire]:
     return reps
 
 
-def build_train_pickles():
+def build_train_pickles(force: bool = False):
     for ds_name, dirname in TRAIN_DATASETS.items():
         raw_path = TRAIN_ROOT / dirname
         out_path = PROCESSED_DIR / f"{ds_name}_train.pkl"
-        if out_path.exists():
+        if out_path.exists() and not force:
             print(f"[build_train_pickles] {out_path} exists, skipping.")
             continue
         # Load using the new directory-aware function
@@ -71,11 +71,11 @@ def build_train_pickles():
         save_repertoires_pickle(reps, out_path)
 
 
-def build_test_pickles():
+def build_test_pickles(force: bool = False):
     for ds_name, dirname in TEST_DATASETS.items():
         raw_path = TEST_ROOT / dirname
         out_path = PROCESSED_DIR / f"{ds_name}_test.pkl"
-        if out_path.exists():
+        if out_path.exists() and not force:
             print(f"[build_test_pickles] {out_path} exists, skipping.")
             continue
         # Test usually has no labels; label_col=None is default behavior if metadata missing
@@ -84,8 +84,13 @@ def build_test_pickles():
 
 
 def main():
-    build_train_pickles()
-    build_test_pickles()
+    import sys
+    force = "--force" in sys.argv
+    if force:
+        print("[load_all_datasets] Force mode enabled: regenerating all pickles.")
+        
+    build_train_pickles(force=force)
+    build_test_pickles(force=force)
 
 
 if __name__ == "__main__":

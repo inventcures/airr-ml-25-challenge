@@ -10,7 +10,6 @@ import sys
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 # Logging setup
-# Logging setup
 Path("logs").mkdir(exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
@@ -29,15 +28,16 @@ SUBMISSIONS_ROOT = Path("outputs/submissions")
 def build_submission():
     logging.info("[Build Submission] Generating final submission file...")
     
-    # 1. Load Task 1 results
+    # 1. Load Task 1 results (Repertoire Level)
     if not TASK1_SUBMISSION.exists():
         logging.error(f"Task 1 submission not found: {TASK1_SUBMISSION}")
         return
         
     df_task1 = pd.read_csv(TASK1_SUBMISSION)
-    logging.info(f"Loaded Task 1 results: {len(df_task1)} rows")
+    logging.info(f"Loaded Task 1 results: {len(df_task1)} rows (Repertoires)")
     
-    # 2. Load Task 2 results
+    # 2. Load Task 2 results (Sequence Level - Top 125 per rep)
+    # These files now contain BOTH Train and Test repertoires
     ranking_files = list(TASK2_DIR.glob("*_ranking.csv"))
     if not ranking_files:
         logging.warning("No Task 2 ranking files found. Submission will have missing Task 2 columns.")
@@ -46,10 +46,10 @@ def build_submission():
     for f in ranking_files:
         try:
             df = pd.read_csv(f)
-            # Take top 1 per repertoire
-            df = df.sort_values(["repertoire_id", "score"], ascending=[True, False])
-            top1 = df.drop_duplicates(subset=["repertoire_id"], keep="first")
-            task2_rows.append(top1)
+            # Kaggle requires 125 sequences per repertoire.
+            # Our rank script already outputs top 125.
+            # We just append them.
+            task2_rows.append(df)
         except Exception as e:
             logging.error(f"Error reading {f}: {e}")
         
@@ -60,11 +60,14 @@ def build_submission():
         df_task2 = pd.DataFrame(columns=["repertoire_id", "sequence", "v_call", "j_call"])
         
     # 3. Merge
-    merged = df_task1.merge(df_task2, on="repertoire_id", how="left")
+    # Task 1 (df_task1) is 1 row per repertoire.
+    # Task 2 (df_task2) is 125 rows per repertoire.
+    # We join Task 2 -> Task 1 (left join on Task 2 to keep all sequences)
+    # Wait, Task 1 must be broadcast to all 125 sequences.
+    
+    merged = df_task2.merge(df_task1, on="repertoire_id", how="left")
     
     # 4. Format
-    # 4. Format
-    # The 'dataset' column is already in the upstream meta-ensemble predictions (merged from Task 1)
     if "dataset" not in merged.columns:
         logging.warning("  'dataset' column missing from Task 1 predictions! Submission may be invalid.")
     
@@ -90,21 +93,7 @@ def build_submission():
         
     final_df = merged[final_cols]
     
-    # FILTER: Kaggle only wants Test Set predictions (4213 rows)
-    # The current dataframe includes 3610 Train rows + 4213 Test rows = 7823 total.
-    # We must properly filter for 'test_dataset'
-    
-    # Check current size
-    initial_len = len(final_df)
-    
-    # Filter for valid test names (containing 'test_dataset')
-    final_df = final_df[final_df["dataset"].astype(str).str.contains("test_dataset", case=False, na=False)]
-    
-    filtered_len = len(final_df)
-    logging.info(f"Filtered submission from {initial_len} to {filtered_len} rows (Removed Training Data).")
-    
-    if filtered_len != 4213:
-        logging.warning(f"⚠️ Expected 4213 rows (Test Only), but got {filtered_len}. Please verify!")
+    # NO FILTERING. We submit everything (Train + Test).
     
     # 5. Save & Versioning
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

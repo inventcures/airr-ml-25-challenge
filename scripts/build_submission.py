@@ -63,24 +63,10 @@ def build_submission():
     merged = df_task1.merge(df_task2, on="repertoire_id", how="left")
     
     # 4. Format
-    from data.load_all_datasets import TEST_DATASETS, PROCESSED_DIR, load_repertoires_pickle
-    
-    rep_to_dataset_real = {}
-    logging.info("  Mapping repertoires to datasets...")
-    for ds_name, dir_name in TEST_DATASETS.items():
-        # Try both pickle naming conventions
-        candidates = [
-            PROCESSED_DIR / f"{ds_name}_test.pkl",
-            PROCESSED_DIR / f"{ds_name}_1_test.pkl"
-        ]
-        for p in candidates:
-            if p.exists():
-                reps = load_repertoires_pickle(p)
-                for r in reps:
-                    rep_to_dataset_real[r.rep_id] = dir_name
-                break # Found for this dataset
-
-    merged["dataset"] = merged["repertoire_id"].map(rep_to_dataset_real)
+    # 4. Format
+    # The 'dataset' column is already in the upstream meta-ensemble predictions (merged from Task 1)
+    if "dataset" not in merged.columns:
+        logging.warning("  'dataset' column missing from Task 1 predictions! Submission may be invalid.")
     
     # Rename columns
     merged = merged.rename(columns={

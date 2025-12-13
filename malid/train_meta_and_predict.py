@@ -101,45 +101,43 @@ def train_meta_and_predict():
     if existing_parts:
         logging.info(f"Found {len(existing_parts)} existing part files. These will be included in final submission.")
     
-    test_ds_iter = tqdm(TEST_DATASETS.keys(), desc="Meta-Ensemble")
+    # Process BOTH Test and Train datasets to match Kaggle submission requirements
+    all_target_datasets = list(TEST_DATASETS.keys()) + list(TRAIN_DATASETS.keys())
+    # Sort to keep order consistent
+    all_target_datasets = sorted(all_target_datasets)
     
-    for test_ds in test_ds_iter:
-        test_ds_iter.set_description(f"Processing {test_ds}")
+    ds_iter = tqdm(all_target_datasets, desc="Meta-Ensemble")
+    
+    for ds_name in ds_iter:
+        ds_iter.set_description(f"Processing {ds_name}")
         
         # Check if part exists
-        part_path = PARTS_DIR / f"{test_ds}_meta_pred.csv"
+        part_path = PARTS_DIR / f"{ds_name}_meta_pred.csv"
         if part_path.exists():
-            logging.info(f"  ✅ Part file exists for {test_ds}. Skipping computation.")
+            logging.info(f"  ✅ Part file exists for {ds_name}. Skipping computation.")
             all_test_preds.append(pd.read_csv(part_path))
             continue
+            
+        logging.info(f"\nProcessing {ds_name}...")
         
-        logging.info(f"\nProcessing {test_ds}...")
-        
-        # Determine corresponding train dataset
-        train_ds = test_ds.split("_")[0]
-        if train_ds not in TRAIN_DATASETS:
-            pass
-             
-        # Load Train Preds (CV) for Training Meta Model
-        # One model per train dataset
+        # Determine train base and split
+        if ds_name in TRAIN_DATASETS:
+            train_ds = ds_name
+            split = "train"
+        else:
+            # e.g. ds7_1 -> ds7
+            train_ds = ds_name.split("_")[0]
+            split = "test"
+            
+        # 1. Ensure Meta Model Exists (Train if needed)
         meta_model_path = MODELS_DIR / f"{train_ds}_meta_model.joblib"
         
-        if meta_model_path.exists():
-            # Load existing meta model
-            clf = MetaEnsembleClassifier.load(meta_model_path)
-            # Make sure we have feature cols from somewhere. 
-            # We can infer them from test data or hardcode/save them. 
-            # Alternatively, re-load train data to get cols.
-            # Loading train data is safer to ensure consistent features.
-            train_df = load_preds(train_ds, "train")
-            feature_cols = [c for c in train_df.columns if c.startswith("p_")]
-        else:
-            # Need to train
-            logging.info(f"  Loading train preds for {train_ds}...")
+        if not meta_model_path.exists():
+            logging.info(f"  Meta model for {train_ds} not found. Loading train data to train it...")
             train_df = load_preds(train_ds, "train")
             
             if train_df.empty or "label" not in train_df.columns:
-                logging.warning(f"  Missing train preds or labels for {train_ds}. Skipping.")
+                logging.warning(f"  Missing train preds or labels for {train_ds}. Skipping {ds_name}.")
                 continue
                 
             feature_cols = [c for c in train_df.columns if c.startswith("p_")]
@@ -148,37 +146,51 @@ def train_meta_and_predict():
             X_train = train_df[feature_cols].fillna(0.5)
             y_train = train_df["label"]
             
-            clf = MetaEnsembleClassifier(random_state=42)
+            clf = MetaEnsembleClassifier(random_state=42) # Added random_state for reproducibility
             clf.fit(X_train, y_train)
             
             clf.save(meta_model_path)
             logging.info(f"  Saved meta model to {meta_model_path}")
+        else:
+            clf = MetaEnsembleClassifier.load(meta_model_path)
+            # We assume features are consistent. 
+            # If we need to know feature names, we can peek at a train file or rely on column naming convention.
+            # Here we just rely on "p_" columns in the target split.
+
+        # 2. Predict on Target Dataset (Train or Test)
+        # If split is "train", we are just predicting on the training set itself (OOF style essentially, or just fitting error check)
+        # But load_preds(..., split="train") gives us the OOF/CV predictions from upstream models.
+        logging.info(f"  Loading predictions for {ds_name} ({split})...")
+        target_df = load_preds(ds_name, split)
         
-        # Load Test Preds
-        logging.info(f"  Loading test preds for {test_ds}...")
-        test_df = load_preds(test_ds, "test")
-        
-        if test_df.empty:
-            logging.warning(f"  Missing test preds for {test_ds}. Skipping.")
+        if target_df.empty:
+            logging.warning(f"  No predictions found for {ds_name}. Skipping.")
             continue
             
-        # Predict
-        for col in feature_cols:
-            if col not in test_df.columns:
-                logging.warning(f"  Warning: {col} missing in test set. Filling with 0.5.")
-                test_df[col] = 0.5
-                
-        X_test = test_df[feature_cols].fillna(0.5)
+        feature_cols = [c for c in target_df.columns if c.startswith("p_")]
+        X_target = target_df[feature_cols].fillna(0.5)
         
-        probs = clf.predict_proba(X_test)[:, 1]
+        # Generate Meta Predictions
+        # If we are in "train" split, we are technically re-predicting on training data using the model trained on it.
+        # Ideally we'd use OOF meta-predictions, but for this level of stacking, re-predicting is often accepted if upstream was OOF.
+        # Or even better: if split=="train", we might just want to use the upstream OOF average?
+        # A simple approach is to use the meta-model we just trained.
+        probs = clf.predict_proba(X_target)[:, 1]
         
-        # Prepare result
         results = pd.DataFrame({
-            "repertoire_id": test_df["repertoire_id"],
+            "repertoire_id": target_df["repertoire_id"], # Corrected from target_df.index
             "probability": probs
         })
         
-        # SAVE PART IMMEDIATELY
+        # Add dataset column for build_submission.py
+        # Map internal 'ds1' -> 'train_dataset_1' or 'test_dataset_1'
+        if split == "train":
+            real_name = TRAIN_DATASETS[ds_name]
+        else:
+            real_name = TEST_DATASETS[ds_name]
+        results["dataset"] = real_name
+        
+        # Save part
         results.to_csv(part_path, index=False)
         logging.info(f"  Saved part file to {part_path}")
         

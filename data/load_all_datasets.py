@@ -12,8 +12,8 @@ PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
 # Paths to the dataset directories
 # We assume the script is run from airr_ml_project_template/
-TRAIN_ROOT = Path("../train_datasets/train_datasets")
-TEST_ROOT = Path("../test_datasets/test_datasets")
+TRAIN_ROOT = Path("data/dataset_new/train_datasets/train_datasets")
+TEST_ROOT = Path("data/dataset_new/test_datasets/test_datasets")
 
 # Keys are internal dataset names; values are directory names
 TRAIN_DATASETS: Dict[str, str] = {

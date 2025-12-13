@@ -145,6 +145,12 @@ def main():
     # 2. Pipeline Steps
     
     manager.run_step(
+        "build_datasets",
+        ["python", "data/load_all_datasets.py"],
+        "Build Dataset Pickles"
+    )
+    
+    manager.run_step(
         "train_stats",
         ["python", "malid/train_stats_all.py"],
         "Stats Model (Train & Preds)"

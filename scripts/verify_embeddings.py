@@ -53,24 +53,25 @@ def check_dataset(ds_name: str, split: str = "train"):
     corrupt_count = 0
     checked_count = 0
     
-    # We assume structure: data/embeddings/{ds_name}/{rep_id}.pt
-    # Or sometimes data/embeddings/{rep_id}.pt if flattened? 
-    # Let's check the first one to guess structure
+    # Map ds7_1 -> ds7, ds8_1 -> ds8
+    embed_ds_folder = ds_name.split("_")[0]
     
-    # Heuristic for folder structure
-    dataset_embed_dir = EMBEDDINGS_DIR / ds_name
+    # Structure: data/embeddings/{ds_name}/{split}/{rep_id}.npy
+    dataset_embed_dir = EMBEDDINGS_DIR / embed_ds_folder / split
+    
     if not dataset_embed_dir.exists():
-        # Maybe it's flattened?
-        if (EMBEDDINGS_DIR / f"{reps[0].rep_id}.pt").exists():
-             dataset_embed_dir = EMBEDDINGS_DIR
+        logger.warning(f"   ⚠️ Folder {dataset_embed_dir} does not exist. Assuming all missing.")
+        # Fallback check: maybe it's just {ds_name}/{rep_id}.npy?
+        if (EMBEDDINGS_DIR / embed_ds_folder / f"{reps[0].rep_id}.npy").exists():
+             logger.info("   ℹ️ Found flattened structure (no split folder).")
+             dataset_embed_dir = EMBEDDINGS_DIR / embed_ds_folder
         else:
-             logger.warning(f"   ⚠️ Folder {dataset_embed_dir} does not exist. Assuming all missing.")
              return {"total": len(reps), "missing": len(reps), "corrupt": 0}
 
     for rep in tqdm(reps, desc=f"Scanning {ds_name}"):
         rep_id = rep.rep_id
         # sanitize rep_id if needed, though usually it matches filename
-        file_path = dataset_embed_dir / f"{rep_id}.pt"
+        file_path = dataset_embed_dir / f"{rep_id}.npy"
         
         if not file_path.exists():
             missing_count += 1

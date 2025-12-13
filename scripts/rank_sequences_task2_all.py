@@ -220,7 +220,7 @@ def rank_sequences_task2_all(force=False):
                             emb = emb[:min_len]
                         
                         # Rank
-                        df_rank = rank_sequences(valid_seqs, emb, model, top_k=per_rep_top_k)
+                        df_rank = rank_sequences(valid_seqs, emb, ensemble_wrapper, top_k=per_rep_top_k)
                         df_rank["repertoire_id"] = r.rep_id
                         
                         # Merge V/J info

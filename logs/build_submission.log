@@ -1,0 +1,9 @@
+2025-12-13 08:23:35,899 - INFO - [Build Submission] Generating final submission file...
+2025-12-13 08:23:35,904 - INFO - Loaded Task 1 results: 4213 rows
+2025-12-13 08:23:36,216 - INFO - Loaded Task 2 results: 4213 rows from 11 files
+2025-12-13 08:26:15,716 - INFO - [Build Submission] Generating final submission file...
+2025-12-13 08:26:15,721 - INFO - Loaded Task 1 results: 4213 rows
+2025-12-13 08:26:16,030 - INFO - Loaded Task 2 results: 4213 rows from 11 files
+2025-12-13 08:26:16,034 - INFO -   Mapping repertoires to datasets...
+2025-12-13 08:26:36,289 - INFO - ✅ Saved final submission to outputs/submissions/submission_20251213_082636/submission.csv
+2025-12-13 08:26:36,289 - INFO - ✅ Also saved to submission.csv

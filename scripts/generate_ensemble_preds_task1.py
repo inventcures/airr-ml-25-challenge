@@ -116,14 +116,7 @@ def generate_train_oof_preds(ds_name: str):
         logging.warning(f"  No labeled reps for {ds_name}.")
         return
 
-    # 1. Load All 5 Models
-    models = []
-    for k in range(5):
-        m_path = MODELS_DIR / f"{ds_name}_fold{k}.joblib"
-        if not m_path.exists():
-            logging.error(f"  ❌ Model fold {k} missing for {ds_name} at {m_path}")
-            return
-        models.append(ESMSequenceClassifier.load(m_path))
+    # Models will be loaded after filtering to save time
         
     # 2. Re-create Splits
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
@@ -140,10 +133,7 @@ def generate_train_oof_preds(ds_name: str):
     #   Thus, fold k model has NOT seen Fold K Data.
     #   So for data in Fold K, we usage Model K.
     
-    for fold_idx, (train_idx, val_idx) in enumerate(skf.split(labeled_reps, y_all)):
-        # Data in val_idx belongs to "Fold {fold_idx}"
-        # Model {fold_idx} was NOT trained on this data.
-        # So we use Model {fold_idx} to predict this data.
+
         
     work_items = []
     fold_map = {} # just to identify which models we truly need if we wanted to be lazy, but let's load all.
@@ -159,6 +149,7 @@ def generate_train_oof_preds(ds_name: str):
         return
 
     # Valid work found, load models now
+    models = []
     for k in range(5):
         m_path = MODELS_DIR / f"{ds_name}_fold{k}.joblib"
         if not m_path.exists():

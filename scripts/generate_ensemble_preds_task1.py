@@ -115,6 +115,17 @@ def generate_train_oof_preds(ds_name: str, force: bool = False):
          logging.info(f"  ⚠️ Force enabled: Deleting existing file {out_path}")
          out_path.unlink()
 
+    # Check for existing progress
+    processed_ids = set()
+    if out_path.exists():
+        try:
+            existing_df = pd.read_csv(out_path)
+            if "repertoire_id" in existing_df.columns:
+                processed_ids = set(existing_df["repertoire_id"].astype(str))
+                logging.info(f"  🔄 Resuming {ds_name}: Found {len(processed_ids)} already processed.")
+        except Exception as e:
+            logging.warning(f"  ⚠️ Could not read existing file {out_path}: {e}")
+
     reps = load_repertoires_pickle(pkl_path)
     labeled_reps = [r for r in reps if r.label is not None]
     

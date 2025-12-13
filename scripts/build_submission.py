@@ -41,31 +41,105 @@ def build_submission():
     ranking_files = list(TASK2_DIR.glob("*_ranking.csv"))
     if not ranking_files:
         logging.warning("No Task 2 ranking files found. Submission will have missing Task 2 columns.")
-    
+    # 2. Load Task 2 Results (Dataset-Specific Ranking Files)
+    # We expect files like: ds1_train_ranking.csv, ds1_test_ranking.csv
+    # We must explicitly strict map them to 'dataset' name to avoid collision.
     task2_rows = []
+    
+    # Import mappings locally
+    from data.load_all_datasets import TRAIN_DATASETS, TEST_DATASETS
+    
+    # helper to find mapping
+    def get_dataset_name_from_file(fname):
+        # fname example: ds1_train.csv or ds7_1_test_ranking.csv
+        # We try to match keys
+        name = fname.name
+        
+        # Check Train keys
+        for k, v in TRAIN_DATASETS.items():
+            if name.startswith(f"{k}_train"):
+                return v, "train"
+                
+        # Check Test keys
+        for k, v in TEST_DATASETS.items():
+            if name.startswith(f"{k}_test"):
+                return v, "test"
+        
+        # Fallback for old style "ds1_ranking.csv" - Try to guess
+        # But this is risky. Let's rely on our new script's output pattern.
+        return None, None
+
+    ranking_files = list(TASK2_DIR.glob("*_ranking.csv"))
+    logging.info(f"Found {len(ranking_files)} Task 2 ranking files.")
+    
     for f in ranking_files:
-        try:
-            df = pd.read_csv(f)
-            # Kaggle requires 125 sequences per repertoire.
-            # Our rank script already outputs top 125.
-            # We just append them.
-            task2_rows.append(df)
-        except Exception as e:
-            logging.error(f"Error reading {f}: {e}")
+        ds_name, ds_type = get_dataset_name_from_file(f)
+        if not ds_name:
+            logging.warning(f"  ⚠️ Skipping unrecognized file: {f.name}")
+            continue
+            
+        df = pd.read_csv(f)
+        df["dataset"] = ds_name # INJECT DATASET NAME HERE
+        task2_rows.append(df)
         
     if task2_rows:
-        df_task2 = pd.concat(task2_rows)
-        logging.info(f"Loaded Task 2 results: {len(df_task2)} rows from {len(ranking_files)} files")
+        df_task2 = pd.concat(task2_rows, ignore_index=True)
+        logging.info(f"Loaded Task 2 Results: {len(df_task2)} rows total.")
     else:
-        df_task2 = pd.DataFrame(columns=["repertoire_id", "sequence", "v_call", "j_call"])
+        # Emergency fallback or empty
+        logging.error("No valid Task 2 files found! Submission will fail.")
+        df_task2 = pd.DataFrame(columns=["repertoire_id", "sequence", "v_call", "j_call", "dataset"])
         
-    # 3. Merge
+    # 3. Process & Merge
     # Task 1 (df_task1) is 1 row per repertoire.
-    # Task 2 (df_task2) is 125 rows per repertoire.
-    # We join Task 2 -> Task 1 (left join on Task 2 to keep all sequences)
-    # Wait, Task 1 must be broadcast to all 125 sequences.
+    # df_task1 has ['repertoire_id', 'dataset', 'label_positive_probability']
+    # df_task2 has ['repertoire_id', 'sequence', 'score', 'dataset', ...]
     
-    merged = df_task2.merge(df_task1, on="repertoire_id", how="left")
+    # We merge on BOTH [repertoire_id, dataset] to ensure safety
+    # But Task 1 might have 'dataset' (e.g. test_dataset_1)
+    
+    merged = df_task2.merge(df_task1, on=["repertoire_id", "dataset"], how="left")
+    
+    # 4. Apply ID Logic
+    final_rows = []
+    
+    # Iterate by dataset to handle specific logic
+    for dataset_name, group in merged.groupby("dataset"):
+        if "test" in dataset_name:
+            # TEST DATASETS: STRICTLY 1 row per repertoire (Duplicate ID Forbidden)
+            # Take the top ranked sequence (first one, since sorting is preserved or we force sort)
+            # Assumption: Inputs are sorted by score desc? Rank script did sort.
+            # But let's be safe. If 'score' is present, sort.
+            if "score" in group.columns:
+                group = group.sort_values("score", ascending=False)
+            
+            # Drop duplicates on repertoire_id, keeping first (best)
+            group = group.drop_duplicates(subset=["repertoire_id"], keep="first")
+            
+            # ID is just Repertoire ID
+            group = group.rename(columns={"repertoire_id": "ID"})
+            final_rows.append(group)
+            logging.info(f"  Processed {dataset_name} (Test): kept {len(group)} rows (1 per rep).")
+            
+        elif "train" in dataset_name:
+            # TRAIN DATASETS: STRICTLY 50,000 rows (Task 2 Target)
+            # ID must be UNIQUE. We use synthetic ID: dataset_name + "_seq_top_" + rank
+            if len(group) != 50000:
+                logging.warning(f"  ⚠️ {dataset_name} has {len(group)} rows. Expected 50,000.")
+            
+            # Sort by score for correct ranking
+            if "score" in group.columns:
+                 group = group.sort_values("score", ascending=False)
+            
+            # Generate Synthetic IDs
+            # 0-indexed rank matches 0..49999
+            ranks = range(len(group)) 
+            group["ID"] = [f"{dataset_name}_seq_top_{i}" for i in ranks]
+            
+            final_rows.append(group)
+            logging.info(f"  Processed {dataset_name} (Train): kept {len(group)} rows with synthetic IDs.")
+            
+    merged = pd.concat(final_rows)
     
     # 4. Format
     if "dataset" not in merged.columns:

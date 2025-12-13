@@ -1,49 +1,46 @@
 import pandas as pd
 import numpy as np
-from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
 import joblib
 from pathlib import Path
-from typing import List, Dict, Optional
+import logging
 
-"""
-Meta-Ensemble Layer (Stacking Classifier)
-
-SYSTEM ARCHITECTURE
--------------------
-This component implements the final fusion layer of our solution.
-It uses **Stacking**, a powerful ensemble technique.
-
-INPUTS:
-The input to this meta-learner is NOT raw sequence data.
-Instead, it takes the **prediction probabilities** from the three base streams:
-1. Stream 1: DeepRC OOF Probabilities (`p_deeprc`)
-2. Stream 2: ESM Sequence Classifier OOF Probabilities (`p_esm`)
-3. Stream 3: Clustering MIL OOF Probabilities (`p_cluster`)
-(And optionally `p_stats` if available).
-
-LOGIC:
-We train a Logistic Regression on these probabilities.
-This allows the system to learn which stream is trustworthy.
-- If DeepRC is confident but ESM is unsure, the meta-learner learns to weigh DeepRC higher.
-- If streams disagree, it finds the optimal weighted consensus.
-
-ROBUSTNESS:
-The `predict_proba` method handles missing columns (e.g., if one stream failed for a test set) by imputing neutral probability (0.5), ensuring the pipeline never crashes in production.
-"""
+# HYBRID APPROACH: Try XGBoost (RunPod), Fallback to HistGradientBoosting (Local Mac)
+try:
+    from xgboost import XGBClassifier
+    HAS_XGBOOST = True
+except ImportError:
+    HAS_XGBOOST = False
+    from sklearn.ensemble import HistGradientBoostingClassifier
 
 class MetaEnsembleClassifier:
     """
-    Logistic Regression Stacker for combining multi-modal OOF predictions.
+    Hybrid Stacker: Uses XGBoost if available, else Scikit-Learn's HistGradientBoosting.
+    Ensures maximum performance on server (RunPod) while working locally.
     """
     def __init__(self, random_state: int = 42):
         self.random_state = random_state
-        # Simple logistic regression to combine probabilities
-        self.model = Pipeline([
-            ('scaler', StandardScaler()),
-            ('clf', LogisticRegression(random_state=random_state))
-        ])
+        
+        if HAS_XGBOOST:
+            # OPTION A: XGBoost (Gold Standard)
+            print("⚡ Using XGBoost (Best Performance)")
+            self.model = XGBClassifier(
+                n_estimators=100,
+                max_depth=3,
+                learning_rate=0.1,
+                random_state=random_state,
+                eval_metric='logloss',
+                use_label_encoder=False
+            )
+        else:
+            # OPTION B: HistGradientBoosting (LightGBM equivalent, No Dependencies)
+            print("⚠️ XGBoost not found. Using HistGradientBoosting (High Performance Fallback)")
+            self.model = HistGradientBoostingClassifier(
+                max_iter=100,
+                max_depth=3,
+                learning_rate=0.1,
+                random_state=random_state,
+                scoring='log_loss'
+            )
         self.feature_names_ = []
 
     def fit(self, X: pd.DataFrame, y: pd.Series):

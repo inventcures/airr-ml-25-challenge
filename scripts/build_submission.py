@@ -84,90 +84,123 @@ def build_submission():
         
     if task2_rows:
         df_task2 = pd.concat(task2_rows, ignore_index=True)
+        # Rename sequence -> junction_aa immediately
+        df_task2 = df_task2.rename(columns={"sequence": "junction_aa"})
         logging.info(f"Loaded Task 2 Results: {len(df_task2)} rows total.")
     else:
         # Emergency fallback or empty
         logging.error("No valid Task 2 files found! Submission will fail.")
-        df_task2 = pd.DataFrame(columns=["repertoire_id", "sequence", "v_call", "j_call", "dataset"])
+        df_task2 = pd.DataFrame(columns=["repertoire_id", "junction_aa", "v_call", "j_call", "dataset"])
         
     # 3. Process & Merge
     # Task 1 (df_task1) is 1 row per repertoire.
-    # df_task1 has ['repertoire_id', 'dataset', 'label_positive_probability']
-    # df_task2 has ['repertoire_id', 'sequence', 'score', 'dataset', ...]
-    
+    # df_task1 has ['repertoire_id', 'dataset', 'probability'] (Checked via logs)
+    # Rename probability -> label_positive_probability
+    if "probability" in df_task1.columns:
+        df_task1 = df_task1.rename(columns={"probability": "label_positive_probability"})
+        
     # We merge on BOTH [repertoire_id, dataset] to ensure safety
-    # But Task 1 might have 'dataset' (e.g. test_dataset_1)
-    
+    # Reverting drop because it caused KeyError (ID not found implies it was already renamed)
     merged = df_task2.merge(df_task1, on=["repertoire_id", "dataset"], how="left")
+    logging.info(f"Merged Data Shape: {merged.shape}")
+    logging.info(f"Merged Columns: {merged.columns.tolist()}")
     
-    # 4. Apply ID Logic
     final_rows = []
     
     # Iterate by dataset to handle specific logic
     for dataset_name, group in merged.groupby("dataset"):
         if "test" in dataset_name:
             # TEST DATASETS: STRICTLY 1 row per repertoire (Duplicate ID Forbidden)
-            # Take the top ranked sequence (first one, since sorting is preserved or we force sort)
-            # Assumption: Inputs are sorted by score desc? Rank script did sort.
-            # But let's be safe. If 'score' is present, sort.
-            if "score" in group.columns:
-                group = group.sort_values("score", ascending=False)
+            # Take the top ranked sequence
+            group = group.sort_values("score", ascending=False)
             
-            # Drop duplicates on repertoire_id, keeping first (best)
-            group = group.drop_duplicates(subset=["repertoire_id"], keep="first")
+            # Filter distinct repertoire_id
+            distinct_reps = group.drop_duplicates(subset=["repertoire_id"])
             
-            # ID is just Repertoire ID
-            group = group.rename(columns={"repertoire_id": "ID"})
-            final_rows.append(group)
-            logging.info(f"  Processed {dataset_name} (Test): kept {len(group)} rows (1 per rep).")
+            # Vectorized ID: Use repertoire_id
+            distinct_reps = distinct_reps.copy()
+            distinct_reps["ID"] = distinct_reps["repertoire_id"]
             
-        elif "train" in dataset_name:
-            # TRAIN DATASETS: STRICTLY 50,000 rows (Task 2 Target)
-            # ID must be UNIQUE. We use synthetic ID: dataset_name + "_seq_top_" + rank
-            if len(group) != 50000:
-                logging.warning(f"  ⚠️ {dataset_name} has {len(group)} rows. Expected 50,000.")
+            logging.info(f"  Processed {dataset_name} (Test): kept {len(distinct_reps)} rows (1 per rep).")
+            final_rows.append(distinct_reps)
+                
+        else:
+            # TRAIN DATASETS: Synthetic IDs
+            # Sort by score desc to be deterministic
+            group = group.sort_values("score", ascending=False)
             
-            # Sort by score for correct ranking
-            if "score" in group.columns:
-                 group = group.sort_values("score", ascending=False)
-            
-            # Generate Synthetic IDs
-            # 0-indexed rank matches 0..49999
-            ranks = range(len(group)) 
+            logging.info(f"  Processed {dataset_name} (Train): kept {len(group)} rows with synthetic IDs.")
+             
+            # Vectorized ID Assignment
+            # Create a 0-indexed range for this group
+            ranks = range(len(group))
+            group = group.copy()
+            # USE SAMPLE FORMAT: {dataset}_seq_top_{i}
             group["ID"] = [f"{dataset_name}_seq_top_{i}" for i in ranks]
             
+            # Debug check
+            if "train_dataset_1" in dataset_name:
+                first_id = group["ID"].iloc[0]
+                logging.info(f"  [DEBUG-VEC] {dataset_name} first ID: {first_id}")
+
             final_rows.append(group)
-            logging.info(f"  Processed {dataset_name} (Train): kept {len(group)} rows with synthetic IDs.")
             
-    merged = pd.concat(final_rows)
+    # Concatenate all groups
+    final_df = pd.concat(final_rows, ignore_index=True)
     
-    # 4. Format
-    if "dataset" not in merged.columns:
-        logging.warning("  'dataset' column missing from Task 1 predictions! Submission may be invalid.")
+    logging.info(f"[DEBUG] Final DF Head:\n{final_df.head()}")
+    logging.info(f"[DEBUG] Final DF Columns: {final_df.columns.tolist()}")
     
-    # Rename columns
-    merged = merged.rename(columns={
-        "repertoire_id": "ID",
-        "probability": "label_positive_probability",
-        "sequence": "junction_aa"
-    })
+    # 5. Sanitize Columns
+    # Remove duplicate columns (e.g. ID, ID.1) by keeping first
+    final_df = final_df.loc[:, ~final_df.columns.duplicated()]
     
-    # Fill missing Task 2 with defaults
-    merged["junction_aa"] = merged["junction_aa"].fillna("-999.0")
-    merged["v_call"] = merged["v_call"].fillna("-999.0")
-    merged["j_call"] = merged["j_call"].fillna("-999.0")
-    
-    # Select columns
+    # Select Final Columns
     final_cols = ["ID", "dataset", "label_positive_probability", "junction_aa", "v_call", "j_call"]
     
-    # Ensure all cols exist (dataset might be null if mapping failed)
-    if "dataset" not in merged.columns or merged["dataset"].isnull().any():
-        logging.warning(f"  {merged['dataset'].isnull().sum()} rows have missing dataset mapping.")
-        merged["dataset"] = merged["dataset"].fillna("unknown")
-        
-    final_df = merged[final_cols]
+    # Ensure all columns exist
+    for c in final_cols:
+        if c not in final_df.columns:
+            logging.warning(f"  Column {c} missing, filling with default.")
+            final_df[c] = None
+            
+    final_df = final_df[final_cols]
     
-    # NO FILTERING. We submit everything (Train + Test).
+    # MASK TEST SET DATA
+    # Rule: "junction_aa must be -999.0 for non-train datasets"
+    test_mask = final_df['dataset'].str.contains('test', na=False)
+    mask_cols = ['junction_aa', 'v_call', 'j_call']
+    logging.info(f"Masking {test_mask.sum()} test rows with -999.0 for columns {mask_cols}")
+    final_df.loc[test_mask, mask_cols] = "-999.0"
+    
+    # Debug Train ID in Final DF
+    train_sample = final_df[final_df['dataset'] == 'train_dataset_1']
+    if not train_sample.empty:
+        logging.info(f"[DEBUG-FINAL] train_dataset_1 Head ID:\n{train_sample['ID'].head()}")
+    
+    # Fill specific missing values if any
+    final_df['dataset'] = final_df['dataset'].fillna("unknown")
+    
+    # Fill logic for sequences if Task 2 missing
+    final_df['junction_aa'] = final_df['junction_aa'].fillna("")
+    final_df['v_call'] = final_df['v_call'].fillna("unknown")
+    final_df['j_call'] = final_df['j_call'].fillna("unknown")
+    
+    # SAFE FILL for probability - DO NOT DROP ROWS
+    if final_df['label_positive_probability'].isnull().sum() > 0:
+        logging.warning(f"  Found {final_df['label_positive_probability'].isnull().sum()} rows with NULL probability. Filling with 0.5.")
+        final_df['label_positive_probability'] = final_df['label_positive_probability'].fillna(0.5)
+        
+    # Check for missing ID
+    if final_df['ID'].isnull().sum() > 0:
+        logging.error(f"  Found {final_df['ID'].isnull().sum()} rows with NULL ID! IDs cannot be missing.")
+        # Try to rescue? Or failure.
+        # Ensure ID at all costs
+        null_id_mask = final_df['ID'].isnull()
+        final_df.loc[null_id_mask, 'ID'] = "MISSING_ID_" + final_df.loc[null_id_mask].index.astype(str)
+    
+    # Sanity Check Row Count
+    logging.info(f"Final Row Count: {len(final_df)}")
     
     # 5. Save & Versioning
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

@@ -117,8 +117,69 @@ def build_submission():
         f.write("Missing Values:\n")
         f.write(str(final_df.isnull().sum()) + "\n\n")
         
+
+def validate_submission(df: pd.DataFrame, log_path: Path):
+    """
+    Performs strict validation checks against contest rules.
+    Logs results to both console and summary log.
+    """
+    logging.info("\n[Validation] Starting strict checks...")
+    issues = []
+    
+    # Check 1: Column Names
+    expected_cols = {"ID", "dataset", "label_positive_probability", "junction_aa", "v_call", "j_call"}
+    missing_cols = expected_cols - set(df.columns)
+    if missing_cols:
+        issues.append(f"❌ Missing columns: {missing_cols}")
+    else:
+        logging.info("✅ Columns check passed.")
+
+    # Check 2: No Nulls in critical columns
+    if df["dataset"].isnull().any():
+        issues.append(f"❌ Null values in 'dataset' column: {df['dataset'].isnull().sum()}")
+    if df["label_positive_probability"].isnull().any():
+        issues.append(f"❌ Null values in 'label_positive_probability' column: {df['label_positive_probability'].isnull().sum()}")
+    else:
+        logging.info("✅ Null check passed.")
+        
+    # Check 3: Row Counts per Dataset
+    # Train datasets must have exactly 50,000 sequences (for Task 2)
+    # Test datasets just need 1 per repertoire (Task 1 focus)
+    ds_counts = df["dataset"].value_counts()
+    
+    for ds_name, count in ds_counts.items():
+        if "train" in ds_name:
+            if count != 50000:
+                issues.append(f"⚠️ warning: {ds_name} has {count} rows. Expected exactly 50,000 for Task 2.")
+            else:
+                logging.info(f"✅ {ds_name}: 50,000 rows (Perfect).")
+        # Test datasets vary, so we skip specific count validation unless we know exact repertoire counts.
+
+    # Check 4: Value Ranges
+    # Task 1 probs should be 0-1. Task 2 dummy rows are ignored (usually same prob).
+    # Since we broadcast prob to all rows, all rows should be 0-1.
+    if not ((df["label_positive_probability"] >= 0) & (df["label_positive_probability"] <= 1)).all():
+         issues.append("❌ Probabilities out of range [0, 1].")
+    else:
+         logging.info("✅ Probability range check passed.")
+
+    # Final Report
+    with open(log_path, "a") as f:
+        f.write("\nValidation Report:\n")
+        if issues:
+            f.write("ISSUES FOUND:\n")
+            for i in issues:
+                f.write(i + "\n")
+                logging.error(i)
+            f.write("\nsubmission.csv might be INVALID.\n")
+        else:
+            f.write("✅ All Checks Passed.\n")
+            logging.info("Click 'Submit'! 🚀")
+
     logging.info(f"✅ Saved final submission to {out_path}")
     logging.info(f"✅ Also saved to {OUTPUT_CSV}")
+    
+    validate_submission(final_df, log_path)
 
 if __name__ == "__main__":
     build_submission()

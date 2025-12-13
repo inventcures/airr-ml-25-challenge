@@ -34,6 +34,22 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 Task 2: Disease-Associated Sequence Discovery (Ranking/Retrieval)
 """
 
+class EnsembleModel:
+    def __init__(self, models):
+        self.models = models
+        
+    def predict_proba(self, X):
+        # Average probabilities
+        p_sum = None
+        for m in self.models:
+            p = m.predict_proba(X)
+            if p_sum is None: p_sum = p
+            else: p_sum += p
+        return p_sum / len(self.models)
+        
+    def predict(self, X):
+        return np.argmax(self.predict_proba(X), axis=1)
+
 def rank_sequences_task2_all():
     # Process both Train and Test datasets separately to avoid overwriting files
     # We will generate specific output files: {ds}_train_ranking.csv and {ds}_test_ranking.csv
@@ -79,19 +95,35 @@ def rank_sequences_task2_all():
         # Determine Train DS for model loading
         train_ds_model = task["base_ds"].split("_")[0] # ds7_1 -> ds7
         
-        model_path = MODELS_DIR / f"{train_ds_model}_esm_seq_model.joblib"
-        if not model_path.exists():
-            logging.warning(f"  Model not found for {ds_name} at {model_path}. Skipping.")
-            continue
-            
-        logging.info(f"  Loading model from {model_path}...")
-        model = ESMSequenceClassifier.load(model_path)
+        # --- MODEL LOADING LOGIC (ENSEMBLE vs SINGLE) ---
+        ensemble_models = []
+        ensemble_dir = Path("models/esm_seq_ensemble")
         
-        # Load Repertoires - STRICT loading based on type
-        # For Test ds1, load ds1_test.pkl. For Train ds1, load ds1_train.pkl.
+        # Check for 5 folds
+        folds_found = 0
+        for k in range(5):
+             fold_path = ensemble_dir / f"{train_ds_model}_fold{k}.joblib"
+             if fold_path.exists():
+                 folds_found += 1
+        
+        if folds_found == 5:
+            logging.info(f"  🚀 Found 5/5 Ensemble Folds for {train_ds_model}! Using Ensemble.")
+            for k in range(5):
+                fold_path = ensemble_dir / f"{train_ds_model}_fold{k}.joblib"
+                ensemble_models.append(ESMSequenceClassifier.load(fold_path))
+        else:
+            # Fallback
+            model_path = MODELS_DIR / f"{train_ds_model}_esm_seq_model.joblib"
+            if not model_path.exists():
+                logging.warning(f"  Model not found for {ds_name} at {model_path}. Skipping.")
+                continue
+            logging.info(f"  Using Single Model from {model_path}...")
+            ensemble_models.append(ESMSequenceClassifier.load(model_path))
+        
+        # Load Repertoires 
         pickle_candidates = [
             PROCESSED_DIR / f"{ds_name}{task['pickle_suffix']}.pkl",
-            PROCESSED_DIR / f"{ds_name}.pkl" # Fallback
+            PROCESSED_DIR / f"{ds_name}.pkl" 
         ]
         
         reps = None
@@ -99,12 +131,18 @@ def rank_sequences_task2_all():
             if p.exists():
                 reps = load_repertoires_pickle(p)
                 break
-        
+                
         if not reps:
-            logging.warning(f"  Pickle not found for {ds_name} ({ds_type}). Candidates: {pickle_candidates}. Skipping.")
+            logging.warning(f"  Pickle not found for {ds_name}. Skipping.")
             continue
             
-        logging.info(f"  Loaded {len(reps)} repertoires from {p.name}")
+        logging.info(f"  Loaded {len(reps)} repertoires. Ranking with {len(ensemble_models)} models...")
+        
+        # Wrap models
+        ensemble_wrapper = EnsembleModel(ensemble_models)
+        
+        # Run Ranking
+        df_res = rank_sequences(reps, ensemble_wrapper, ds_name, task["base_ds"], task["target_rows"])
 
         # Load embeddings with robust checking
         base_ds = task["base_ds"]

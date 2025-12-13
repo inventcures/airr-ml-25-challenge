@@ -90,6 +90,22 @@ def build_submission():
         
     final_df = merged[final_cols]
     
+    # FILTER: Kaggle only wants Test Set predictions (4213 rows)
+    # The current dataframe includes 3610 Train rows + 4213 Test rows = 7823 total.
+    # We must properly filter for 'test_dataset'
+    
+    # Check current size
+    initial_len = len(final_df)
+    
+    # Filter for valid test names (containing 'test_dataset')
+    final_df = final_df[final_df["dataset"].astype(str).str.contains("test_dataset", case=False, na=False)]
+    
+    filtered_len = len(final_df)
+    logging.info(f"Filtered submission from {initial_len} to {filtered_len} rows (Removed Training Data).")
+    
+    if filtered_len != 4213:
+        logging.warning(f"⚠️ Expected 4213 rows (Test Only), but got {filtered_len}. Please verify!")
+    
     # 5. Save & Versioning
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     version_dir = SUBMISSIONS_ROOT / f"submission_{timestamp}"

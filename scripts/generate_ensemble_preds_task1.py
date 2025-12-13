@@ -174,10 +174,75 @@ def generate_train_oof_preds(ds_name: str):
                 })
                 
     # Save
-    df = pd.DataFrame(results)
     out_path = OUTPUT_DIR / f"{ds_name}_train_esm_preds.csv"
-    df.to_csv(out_path, index=False)
-    logging.info(f"  ✅ Saved OOF preds to {out_path} ({len(df)} rows)")
+    
+    # Check for existing progress
+    processed_ids = set()
+    if out_path.exists():
+        try:
+            existing_df = pd.read_csv(out_path)
+            if "repertoire_id" in existing_df.columns:
+                processed_ids = set(existing_df["repertoire_id"].astype(str))
+                logging.info(f"  🔄 Resuming {ds_name}: Found {len(processed_ids)} already processed.")
+        except Exception as e:
+            logging.warning(f"  ⚠️ Could not read existing file {out_path}: {e}")
+
+    # 3. Predict per Fold (OOF)
+    results_buffer = []
+    
+    # We need to flatten the work items first to filter effectively OR filter inside loop
+    # Filter up front is harder because we need the fold structure.
+    # We will filter at the batch level or item level.
+    
+    work_items = []
+    for fold_idx, (train_idx, val_idx) in enumerate(skf.split(labeled_reps, y_all)):
+        model_to_use = models[fold_idx]
+        for i in val_idx:
+            rep = labeled_reps[i]
+            if str(rep.rep_id) not in processed_ids:
+                work_items.append((rep, model_to_use))
+                
+    if not work_items:
+        logging.info(f"  ✅ All items already processed for {ds_name}.")
+        return
+
+    logging.info(f"  Processing {len(work_items)} remaining items for {ds_name}...")
+    
+    # Process in chunks
+    batch_iter = tqdm(chunk_list(work_items, BATCH_SIZE), total=(len(work_items)//BATCH_SIZE)+1, desc=f"OOF {ds_name}")
+    
+    for batch_items in batch_iter:
+        # Batch items is list of (rep, model)
+        # Note: models might differ in a batch if we cross fold boundaries (unlikely with this flat list order, but possible)
+        # Actually our load_embeddings takes a list of IDs.
+        # It's better to group by model? 
+        # No, let's just do one-by-one for safety or group by model if needed.
+        # But wait, load_embeddings is the bottleneck.
+        
+        batch_reps = [x[0] for x in batch_items]
+        batch_models = [x[1] for x in batch_items]
+        batch_ids = [r.rep_id for r in batch_reps]
+        
+        emb_map = load_embeddings(ds_name, batch_ids)
+        
+        batch_results = []
+        for i, r in enumerate(batch_reps):
+            if r.rep_id not in emb_map:
+                batch_results.append({"repertoire_id": r.rep_id, "p_esm": 0.5, "label": r.label})
+                continue
+                
+            emb = emb_map[r.rep_id]
+            model = batch_models[i]
+            p = model.predict_repertoire(emb)
+            
+            batch_results.append({"repertoire_id": r.rep_id, "p_esm": p, "label": r.label})
+            
+        # Write Batch
+        df_batch = pd.DataFrame(batch_results)
+        header = not out_path.exists()
+        df_batch.to_csv(out_path, mode='a', header=header, index=False)
+        
+    logging.info(f"  ✅ Completed OOF preds for {ds_name}")
 
 def generate_test_ensemble_preds(ds_name: str):
     logging.info(f"Generating TEST Ensemble Preds for {ds_name}...")
@@ -199,8 +264,6 @@ def generate_test_ensemble_preds(ds_name: str):
     for k in range(5):
         m_path = MODELS_DIR / f"{base_ds}_fold{k}.joblib"
         if not m_path.exists():
-             # Fallback: Maybe only single model exists?
-             # But this script is specifically for ENSEMBLE.
              logging.warning(f"  ⚠️ Model fold {k} missing for {base_ds}. Ensemble incomplete.")
              continue
         models.append(ESMSequenceClassifier.load(m_path))
@@ -209,28 +272,52 @@ def generate_test_ensemble_preds(ds_name: str):
         logging.error(f"  ❌ No models found for {base_ds}. Skipping {ds_name}.")
         return
         
-    results = []
+    out_path = OUTPUT_DIR / f"{ds_name}_test_esm_preds.csv"
     
+    # Check resumption
+    processed_ids = set()
+    if out_path.exists():
+        try:
+            existing_df = pd.read_csv(out_path)
+            if "repertoire_id" in existing_df.columns:
+                processed_ids = set(existing_df["repertoire_id"].astype(str))
+                logging.info(f"  🔄 Resuming {ds_name}: Found {len(processed_ids)} already processed.")
+        except Exception as e:
+            logging.warning(f"  ⚠️ Could not read existing file {out_path}: {e}")
+            
+    # Filter work
+    reps_to_process = [r for r in reps if str(r.rep_id) not in processed_ids]
+    
+    if not reps_to_process:
+        logging.info(f"  ✅ All items already processed for {ds_name}.")
+        return
+
+    logging.info(f"  Processing {len(reps_to_process)} remaining items for {ds_name}...")
+
     # Predict
-    batch_iter = tqdm(chunk_list(reps, BATCH_SIZE), total=(len(reps)//BATCH_SIZE)+1, desc=f"Predicting {ds_name}")
+    batch_iter = tqdm(chunk_list(reps_to_process, BATCH_SIZE), total=(len(reps_to_process)//BATCH_SIZE)+1, desc=f"Predicting {ds_name}")
+    
     for batch_reps in batch_iter:
         batch_ids = [r.rep_id for r in batch_reps]
         emb_map = load_embeddings(ds_name, batch_ids)
         
+        batch_results = []
         for r in batch_reps:
             if r.rep_id not in emb_map:
-                results.append({"repertoire_id": r.rep_id, "p_esm": 0.5})
+                batch_results.append({"repertoire_id": r.rep_id, "p_esm": 0.5})
                 continue
                 
             emb = emb_map[r.rep_id]
             p_avg = predict_repertoire_ensemble(models, emb)
             
-            results.append({"repertoire_id": r.rep_id, "p_esm": p_avg})
+            batch_results.append({"repertoire_id": r.rep_id, "p_esm": p_avg})
             
-    df = pd.DataFrame(results)
-    out_path = OUTPUT_DIR / f"{ds_name}_test_esm_preds.csv"
-    df.to_csv(out_path, index=False)
-    logging.info(f"  ✅ Saved Ensemble preds to {out_path} ({len(df)} rows)")
+        # Write Batch
+        df_batch = pd.DataFrame(batch_results)
+        header = not out_path.exists()
+        df_batch.to_csv(out_path, mode='a', header=header, index=False)
+        
+    logging.info(f"  ✅ Completed Ensemble preds for {ds_name}")
 
 def main():
     # 1. Process Train (OOF)

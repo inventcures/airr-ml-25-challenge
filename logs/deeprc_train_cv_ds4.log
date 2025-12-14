@@ -1,0 +1,138 @@
+2025-12-11 04:30:25,069 - INFO - [DeepRC CV] Training on ds4 with 5 folds...
+2025-12-11 04:30:27,510 - INFO - Using device: cuda
+2025-12-11 04:30:27,521 - INFO - --- Fold 0 ---
+2025-12-11 04:31:18,159 - INFO - [Fold 1/5] Epoch 1/20 - Loss: 0.6941 - Val AUC: 0.5019
+2025-12-11 04:31:18,168 - INFO -    ⭐️ New best AUC for fold 1: 0.5019
+2025-12-11 04:31:54,784 - INFO - [Fold 1/5] Epoch 2/20 - Loss: 0.6933 - Val AUC: 0.6931
+2025-12-11 04:31:54,789 - INFO -    ⭐️ New best AUC for fold 1: 0.6931
+2025-12-11 04:32:15,113 - INFO - [Fold 1/5] Epoch 3/20 - Loss: 0.6946 - Val AUC: 0.5994
+2025-12-11 04:32:22,763 - INFO - [Fold 1/5] Epoch 4/20 - Loss: 0.6941 - Val AUC: 0.4906
+2025-12-11 04:32:27,862 - INFO - [Fold 1/5] Epoch 5/20 - Loss: 0.6928 - Val AUC: 0.6450
+2025-12-11 04:32:33,084 - INFO - [Fold 1/5] Epoch 6/20 - Loss: 0.6933 - Val AUC: 0.5125
+2025-12-11 04:32:37,921 - INFO - [Fold 1/5] Epoch 7/20 - Loss: 0.6948 - Val AUC: 0.4778
+2025-12-11 04:32:42,997 - INFO - [Fold 1/5] Epoch 8/20 - Loss: 0.6944 - Val AUC: 0.4856
+2025-12-11 04:32:47,788 - INFO - [Fold 1/5] Epoch 9/20 - Loss: 0.6934 - Val AUC: 0.5244
+2025-12-11 04:32:52,884 - INFO - [Fold 1/5] Epoch 10/20 - Loss: 0.6931 - Val AUC: 0.5072
+2025-12-11 04:32:57,725 - INFO - [Fold 1/5] Epoch 11/20 - Loss: 0.6933 - Val AUC: 0.5291
+2025-12-11 04:33:02,823 - INFO - [Fold 1/5] Epoch 12/20 - Loss: 0.6936 - Val AUC: 0.5153
+2025-12-11 04:33:07,738 - INFO - [Fold 1/5] Epoch 13/20 - Loss: 0.6942 - Val AUC: 0.4956
+2025-12-11 04:33:12,464 - INFO - [Fold 1/5] Epoch 14/20 - Loss: 0.6942 - Val AUC: 0.5653
+2025-12-11 04:33:17,206 - INFO - [Fold 1/5] Epoch 15/20 - Loss: 0.6920 - Val AUC: 0.5791
+2025-12-11 04:33:22,089 - INFO - [Fold 1/5] Epoch 16/20 - Loss: 0.6938 - Val AUC: 0.5188
+2025-12-11 04:33:26,679 - INFO - [Fold 1/5] Epoch 17/20 - Loss: 0.6941 - Val AUC: 0.5444
+2025-12-11 04:33:31,429 - INFO - [Fold 1/5] Epoch 18/20 - Loss: 0.6949 - Val AUC: 0.5816
+2025-12-11 04:33:36,588 - INFO - [Fold 1/5] Epoch 19/20 - Loss: 0.6921 - Val AUC: 0.4984
+2025-12-11 04:33:41,548 - INFO - [Fold 1/5] Epoch 20/20 - Loss: 0.6939 - Val AUC: 0.4841
+2025-12-11 04:33:41,616 - INFO - Fold 1 Finished. Best Val AUC: 0.6931
+2025-12-11 04:33:41,639 - INFO - Saved best model for fold 1 to models/deeprc_cv/ds4/fold0_model.pth
+2025-12-11 04:33:42,870 - INFO -    💾 Fold 1 completed. Checkpoint updated for next fold.
+2025-12-11 04:33:42,871 - INFO - --- Fold 1 ---
+2025-12-11 04:33:47,615 - INFO - [Fold 2/5] Epoch 1/20 - Loss: 0.6942 - Val AUC: 0.6431
+2025-12-11 04:33:47,622 - INFO -    ⭐️ New best AUC for fold 2: 0.6431
+2025-12-11 04:33:52,300 - INFO - [Fold 2/5] Epoch 2/20 - Loss: 0.6935 - Val AUC: 0.5231
+2025-12-11 04:33:56,993 - INFO - [Fold 2/5] Epoch 3/20 - Loss: 0.6934 - Val AUC: 0.5441
+2025-12-11 04:34:01,751 - INFO - [Fold 2/5] Epoch 4/20 - Loss: 0.6936 - Val AUC: 0.5316
+2025-12-11 04:34:06,455 - INFO - [Fold 2/5] Epoch 5/20 - Loss: 0.6941 - Val AUC: 0.5062
+2025-12-11 04:34:11,106 - INFO - [Fold 2/5] Epoch 6/20 - Loss: 0.6935 - Val AUC: 0.5653
+2025-12-11 04:34:15,769 - INFO - [Fold 2/5] Epoch 7/20 - Loss: 0.6930 - Val AUC: 0.5056
+2025-12-11 04:34:20,854 - INFO - [Fold 2/5] Epoch 8/20 - Loss: 0.6931 - Val AUC: 0.5669
+2025-12-11 04:34:25,814 - INFO - [Fold 2/5] Epoch 9/20 - Loss: 0.6937 - Val AUC: 0.4672
+2025-12-11 04:34:30,591 - INFO - [Fold 2/5] Epoch 10/20 - Loss: 0.6941 - Val AUC: 0.5513
+2025-12-11 04:34:35,654 - INFO - [Fold 2/5] Epoch 11/20 - Loss: 0.6934 - Val AUC: 0.5378
+2025-12-11 04:34:40,246 - INFO - [Fold 2/5] Epoch 12/20 - Loss: 0.6938 - Val AUC: 0.6031
+2025-12-11 04:34:45,033 - INFO - [Fold 2/5] Epoch 13/20 - Loss: 0.6942 - Val AUC: 0.5547
+2025-12-11 04:34:50,032 - INFO - [Fold 2/5] Epoch 14/20 - Loss: 0.6941 - Val AUC: 0.5503
+2025-12-11 04:34:54,981 - INFO - [Fold 2/5] Epoch 15/20 - Loss: 0.6941 - Val AUC: 0.5406
+2025-12-11 04:34:59,830 - INFO - [Fold 2/5] Epoch 16/20 - Loss: 0.6942 - Val AUC: 0.5956
+2025-12-11 04:35:04,591 - INFO - [Fold 2/5] Epoch 17/20 - Loss: 0.6942 - Val AUC: 0.4550
+2025-12-11 04:35:09,892 - INFO - [Fold 2/5] Epoch 18/20 - Loss: 0.6929 - Val AUC: 0.4806
+2025-12-11 04:35:14,943 - INFO - [Fold 2/5] Epoch 19/20 - Loss: 0.6949 - Val AUC: 0.5744
+2025-12-11 04:35:20,075 - INFO - [Fold 2/5] Epoch 20/20 - Loss: 0.6932 - Val AUC: 0.5203
+2025-12-11 04:35:20,118 - INFO - Fold 2 Finished. Best Val AUC: 0.6431
+2025-12-11 04:35:20,137 - INFO - Saved best model for fold 2 to models/deeprc_cv/ds4/fold1_model.pth
+2025-12-11 04:35:21,377 - INFO -    💾 Fold 2 completed. Checkpoint updated for next fold.
+2025-12-11 04:35:21,378 - INFO - --- Fold 2 ---
+2025-12-11 04:35:26,029 - INFO - [Fold 3/5] Epoch 1/20 - Loss: 0.6936 - Val AUC: 0.5400
+2025-12-11 04:35:26,034 - INFO -    ⭐️ New best AUC for fold 3: 0.5400
+2025-12-11 04:35:30,897 - INFO - [Fold 3/5] Epoch 2/20 - Loss: 0.6934 - Val AUC: 0.5303
+2025-12-11 04:35:36,073 - INFO - [Fold 3/5] Epoch 3/20 - Loss: 0.6938 - Val AUC: 0.5544
+2025-12-11 04:35:36,078 - INFO -    ⭐️ New best AUC for fold 3: 0.5544
+2025-12-11 04:35:41,033 - INFO - [Fold 3/5] Epoch 4/20 - Loss: 0.6936 - Val AUC: 0.4884
+2025-12-11 04:35:45,621 - INFO - [Fold 3/5] Epoch 5/20 - Loss: 0.6942 - Val AUC: 0.5303
+2025-12-11 04:35:50,209 - INFO - [Fold 3/5] Epoch 6/20 - Loss: 0.6933 - Val AUC: 0.5394
+2025-12-11 04:35:55,048 - INFO - [Fold 3/5] Epoch 7/20 - Loss: 0.6939 - Val AUC: 0.5206
+2025-12-11 04:35:59,864 - INFO - [Fold 3/5] Epoch 8/20 - Loss: 0.6937 - Val AUC: 0.5759
+2025-12-11 04:35:59,869 - INFO -    ⭐️ New best AUC for fold 3: 0.5759
+2025-12-11 04:36:04,604 - INFO - [Fold 3/5] Epoch 9/20 - Loss: 0.6949 - Val AUC: 0.4969
+2025-12-11 04:36:09,752 - INFO - [Fold 3/5] Epoch 10/20 - Loss: 0.6939 - Val AUC: 0.4034
+2025-12-11 04:36:14,541 - INFO - [Fold 3/5] Epoch 11/20 - Loss: 0.6940 - Val AUC: 0.5719
+2025-12-11 04:36:19,464 - INFO - [Fold 3/5] Epoch 12/20 - Loss: 0.6934 - Val AUC: 0.4938
+2025-12-11 04:36:24,592 - INFO - [Fold 3/5] Epoch 13/20 - Loss: 0.6939 - Val AUC: 0.4441
+2025-12-11 04:36:29,734 - INFO - [Fold 3/5] Epoch 14/20 - Loss: 0.6943 - Val AUC: 0.6138
+2025-12-11 04:36:29,738 - INFO -    ⭐️ New best AUC for fold 3: 0.6138
+2025-12-11 04:36:34,476 - INFO - [Fold 3/5] Epoch 15/20 - Loss: 0.6932 - Val AUC: 0.5741
+2025-12-11 04:36:39,614 - INFO - [Fold 3/5] Epoch 16/20 - Loss: 0.6934 - Val AUC: 0.5456
+2025-12-11 04:36:44,541 - INFO - [Fold 3/5] Epoch 17/20 - Loss: 0.6930 - Val AUC: 0.5141
+2025-12-11 04:36:49,385 - INFO - [Fold 3/5] Epoch 18/20 - Loss: 0.6941 - Val AUC: 0.5147
+2025-12-11 04:36:54,308 - INFO - [Fold 3/5] Epoch 19/20 - Loss: 0.6932 - Val AUC: 0.5109
+2025-12-11 04:36:59,192 - INFO - [Fold 3/5] Epoch 20/20 - Loss: 0.6933 - Val AUC: 0.5653
+2025-12-11 04:36:59,278 - INFO - Fold 3 Finished. Best Val AUC: 0.6138
+2025-12-11 04:36:59,299 - INFO - Saved best model for fold 3 to models/deeprc_cv/ds4/fold2_model.pth
+2025-12-11 04:37:00,600 - INFO -    💾 Fold 3 completed. Checkpoint updated for next fold.
+2025-12-11 04:37:00,619 - INFO - --- Fold 3 ---
+2025-12-11 04:37:05,310 - INFO - [Fold 4/5] Epoch 1/20 - Loss: 0.6943 - Val AUC: 0.5237
+2025-12-11 04:37:05,322 - INFO -    ⭐️ New best AUC for fold 4: 0.5237
+2025-12-11 04:37:10,074 - INFO - [Fold 4/5] Epoch 2/20 - Loss: 0.6951 - Val AUC: 0.5050
+2025-12-11 04:37:15,058 - INFO - [Fold 4/5] Epoch 3/20 - Loss: 0.6940 - Val AUC: 0.4941
+2025-12-11 04:37:19,923 - INFO - [Fold 4/5] Epoch 4/20 - Loss: 0.6936 - Val AUC: 0.5122
+2025-12-11 04:37:24,593 - INFO - [Fold 4/5] Epoch 5/20 - Loss: 0.6950 - Val AUC: 0.4725
+2025-12-11 04:37:29,372 - INFO - [Fold 4/5] Epoch 6/20 - Loss: 0.6938 - Val AUC: 0.5263
+2025-12-11 04:37:29,377 - INFO -    ⭐️ New best AUC for fold 4: 0.5263
+2025-12-11 04:37:34,280 - INFO - [Fold 4/5] Epoch 7/20 - Loss: 0.6931 - Val AUC: 0.4831
+2025-12-11 04:37:39,116 - INFO - [Fold 4/5] Epoch 8/20 - Loss: 0.6937 - Val AUC: 0.4731
+2025-12-11 04:37:43,940 - INFO - [Fold 4/5] Epoch 9/20 - Loss: 0.6949 - Val AUC: 0.4188
+2025-12-11 04:37:48,891 - INFO - [Fold 4/5] Epoch 10/20 - Loss: 0.6930 - Val AUC: 0.6012
+2025-12-11 04:37:48,895 - INFO -    ⭐️ New best AUC for fold 4: 0.6012
+2025-12-11 04:37:53,706 - INFO - [Fold 4/5] Epoch 11/20 - Loss: 0.6950 - Val AUC: 0.4262
+2025-12-11 04:37:58,575 - INFO - [Fold 4/5] Epoch 12/20 - Loss: 0.6936 - Val AUC: 0.4941
+2025-12-11 04:38:03,227 - INFO - [Fold 4/5] Epoch 13/20 - Loss: 0.6934 - Val AUC: 0.5750
+2025-12-11 04:38:07,831 - INFO - [Fold 4/5] Epoch 14/20 - Loss: 0.6928 - Val AUC: 0.5278
+2025-12-11 04:38:12,518 - INFO - [Fold 4/5] Epoch 15/20 - Loss: 0.6939 - Val AUC: 0.4950
+2025-12-11 04:38:17,419 - INFO - [Fold 4/5] Epoch 16/20 - Loss: 0.6937 - Val AUC: 0.6009
+2025-12-11 04:38:22,131 - INFO - [Fold 4/5] Epoch 17/20 - Loss: 0.6939 - Val AUC: 0.5138
+2025-12-11 04:38:26,997 - INFO - [Fold 4/5] Epoch 18/20 - Loss: 0.6939 - Val AUC: 0.5759
+2025-12-11 04:38:31,689 - INFO - [Fold 4/5] Epoch 19/20 - Loss: 0.6940 - Val AUC: 0.5653
+2025-12-11 04:38:36,406 - INFO - [Fold 4/5] Epoch 20/20 - Loss: 0.6942 - Val AUC: 0.5694
+2025-12-11 04:38:36,475 - INFO - Fold 4 Finished. Best Val AUC: 0.6012
+2025-12-11 04:38:36,496 - INFO - Saved best model for fold 4 to models/deeprc_cv/ds4/fold3_model.pth
+2025-12-11 04:38:38,050 - INFO -    💾 Fold 4 completed. Checkpoint updated for next fold.
+2025-12-11 04:38:38,051 - INFO - --- Fold 4 ---
+2025-12-11 04:38:42,975 - INFO - [Fold 5/5] Epoch 1/20 - Loss: 0.6943 - Val AUC: 0.4694
+2025-12-11 04:38:42,980 - INFO -    ⭐️ New best AUC for fold 5: 0.4694
+2025-12-11 04:38:47,884 - INFO - [Fold 5/5] Epoch 2/20 - Loss: 0.6938 - Val AUC: 0.5737
+2025-12-11 04:38:47,888 - INFO -    ⭐️ New best AUC for fold 5: 0.5737
+2025-12-11 04:38:52,999 - INFO - [Fold 5/5] Epoch 3/20 - Loss: 0.6929 - Val AUC: 0.4819
+2025-12-11 04:38:57,994 - INFO - [Fold 5/5] Epoch 4/20 - Loss: 0.6944 - Val AUC: 0.4525
+2025-12-11 04:39:02,804 - INFO - [Fold 5/5] Epoch 5/20 - Loss: 0.6937 - Val AUC: 0.5575
+2025-12-11 04:39:07,721 - INFO - [Fold 5/5] Epoch 6/20 - Loss: 0.6931 - Val AUC: 0.4994
+2025-12-11 04:39:12,904 - INFO - [Fold 5/5] Epoch 7/20 - Loss: 0.6936 - Val AUC: 0.5950
+2025-12-11 04:39:12,921 - INFO -    ⭐️ New best AUC for fold 5: 0.5950
+2025-12-11 04:39:17,749 - INFO - [Fold 5/5] Epoch 8/20 - Loss: 0.6935 - Val AUC: 0.3794
+2025-12-11 04:39:22,415 - INFO - [Fold 5/5] Epoch 9/20 - Loss: 0.6937 - Val AUC: 0.5431
+2025-12-11 04:39:27,216 - INFO - [Fold 5/5] Epoch 10/20 - Loss: 0.6932 - Val AUC: 0.4866
+2025-12-11 04:39:32,191 - INFO - [Fold 5/5] Epoch 11/20 - Loss: 0.6941 - Val AUC: 0.6050
+2025-12-11 04:39:32,195 - INFO -    ⭐️ New best AUC for fold 5: 0.6050
+2025-12-11 04:39:37,143 - INFO - [Fold 5/5] Epoch 12/20 - Loss: 0.6944 - Val AUC: 0.4344
+2025-12-11 04:39:42,307 - INFO - [Fold 5/5] Epoch 13/20 - Loss: 0.6934 - Val AUC: 0.5075
+2025-12-11 04:39:47,260 - INFO - [Fold 5/5] Epoch 14/20 - Loss: 0.6929 - Val AUC: 0.5250
+2025-12-11 04:39:52,345 - INFO - [Fold 5/5] Epoch 15/20 - Loss: 0.6938 - Val AUC: 0.4300
+2025-12-11 04:39:57,214 - INFO - [Fold 5/5] Epoch 16/20 - Loss: 0.6932 - Val AUC: 0.4766
+2025-12-11 04:40:02,097 - INFO - [Fold 5/5] Epoch 17/20 - Loss: 0.6940 - Val AUC: 0.5047
+2025-12-11 04:40:06,944 - INFO - [Fold 5/5] Epoch 18/20 - Loss: 0.6946 - Val AUC: 0.4806
+2025-12-11 04:40:12,028 - INFO - [Fold 5/5] Epoch 19/20 - Loss: 0.6934 - Val AUC: 0.5009
+2025-12-11 04:40:16,863 - INFO - [Fold 5/5] Epoch 20/20 - Loss: 0.6934 - Val AUC: 0.5403
+2025-12-11 04:40:16,919 - INFO - Fold 5 Finished. Best Val AUC: 0.6050
+2025-12-11 04:40:16,942 - INFO - Saved best model for fold 5 to models/deeprc_cv/ds4/fold4_model.pth
+2025-12-11 04:40:18,254 - INFO -    💾 Fold 5 completed. Checkpoint updated for next fold.
+2025-12-11 04:40:18,339 - INFO - Saved OOF predictions to outputs/deeprc_cv_preds/ds4_oof.csv
+2025-12-11 04:40:18,341 - INFO - Training complete. Removed checkpoint.

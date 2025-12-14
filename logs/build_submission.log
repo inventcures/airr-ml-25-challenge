@@ -7,3 +7,93 @@
 2025-12-13 08:26:16,034 - INFO -   Mapping repertoires to datasets...
 2025-12-13 08:26:36,289 - INFO - ✅ Saved final submission to outputs/submissions/submission_20251213_082636/submission.csv
 2025-12-13 08:26:36,289 - INFO - ✅ Also saved to submission.csv
+2025-12-14 01:15:25,156 - INFO - [Build Submission] Generating final submission file...
+2025-12-14 01:15:25,226 - INFO - Loaded Task 1 results: 7823 rows (Repertoires)
+2025-12-14 01:15:25,254 - INFO - Found 19 Task 2 ranking files.
+2025-12-14 01:15:26,072 - INFO - Loaded Task 2 Results: 404213 rows total.
+2025-12-14 01:15:26,192 - INFO - Merged Data Shape: (404213, 7)
+2025-12-14 01:15:26,193 - INFO - Merged Columns: ['repertoire_id', 'junction_aa', 'score', 'v_call', 'j_call', 'dataset', 'label_positive_probability']
+2025-12-14 01:15:26,264 - INFO -   Processed test_dataset_1 (Test): kept 400 rows (1 per rep).
+2025-12-14 01:15:26,266 - INFO -   Processed test_dataset_2 (Test): kept 400 rows (1 per rep).
+2025-12-14 01:15:26,268 - INFO -   Processed test_dataset_3 (Test): kept 400 rows (1 per rep).
+2025-12-14 01:15:26,270 - INFO -   Processed test_dataset_4 (Test): kept 400 rows (1 per rep).
+2025-12-14 01:15:26,272 - INFO -   Processed test_dataset_5 (Test): kept 400 rows (1 per rep).
+2025-12-14 01:15:26,273 - INFO -   Processed test_dataset_6 (Test): kept 400 rows (1 per rep).
+2025-12-14 01:15:26,275 - INFO -   Processed test_dataset_7_1 (Test): kept 76 rows (1 per rep).
+2025-12-14 01:15:26,277 - INFO -   Processed test_dataset_7_2 (Test): kept 100 rows (1 per rep).
+2025-12-14 01:15:26,279 - INFO -   Processed test_dataset_8_1 (Test): kept 390 rows (1 per rep).
+2025-12-14 01:15:26,280 - INFO -   Processed test_dataset_8_2 (Test): kept 857 rows (1 per rep).
+2025-12-14 01:15:26,282 - INFO -   Processed test_dataset_8_3 (Test): kept 390 rows (1 per rep).
+2025-12-14 01:15:26,291 - INFO -   Processed train_dataset_1 (Train): kept 50000 rows with synthetic IDs.
+2025-12-14 01:15:26,312 - INFO -   [DEBUG-VEC] train_dataset_1 first ID: train_dataset_1_seq_top_0
+2025-12-14 01:15:26,326 - INFO -   Processed train_dataset_2 (Train): kept 50000 rows with synthetic IDs.
+2025-12-14 01:15:26,355 - INFO -   Processed train_dataset_3 (Train): kept 50000 rows with synthetic IDs.
+2025-12-14 01:15:26,384 - INFO -   Processed train_dataset_4 (Train): kept 50000 rows with synthetic IDs.
+2025-12-14 01:15:26,414 - INFO -   Processed train_dataset_5 (Train): kept 50000 rows with synthetic IDs.
+2025-12-14 01:15:26,450 - INFO -   Processed train_dataset_6 (Train): kept 50000 rows with synthetic IDs.
+2025-12-14 01:15:26,475 - INFO -   Processed train_dataset_7 (Train): kept 50000 rows with synthetic IDs.
+2025-12-14 01:15:26,501 - INFO -   Processed train_dataset_8 (Train): kept 50000 rows with synthetic IDs.
+2025-12-14 01:15:26,588 - INFO - [DEBUG] Final DF Head:
+                      repertoire_id      junction_aa     score  ...         dataset label_positive_probability                                ID
+0  de6a0fdb372a8ca1c0e3c18a18d6803a    CASSFGGGGSSFF  0.997705  ...  test_dataset_1                   0.496375  de6a0fdb372a8ca1c0e3c18a18d6803a
+1  b2ce29754270738226990fafebaeaa40  CASSFGGGGGGGYTF  0.997659  ...  test_dataset_1                   0.433200  b2ce29754270738226990fafebaeaa40
+2  ee3133357a45eee5fe1c88a30b2f42e9   CSGSSGNFGGGQFF  0.997136  ...  test_dataset_1                   0.476377  ee3133357a45eee5fe1c88a30b2f42e9
+3  6ecca4fd6ecaadd3123ba01db24daee6   CSASAGGSGGSGYF  0.996979  ...  test_dataset_1                   0.612313  6ecca4fd6ecaadd3123ba01db24daee6
+4  3cfa38222a43288ccb1e8f0eb7fc41c3      CASSGGGGGFF  0.996701  ...  test_dataset_1                   0.615377  3cfa38222a43288ccb1e8f0eb7fc41c3
+
+[5 rows x 8 columns]
+2025-12-14 01:15:26,589 - INFO - [DEBUG] Final DF Columns: ['repertoire_id', 'junction_aa', 'score', 'v_call', 'j_call', 'dataset', 'label_positive_probability', 'ID']
+2025-12-14 01:15:26,761 - INFO - Masking 4213 test rows with -999.0 for columns ['junction_aa', 'v_call', 'j_call']
+2025-12-14 01:15:26,803 - INFO - [DEBUG-FINAL] train_dataset_1 Head ID:
+4213    train_dataset_1_seq_top_0
+4214    train_dataset_1_seq_top_1
+4215    train_dataset_1_seq_top_2
+4216    train_dataset_1_seq_top_3
+4217    train_dataset_1_seq_top_4
+Name: ID, dtype: object
+2025-12-14 01:15:26,933 - INFO - Final Row Count: 404213
+2025-12-14 06:48:30,254 - INFO - [Build Submission] Generating final submission file...
+2025-12-14 06:48:30,307 - INFO - Loaded Task 1 results: 7823 rows (Repertoires)
+2025-12-14 06:48:30,348 - INFO - Found 19 Task 2 ranking files.
+2025-12-14 06:48:31,174 - INFO - Loaded Task 2 Results: 404213 rows total.
+2025-12-14 06:48:31,286 - INFO - Merged Data Shape: (404213, 7)
+2025-12-14 06:48:31,287 - INFO - Merged Columns: ['repertoire_id', 'junction_aa', 'score', 'v_call', 'j_call', 'dataset', 'label_positive_probability']
+2025-12-14 06:48:31,387 - INFO -   Processed test_dataset_1 (Test): kept 400 rows (1 per rep).
+2025-12-14 06:48:31,388 - INFO -   Processed test_dataset_2 (Test): kept 400 rows (1 per rep).
+2025-12-14 06:48:31,390 - INFO -   Processed test_dataset_3 (Test): kept 400 rows (1 per rep).
+2025-12-14 06:48:31,392 - INFO -   Processed test_dataset_4 (Test): kept 400 rows (1 per rep).
+2025-12-14 06:48:31,394 - INFO -   Processed test_dataset_5 (Test): kept 400 rows (1 per rep).
+2025-12-14 06:48:31,395 - INFO -   Processed test_dataset_6 (Test): kept 400 rows (1 per rep).
+2025-12-14 06:48:31,397 - INFO -   Processed test_dataset_7_1 (Test): kept 76 rows (1 per rep).
+2025-12-14 06:48:31,398 - INFO -   Processed test_dataset_7_2 (Test): kept 100 rows (1 per rep).
+2025-12-14 06:48:31,400 - INFO -   Processed test_dataset_8_1 (Test): kept 390 rows (1 per rep).
+2025-12-14 06:48:31,402 - INFO -   Processed test_dataset_8_2 (Test): kept 857 rows (1 per rep).
+2025-12-14 06:48:31,418 - INFO -   Processed test_dataset_8_3 (Test): kept 390 rows (1 per rep).
+2025-12-14 06:48:31,428 - INFO -   Processed train_dataset_1 (Train): kept 50000 rows with synthetic IDs.
+2025-12-14 06:48:31,457 - INFO -   [DEBUG-VEC] train_dataset_1 first ID: train_dataset_1_seq_top_0
+2025-12-14 06:48:31,466 - INFO -   Processed train_dataset_2 (Train): kept 50000 rows with synthetic IDs.
+2025-12-14 06:48:31,497 - INFO -   Processed train_dataset_3 (Train): kept 50000 rows with synthetic IDs.
+2025-12-14 06:48:31,526 - INFO -   Processed train_dataset_4 (Train): kept 50000 rows with synthetic IDs.
+2025-12-14 06:48:31,554 - INFO -   Processed train_dataset_5 (Train): kept 50000 rows with synthetic IDs.
+2025-12-14 06:48:31,584 - INFO -   Processed train_dataset_6 (Train): kept 50000 rows with synthetic IDs.
+2025-12-14 06:48:31,608 - INFO -   Processed train_dataset_7 (Train): kept 50000 rows with synthetic IDs.
+2025-12-14 06:48:31,642 - INFO -   Processed train_dataset_8 (Train): kept 50000 rows with synthetic IDs.
+2025-12-14 06:48:31,714 - INFO - [DEBUG] Final DF Head:
+                      repertoire_id      junction_aa     score  ...         dataset label_positive_probability                                ID
+0  de6a0fdb372a8ca1c0e3c18a18d6803a    CASSFGGGGSSFF  0.997705  ...  test_dataset_1                   0.496375  de6a0fdb372a8ca1c0e3c18a18d6803a
+1  b2ce29754270738226990fafebaeaa40  CASSFGGGGGGGYTF  0.997659  ...  test_dataset_1                   0.433200  b2ce29754270738226990fafebaeaa40
+2  ee3133357a45eee5fe1c88a30b2f42e9   CSGSSGNFGGGQFF  0.997136  ...  test_dataset_1                   0.476377  ee3133357a45eee5fe1c88a30b2f42e9
+3  6ecca4fd6ecaadd3123ba01db24daee6   CSASAGGSGGSGYF  0.996979  ...  test_dataset_1                   0.612313  6ecca4fd6ecaadd3123ba01db24daee6
+4  3cfa38222a43288ccb1e8f0eb7fc41c3      CASSGGGGGFF  0.996701  ...  test_dataset_1                   0.615377  3cfa38222a43288ccb1e8f0eb7fc41c3
+
+[5 rows x 8 columns]
+2025-12-14 06:48:31,719 - INFO - [DEBUG] Final DF Columns: ['repertoire_id', 'junction_aa', 'score', 'v_call', 'j_call', 'dataset', 'label_positive_probability', 'ID']
+2025-12-14 06:48:31,881 - INFO - Masking 4213 test rows with -999.0 for columns ['junction_aa', 'v_call', 'j_call']
+2025-12-14 06:48:31,920 - INFO - [DEBUG-FINAL] train_dataset_1 Head ID:
+4213    train_dataset_1_seq_top_0
+4214    train_dataset_1_seq_top_1
+4215    train_dataset_1_seq_top_2
+4216    train_dataset_1_seq_top_3
+4217    train_dataset_1_seq_top_4
+Name: ID, dtype: object
+2025-12-14 06:48:32,026 - INFO - Final Row Count: 404213

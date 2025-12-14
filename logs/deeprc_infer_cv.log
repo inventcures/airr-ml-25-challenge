@@ -1,0 +1,71 @@
+2025-12-11 22:53:17,228 - INFO - Inferring ds1 (test) using models from ds1 (Ensemble of 5 folds)...
+2025-12-11 22:53:20,290 - INFO -   Loaded 5 models.
+2025-12-11 22:53:41,334 - INFO -   💾 Checkpoint saved. Inference finished for ds1.
+2025-12-11 22:53:41,430 - INFO -   Saved averaged preds to outputs/deeprc_cv_preds/ds1_test_deeprc_preds.csv
+2025-12-11 22:53:41,433 - INFO -   Removed checkpoint.
+2025-12-11 22:54:02,379 - INFO - Inferring ds2 (test) using models from ds2 (Ensemble of 5 folds)...
+2025-12-11 22:54:05,297 - INFO -   Loaded 5 models.
+2025-12-11 22:54:31,726 - INFO -   💾 Checkpoint saved. Inference finished for ds2.
+2025-12-11 22:54:31,866 - INFO -   Saved averaged preds to outputs/deeprc_cv_preds/ds2_test_deeprc_preds.csv
+2025-12-11 22:54:31,869 - INFO -   Removed checkpoint.
+2025-12-11 22:54:48,519 - INFO - Inferring ds3 (test) using models from ds3 (Ensemble of 5 folds)...
+2025-12-11 22:54:51,396 - INFO -   Loaded 5 models.
+2025-12-11 22:55:17,562 - INFO -   💾 Checkpoint saved. Inference finished for ds3.
+2025-12-11 22:55:17,643 - INFO -   Saved averaged preds to outputs/deeprc_cv_preds/ds3_test_deeprc_preds.csv
+2025-12-11 22:55:17,646 - INFO -   Removed checkpoint.
+2025-12-11 22:55:32,340 - INFO - Inferring ds4 (test) using models from ds4 (Ensemble of 5 folds)...
+2025-12-11 22:55:35,478 - INFO -   Loaded 5 models.
+2025-12-11 22:56:02,887 - INFO -   💾 Checkpoint saved. Inference finished for ds4.
+2025-12-11 22:56:02,952 - INFO -   Saved averaged preds to outputs/deeprc_cv_preds/ds4_test_deeprc_preds.csv
+2025-12-11 22:56:02,955 - INFO -   Removed checkpoint.
+2025-12-11 22:56:16,818 - INFO - Inferring ds5 (test) using models from ds5 (Ensemble of 5 folds)...
+2025-12-11 22:56:20,576 - INFO -   Loaded 5 models.
+2025-12-11 22:56:50,330 - INFO -   💾 Checkpoint saved. Inference finished for ds5.
+2025-12-11 22:56:50,371 - INFO -   Saved averaged preds to outputs/deeprc_cv_preds/ds5_test_deeprc_preds.csv
+2025-12-11 22:56:50,373 - INFO -   Removed checkpoint.
+2025-12-11 22:57:05,190 - INFO - Inferring ds6 (test) using models from ds6 (Ensemble of 5 folds)...
+2025-12-11 22:57:07,898 - INFO -   Loaded 5 models.
+2025-12-11 22:57:40,159 - INFO -   💾 Checkpoint saved. Inference finished for ds6.
+2025-12-11 22:57:40,223 - INFO -   Saved averaged preds to outputs/deeprc_cv_preds/ds6_test_deeprc_preds.csv
+2025-12-11 22:57:40,226 - INFO -   Removed checkpoint.
+2025-12-11 22:57:55,552 - INFO - Inferring ds7 (test) using models from ds7 (Ensemble of 5 folds)...
+2025-12-11 22:57:55,554 - ERROR -   Pickle not found: data/processed/ds7_test.pkl
+2025-12-11 22:58:09,231 - INFO - Inferring ds8 (test) using models from ds8 (Ensemble of 5 folds)...
+2025-12-11 22:58:09,232 - ERROR -   Pickle not found: data/processed/ds8_test.pkl
+2025-12-11 23:08:32,561 - INFO - Inferring ds1 (test) using models from ds1 (Ensemble of 5 folds)...
+2025-12-11 23:08:32,562 - INFO -   ✅ Output already exists: outputs/deeprc_cv_preds/ds1_test_deeprc_preds.csv. Skipping.
+2025-12-11 23:08:51,648 - INFO - Inferring ds2 (test) using models from ds2 (Ensemble of 5 folds)...
+2025-12-11 23:08:51,649 - INFO -   ✅ Output already exists: outputs/deeprc_cv_preds/ds2_test_deeprc_preds.csv. Skipping.
+2025-12-11 23:09:03,922 - INFO - Inferring ds3 (test) using models from ds3 (Ensemble of 5 folds)...
+2025-12-11 23:09:03,924 - INFO -   ✅ Output already exists: outputs/deeprc_cv_preds/ds3_test_deeprc_preds.csv. Skipping.
+2025-12-11 23:09:16,595 - INFO - Inferring ds4 (test) using models from ds4 (Ensemble of 5 folds)...
+2025-12-11 23:09:16,597 - INFO -   ✅ Output already exists: outputs/deeprc_cv_preds/ds4_test_deeprc_preds.csv. Skipping.
+2025-12-11 23:09:29,224 - INFO - Inferring ds5 (test) using models from ds5 (Ensemble of 5 folds)...
+2025-12-11 23:09:29,225 - INFO -   ✅ Output already exists: outputs/deeprc_cv_preds/ds5_test_deeprc_preds.csv. Skipping.
+2025-12-11 23:09:42,898 - INFO - Inferring ds6 (test) using models from ds6 (Ensemble of 5 folds)...
+2025-12-11 23:09:42,901 - INFO -   ✅ Output already exists: outputs/deeprc_cv_preds/ds6_test_deeprc_preds.csv. Skipping.
+2025-12-11 23:09:57,696 - INFO - Inferring ds7_1 (test) using models from ds7 (Ensemble of 5 folds)...
+2025-12-11 23:10:05,256 - INFO -   Loaded 5 models.
+2025-12-11 23:11:05,970 - INFO -   💾 Checkpoint saved. Inference finished for ds7_1.
+2025-12-11 23:11:06,091 - INFO -   Saved averaged preds to outputs/deeprc_cv_preds/ds7_1_test_deeprc_preds.csv
+2025-12-11 23:11:06,093 - INFO -   Removed checkpoint.
+2025-12-11 23:11:07,218 - INFO - Inferring ds7_2 (test) using models from ds7 (Ensemble of 5 folds)...
+2025-12-11 23:11:11,892 - INFO -   Loaded 5 models.
+2025-12-11 23:12:00,934 - INFO -   💾 Checkpoint saved. Inference finished for ds7_2.
+2025-12-11 23:12:00,959 - INFO -   Saved averaged preds to outputs/deeprc_cv_preds/ds7_2_test_deeprc_preds.csv
+2025-12-11 23:12:00,962 - INFO -   Removed checkpoint.
+2025-12-11 23:12:18,700 - INFO - Inferring ds8_1 (test) using models from ds8 (Ensemble of 5 folds)...
+2025-12-11 23:12:29,752 - INFO -   Loaded 5 models.
+2025-12-11 23:13:55,862 - INFO -   💾 Checkpoint saved. Inference finished for ds8_1.
+2025-12-11 23:13:55,987 - INFO -   Saved averaged preds to outputs/deeprc_cv_preds/ds8_1_test_deeprc_preds.csv
+2025-12-11 23:13:55,990 - INFO -   Removed checkpoint.
+2025-12-11 23:13:57,412 - INFO - Inferring ds8_2 (test) using models from ds8 (Ensemble of 5 folds)...
+2025-12-11 23:14:08,023 - INFO -   Loaded 5 models.
+2025-12-11 23:15:28,917 - INFO -   💾 Checkpoint saved. Inference finished for ds8_2.
+2025-12-11 23:15:28,949 - INFO -   Saved averaged preds to outputs/deeprc_cv_preds/ds8_2_test_deeprc_preds.csv
+2025-12-11 23:15:28,952 - INFO -   Removed checkpoint.
+2025-12-11 23:15:30,727 - INFO - Inferring ds8_3 (test) using models from ds8 (Ensemble of 5 folds)...
+2025-12-11 23:15:44,269 - INFO -   Loaded 5 models.
+2025-12-11 23:17:05,951 - INFO -   💾 Checkpoint saved. Inference finished for ds8_3.
+2025-12-11 23:17:05,982 - INFO -   Saved averaged preds to outputs/deeprc_cv_preds/ds8_3_test_deeprc_preds.csv
+2025-12-11 23:17:05,985 - INFO -   Removed checkpoint.

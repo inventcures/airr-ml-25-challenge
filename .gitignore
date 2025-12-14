@@ -18,6 +18,8 @@ outputs/
 !outputs/deeprc_cv_preds/
 !outputs/cluster_preds_lancedb/
 !outputs/stats_preds/
+!outputs/task2_ranking/
+!outputs/submission/
 
 # Python
 __pycache__/

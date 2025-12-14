@@ -7,7 +7,8 @@ import logging
 # HYBRID APPROACH: Try XGBoost (RunPod), Fallback to HistGradientBoosting (Local Mac)
 try:
     from xgboost import XGBClassifier
-    HAS_XGBOOST = True
+    # FORCE DISABLE XGBOOST TO MATCH HIGH SCORE LOGIC
+    HAS_XGBOOST = False 
 except ImportError:
     HAS_XGBOOST = False
     from sklearn.ensemble import HistGradientBoostingClassifier

@@ -1,0 +1,37 @@
+Submission Generated: 20251214_011526
+========================================
+Total Rows: 404213
+Columns: ['ID', 'dataset', 'label_positive_probability', 'junction_aa', 'v_call', 'j_call']
+
+Dataset Breakdown:
+dataset
+train_dataset_6     50000
+train_dataset_7     50000
+train_dataset_8     50000
+train_dataset_4     50000
+train_dataset_3     50000
+train_dataset_2     50000
+train_dataset_5     50000
+train_dataset_1     50000
+test_dataset_8_2      857
+test_dataset_1        400
+test_dataset_2        400
+test_dataset_3        400
+test_dataset_5        400
+test_dataset_4        400
+test_dataset_6        400
+test_dataset_8_1      390
+test_dataset_8_3      390
+test_dataset_7_2      100
+test_dataset_7_1       76
+Name: count, dtype: int64
+
+Missing Values:
+ID                            0
+dataset                       0
+label_positive_probability    0
+junction_aa                   0
+v_call                        0
+j_call                        0
+dtype: int64
+

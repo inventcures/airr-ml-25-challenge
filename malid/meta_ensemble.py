@@ -5,12 +5,17 @@ from pathlib import Path
 import logging
 
 # HYBRID APPROACH: Try XGBoost (RunPod), Fallback to HistGradientBoosting (Local Mac)
-try:
-    from xgboost import XGBClassifier
-    # FORCE DISABLE XGBOOST TO MATCH HIGH SCORE LOGIC
-    HAS_XGBOOST = False 
-except ImportError:
-    HAS_XGBOOST = False
+# FORCE DISABLE XGBOOST TO MATCH HIGH SCORE LOGIC
+HAS_XGBOOST = False
+
+if HAS_XGBOOST:
+    try:
+        from xgboost import XGBClassifier
+    except ImportError:
+        HAS_XGBOOST = False
+
+# Fallback or Forced
+if not HAS_XGBOOST:
     from sklearn.ensemble import HistGradientBoostingClassifier
 
 class MetaEnsembleClassifier:

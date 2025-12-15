@@ -2,6 +2,11 @@
 
 This guide details how to switch the pipeline to use the larger **ESM2-650M** embeddings.
 
+## ✅ Time Savers (Skipped Steps)
+You do **NOT** need to re-run the following, as they are independent of embeddings:
+- `python malid/train_stats_all.py` (Statistical baseline uses metadata only).
+- **Keep** `outputs/stats_preds/*.csv`.
+
 ## 🛑 Prerequisite: Cleanup Old Models
 Since we reuse file names (to compatibility with the meta-learner), you **MUST** clear old artifacts to ensure you are training on new data.
 
@@ -25,7 +30,7 @@ rm -rf outputs/submission/*
 
 ---
 
-## 🏃 STEP 1: Train ESM Models (650M)
+## 🏃 STEP 1: Train ESM Models (650M) ~2 Hours
 
 The `-m 650` flag tells the script to look in `data/embeddings` (where 650M embeddings are generated), instead of `data/embeddings/35m`.
 
@@ -37,7 +42,7 @@ python malid/train_esm_seq_all.py -m 650
 
 ---
 
-## 🧠 STEP 2: Retrain Meta-Learner
+## 🧠 STEP 2: Retrain Meta-Learner (~5 Mins)
 
 The meta-learner automatically picks up the new predictions from `outputs/esm_seq_preds/`.
 
@@ -49,7 +54,7 @@ python malid/train_meta_and_predict.py
 
 ---
 
-## 🏆 STEP 3: Rank Sequences (Task 2)
+## 🏆 STEP 3: Rank Sequences (Task 2) (~3 Hours)
 
 We force re-ranking using the 650M embeddings.
 
@@ -61,7 +66,7 @@ python scripts/rank_sequences_task2_all.py -m 650 --force
 
 ---
 
-## 📦 STEP 4: Build Submission
+## 📦 STEP 4: Build Submission (~1 Min)
 
 Combine everything into the final Kaggle file.
 

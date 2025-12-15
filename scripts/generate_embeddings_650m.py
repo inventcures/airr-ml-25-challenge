@@ -172,7 +172,8 @@ def embed_dataset(dataset_name: str, split: str):
                 batch_seqs = seqs[i : i + BATCH_SIZE]
                 try:
                     # Try standard batch with Mixed Precision
-                    with torch.cuda.amp.autocast():
+                    # Fix FutureWarning: use torch.amp.autocast('cuda')
+                    with torch.amp.autocast('cuda'):
                         batch_embs = run_batch(batch_seqs)
                     embeddings.extend(batch_embs)
                     i += BATCH_SIZE

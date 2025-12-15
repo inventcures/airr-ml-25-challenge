@@ -84,6 +84,12 @@ def embed_dataset(dataset_name: str, split: str):
     if 'model' not in globals():
         logging.info(f"Loading {MODEL_NAME}...")
         try:
+            # Set Persistent Cache for Model Weights (Avoid re-downloading)
+            CACHE_DIR = Path("data/model_cache")
+            CACHE_DIR.mkdir(parents=True, exist_ok=True)
+            torch.hub.set_dir(str(CACHE_DIR))
+            logging.info(f"  Model cache set to: {CACHE_DIR}")
+
             model, alphabet = esm.pretrained.esm2_t33_650M_UR50D()
             batch_converter = alphabet.get_batch_converter()
             model.eval()

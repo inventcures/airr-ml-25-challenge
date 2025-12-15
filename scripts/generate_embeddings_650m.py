@@ -199,6 +199,13 @@ def embed_dataset(dataset_name: str, split: str):
             else:
                 logging.warning(f"Skipping save for {r.rep_id} due to inference failure.")
 
+            # Explicit Cleanup to prevent Memory Leaks (Critical for DS7)
+            del embeddings, final_arr
+            import gc
+            gc.collect()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+
         except Exception as e:
             logging.error(f"🔥 CRASH AVOIDED on Repertoire {r.rep_id}: {e}")
             # Continue to next repertoire

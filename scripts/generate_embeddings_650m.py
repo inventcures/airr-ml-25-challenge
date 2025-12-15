@@ -169,7 +169,10 @@ def embed_dataset(dataset_name: str, split: str):
             while i < len(seqs):
                 # Heartbeat for huge repertoires
                 if i > 0 and i % 5000 == 0:
-                     logging.info(f"    ...processed {i}/{total_seqs} sequences for rep {r.rep_id}...")
+                     # Calculate rough instantaneous batch size (look back)
+                     # Just logging the 'est_batch_size' from prev iteration is hard here due to scope.
+                     # We will just print the loop index i.
+                     logging.info(f"    ...processed {i}/{total_seqs} (Current Batch Size: {est_batch_size})...")
                 
                 # --- Dynamic Batching Logic ---
                 # 1. Initial Guess based on start of batch (shortest seq because sorted)
@@ -255,13 +258,15 @@ def embed_dataset(dataset_name: str, split: str):
 
 def main():
     try:
-        # Process Train Datasets
-        for ds_name in TRAIN_DATASETS.keys():
-            embed_dataset(ds_name, "train")
-            
-        # Process Test Datasets
+        # PRIORITY: Process Test Datasets FIRST (Critical for Submission)
+        logging.info("🚀 STARTING WITH TEST DATASETS (PRIORITY)...")
         for ds_name in TEST_DATASETS.keys():
             embed_dataset(ds_name, "test")
+
+        # Process Train Datasets (Lower Priority if time is tight)
+        logging.info("🔄 Processing Train Datasets...")
+        for ds_name in TRAIN_DATASETS.keys():
+            embed_dataset(ds_name, "train")
             
         logging.info("🎉 All Datasets Processed Successfully!")
         

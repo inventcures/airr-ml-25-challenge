@@ -147,24 +147,33 @@ def embed_dataset(dataset_name: str, split: str):
         
         # Robust Repertoire Processing
         try:
-            # Extract Seqs
+            # Extract Seqs & OPTIMIZATION: Sort by length to minimize padding
             seqs = [s for s in r.junction_aa if isinstance(s, str) and len(s) > 0]
             if not seqs:
                 # Save empty
                 np.save(tmp_file, np.array([]))
                 tmp_file.rename(out_file)
                 continue
+            
+            # Sort for batch efficiency (bucket similar lengths)
+            seqs.sort(key=len) 
                 
             embeddings = []
             batch_failure = False
+            total_seqs = len(seqs)
             
             # Batch Processing
             i = 0
             while i < len(seqs):
+                # Heartbeat for huge repertoires (Show we are alive)
+                if i > 0 and i % 5000 == 0:
+                     logging.info(f"    ...processed {i}/{total_seqs} sequences for rep {r.rep_id}...")
+                
                 batch_seqs = seqs[i : i + BATCH_SIZE]
                 try:
-                    # Try standard batch
-                    batch_embs = run_batch(batch_seqs)
+                    # Try standard batch with Mixed Precision
+                    with torch.cuda.amp.autocast():
+                        batch_embs = run_batch(batch_seqs)
                     embeddings.extend(batch_embs)
                     i += BATCH_SIZE
                 except RuntimeError as e:

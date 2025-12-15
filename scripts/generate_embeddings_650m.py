@@ -164,19 +164,45 @@ def embed_dataset(dataset_name: str, split: str):
             
             # Batch Processing
             i = 0
+            TOKEN_BUDGET = 4500 # Conservative limit for 650M model on 24GB VRAM
+            
             while i < len(seqs):
-                # Heartbeat for huge repertoires (Show we are alive)
+                # Heartbeat for huge repertoires
                 if i > 0 and i % 5000 == 0:
                      logging.info(f"    ...processed {i}/{total_seqs} sequences for rep {r.rep_id}...")
                 
-                batch_seqs = seqs[i : i + BATCH_SIZE]
+                # --- Dynamic Batching Logic ---
+                # 1. Initial Guess based on start of batch (shortest seq because sorted)
+                current_len = len(seqs[i])
+                # +2 for CLS/EOS tokens, +padding overhead safety
+                est_batch_size = max(1, TOKEN_BUDGET // (current_len + 4))
+                
+                # Cap valid range
+                est_batch_size = min(est_batch_size, 2048) # 2048 hard limit for sanity
+                
+                # 2. Safety Lookahead (Prevent OOM if length jumps drastically in this slice)
+                # If we take est_batch_size, the max length (padding) is determined by the last element
+                last_idx = min(i + est_batch_size, len(seqs)) - 1
+                max_len_in_batch = len(seqs[last_idx]) + 2
+                
+                # Recalculate usage: (Batch Size) * (Max Length in Batch)
+                # If this exceeds budget, shrink batch size
+                actual_tokens = (last_idx - i + 1) * max_len_in_batch
+                if actual_tokens > TOKEN_BUDGET:
+                    # Resize: New Size = Budget / Max Len
+                    # Note: Max Len might drop if we shrink, but using current max_len is a safe conservative bound
+                    est_batch_size = max(1, TOKEN_BUDGET // max_len_in_batch)
+                
+                # 3. Final Slice
+                batch_seqs = seqs[i : i + est_batch_size]
+                
                 try:
-                    # Try standard batch with Mixed Precision
+                    # Try dynamic batch with Mixed Precision
                     # Fix FutureWarning: use torch.amp.autocast('cuda')
                     with torch.amp.autocast('cuda'):
                         batch_embs = run_batch(batch_seqs)
                     embeddings.extend(batch_embs)
-                    i += BATCH_SIZE
+                    i += len(batch_seqs) # Advance by ACTUAL batch size
                 except RuntimeError as e:
                     if "out of memory" in str(e).lower():
                         # OOM Fallback: Process this batch one-by-one

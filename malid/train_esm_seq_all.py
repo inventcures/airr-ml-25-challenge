@@ -374,7 +374,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Train ESM Sequence Classifier (Stream 2)")
     parser.add_argument("-m", "--model_size", type=str, choices=["35", "650", "35m", "650m"], default="650",
-                      help="Embedding model size to use: 35 (35M) or 650 (650M). Adjusts EMBEDDINGS_DIR.")
+                      help="Embedding model size to use: 35 (35M) or 650 (650M). Adjusts EMBEDDINGS_DIR and OUTPUT DIRS.")
     args = parser.parse_args()
 
     # Dynamic Configuration
@@ -386,9 +386,22 @@ if __name__ == "__main__":
         else:
             EMBEDDINGS_DIR = Path("data/embeddings")
             logging.info(f"🔵 Selected 35M Embeddings (Fallback/Legacy) from {EMBEDDINGS_DIR}")
+        
+        # Keep Default Outputs for 35M (Legacy compatibility)
+        MODELS_DIR = Path("models/esm_seq")
+        PREDS_DIR = Path("outputs/esm_seq_preds")
+
     else:
-        # Default or 650
+        # 650M Namespaced Outputs
         EMBEDDINGS_DIR = Path("data/embeddings") 
         logging.info(f"🟣 Selected 650M Embeddings from {EMBEDDINGS_DIR}")
+        
+        MODELS_DIR = Path("models/esm_seq_650m")
+        PREDS_DIR = Path("outputs/esm_seq_preds_650m")
+        logging.info(f"🟣 Outputs redirected to: {MODELS_DIR} & {PREDS_DIR}")
+
+    # Ensure directories exist
+    MODELS_DIR.mkdir(parents=True, exist_ok=True)
+    PREDS_DIR.mkdir(parents=True, exist_ok=True)
 
     train_esm_seq_all()

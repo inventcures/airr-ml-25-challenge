@@ -289,4 +289,32 @@ def validate_submission(df: pd.DataFrame, log_path: Path):
     validate_submission(final_df, log_path)
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-m", "--model_size", type=str, choices=["35", "650", "35m", "650m"], default="650",
+                      help="Embedding model size to use: 35 (35M) or 650 (650M). Adjusts INPUT and OUTPUT paths.")
+    args = parser.parse_args()
+
+    # Dynamic Configuration
+    if "35" in args.model_size:
+        # Legacy / Default
+        logging.info("🔵 Selected 35M Workflow")
+        # Keep globals as is (Task 1: outputs/submission/submission.csv, Task 2: outputs/task2_ranking)
+        
+    else:
+        # 650M Namespaced
+        logging.info("🟣 Selected 650M Workflow")
+        
+        # Adjust inputs to read from 650M namespaced folders
+        TASK1_SUBMISSION = Path("outputs/submission_650m/submission.csv")
+        TASK2_DIR = Path("outputs/task2_ranking_650m")
+        SUBMISSIONS_ROOT = Path("outputs/submissions_650m")
+        OUTPUT_CSV = Path("submission_650m.csv")
+        
+        logging.info(f"🟣 Inputs: Task1={TASK1_SUBMISSION}, Task2={TASK2_DIR}")
+        logging.info(f"🟣 Output: {OUTPUT_CSV}")
+
+    # Ensure root exists
+    SUBMISSIONS_ROOT.mkdir(parents=True, exist_ok=True)
+    
     build_submission()

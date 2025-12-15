@@ -218,4 +218,36 @@ def train_meta_and_predict():
         logging.warning("\nNo predictions generated.")
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-m", "--model_size", type=str, choices=["35", "650", "35m", "650m"], default="650",
+                      help="Embedding model size to use: 35 (35M) or 650 (650M). Adjusts INPUT (ESM) and OUTPUT DIRS.")
+    args = parser.parse_args()
+
+    # Dynamic Configuration
+    if "35" in args.model_size:
+        # 35M: Legacy / Default
+        logging.info("🔵 Selected 35M Workflow (Using models/meta, outputs/submission)")
+        # Globals already set to defaults
+        # STATS_PREDS_DIR, ESM_PREDS_DIR are defaults
+    else:
+        # 650M: Namespaced
+        logging.info("🟣 Selected 650M Workflow (Using models/meta_650m, outputs/submission_650m)")
+        
+        # Inputs: Point to 650M ESM predictions
+        ESM_PREDS_DIR = Path("outputs/esm_seq_preds_650m")
+        
+        # Outputs: Point to 650M meta models and submission
+        MODELS_DIR = Path("models/meta_650m")
+        SUBMISSION_DIR = Path("outputs/submission_650m")
+        PARTS_DIR = SUBMISSION_DIR / "parts"
+        
+        logging.info(f"🟣 Inputs: {ESM_PREDS_DIR}")
+        logging.info(f"🟣 Outputs: {MODELS_DIR}, {SUBMISSION_DIR}")
+
+    # Ensure directories exist
+    MODELS_DIR.mkdir(parents=True, exist_ok=True)
+    SUBMISSION_DIR.mkdir(parents=True, exist_ok=True)
+    PARTS_DIR.mkdir(parents=True, exist_ok=True)
+
     train_meta_and_predict()

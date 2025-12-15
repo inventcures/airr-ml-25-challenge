@@ -25,7 +25,9 @@ logging.basicConfig(
 )
 Path("logs").mkdir(exist_ok=True)
 
+# Dynamic Global Configuration (Defaults)
 MODELS_DIR = Path("models/esm_seq")
+ENSEMBLE_DIR = Path("models/esm_seq_ensemble")
 EMBEDDINGS_DIR = Path("data/embeddings")
 OUTPUT_DIR = Path("outputs/task2_ranking")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -112,7 +114,7 @@ def rank_sequences_task2_all(force=False):
         
         # --- MODEL LOADING LOGIC (ENSEMBLE vs SINGLE) ---
         ensemble_models = []
-        ensemble_dir = Path("models/esm_seq_ensemble")
+        ensemble_dir = ENSEMBLE_DIR
         
         # Check for 5 folds
         folds_found = 0
@@ -286,7 +288,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--force", action="store_true", help="Overwrite existing output files")
     parser.add_argument("-m", "--model_size", type=str, choices=["35", "650", "35m", "650m"], default="650",
-                      help="Embedding model size to use: 35 (35M) or 650 (650M). Adjusts EMBEDDINGS_DIR.")
+                      help="Embedding model size to use: 35 (35M) or 650 (650M). Adjusts EMBEDDINGS_DIR and OUTPUT DIRS.")
     args = parser.parse_args()
 
     logging.info(f"Arguments: {args}")
@@ -300,9 +302,23 @@ if __name__ == "__main__":
         else:
             EMBEDDINGS_DIR = Path("data/embeddings")
             logging.info(f"🔵 Selected 35M Embeddings (Fallback/Legacy) from {EMBEDDINGS_DIR}")
+            
+        # Keep Default Outputs for 35M
+        MODELS_DIR = Path("models/esm_seq")
+        ENSEMBLE_DIR = Path("models/esm_seq_ensemble")
+        OUTPUT_DIR = Path("outputs/task2_ranking")
+        
     else:
-        # Default or 650
+        # 650M Namespaced Outputs
         EMBEDDINGS_DIR = Path("data/embeddings") 
         logging.info(f"🟣 Selected 650M Embeddings from {EMBEDDINGS_DIR}")
+        
+        MODELS_DIR = Path("models/esm_seq_650m")           # Though we might use ensemble, best to map both for fallback
+        ENSEMBLE_DIR = Path("models/esm_seq_ensemble_650m") # Where we expect trained models from Stream 2
+        OUTPUT_DIR = Path("outputs/task2_ranking_650m")
+        logging.info(f"🟣 Outputs redirected to: {OUTPUT_DIR}")
+        logging.info(f"🟣 Loading models from: {ENSEMBLE_DIR} (or {MODELS_DIR})")
+
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     
     rank_sequences_task2_all(force=args.force)

@@ -59,24 +59,31 @@ def embed_dataset(dataset_name: str, split: str):
     
     # 2. Setup Output Directory
     # Match documentation structure: data/embeddings/ds1/train/
+    # 2. Setup Output Directory
+    # Match documentation structure: data/embeddings/ds1/train/
     if split == "train":
         target_dir = EMBEDDINGS_DIR / dataset_name / "train"
-    elif "test" in dataset_name:
-         # Special handling for ds7_test -> ds7/test? or ds7/1_test?
-         parts = dataset_name.split("_")
-         base_ds = parts[0] # ds7
-         
-         if len(parts) == 2 and parts[1] == "test":
-             # "ds1_test" -> ds1/test
-             target_dir = EMBEDDINGS_DIR / base_ds / "test"
-         elif len(parts) >= 3 and "test" in parts[-1]:
-             # "ds7_1_test" -> ds7/1_test
-             sub_folder = "_".join(parts[1:]) 
-             target_dir = EMBEDDINGS_DIR / base_ds / sub_folder
-         else:
-             # Fallback
+    else:
+        # TEST SPLIT LOGIC
+        # Case A: Standard (ds1, ds2...) -> data/embeddings/ds1/test
+        if "test" not in dataset_name:
              target_dir = EMBEDDINGS_DIR / dataset_name / "test"
+        else:
+             # Case B: Complex (ds7_test, ds7_1_test...)
+             parts = dataset_name.split("_")
+             base_ds = parts[0] # ds7
              
+             if len(parts) == 2 and parts[1] == "test":
+                 # "ds1_test" -> ds1/test
+                 target_dir = EMBEDDINGS_DIR / base_ds / "test"
+             elif len(parts) >= 3 and "test" in parts[-1]:
+                 # "ds7_1_test" -> ds7/1_test
+                 sub_folder = "_".join(parts[1:]) 
+                 target_dir = EMBEDDINGS_DIR / base_ds / sub_folder
+             else:
+                 # Fallback
+                 target_dir = EMBEDDINGS_DIR / dataset_name / "test"
+                 
     target_dir.mkdir(parents=True, exist_ok=True)
     
     # 3. Load Model (Lazy load to save VRAM if not needed?)

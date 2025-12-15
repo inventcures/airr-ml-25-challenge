@@ -285,18 +285,24 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--force", action="store_true", help="Overwrite existing output files")
+    parser.add_argument("-m", "--model_size", type=str, choices=["35", "650", "35m", "650m"], default="650",
+                      help="Embedding model size to use: 35 (35M) or 650 (650M). Adjusts EMBEDDINGS_DIR.")
     args = parser.parse_args()
 
-    # Pass logic (Hackier than threading it through 5 functions, but effective for this script)
-    # We modify the behavior inside the loop by checking `args.force`
-    # Since rank_sequences_task2_all didn't take args, we can adapt it or just patch the global logic in the loop.
-    # Actually, let's just make the function look at sys.argv or pass it.
-    
-    # Better: Update the global function to accept the flag, but it's hard to change signature without changing call site if imported.
-    # But this is a script.
-    
     logging.info(f"Arguments: {args}")
+
+    # Dynamic Configuration
+    if "35" in args.model_size:
+        # Check if we are on the 'New Pod' structure where 35m was moved to subdir
+        if Path("data/embeddings/35m").exists():
+            EMBEDDINGS_DIR = Path("data/embeddings/35m")
+            logging.info(f"🔵 Selected 35M Embeddings from {EMBEDDINGS_DIR}")
+        else:
+            EMBEDDINGS_DIR = Path("data/embeddings")
+            logging.info(f"🔵 Selected 35M Embeddings (Fallback/Legacy) from {EMBEDDINGS_DIR}")
+    else:
+        # Default or 650
+        EMBEDDINGS_DIR = Path("data/embeddings") 
+        logging.info(f"🟣 Selected 650M Embeddings from {EMBEDDINGS_DIR}")
     
-    # We will just redefine the loop logic here? No, let's just use the global 'args' variable since it's a script.
-    # Or cleaner: Modify lines 89-91 to check args.force
     rank_sequences_task2_all(force=args.force)

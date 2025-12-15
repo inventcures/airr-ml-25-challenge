@@ -371,4 +371,24 @@ def train_esm_seq_all():
                 logging.warning("    No predictions generated (missing embeddings?).")
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Train ESM Sequence Classifier (Stream 2)")
+    parser.add_argument("-m", "--model_size", type=str, choices=["35", "650", "35m", "650m"], default="650",
+                      help="Embedding model size to use: 35 (35M) or 650 (650M). Adjusts EMBEDDINGS_DIR.")
+    args = parser.parse_args()
+
+    # Dynamic Configuration
+    if "35" in args.model_size:
+        # Check if we are on the 'New Pod' structure where 35m was moved to subdir
+        if Path("data/embeddings/35m").exists():
+            EMBEDDINGS_DIR = Path("data/embeddings/35m")
+            logging.info(f"🔵 Selected 35M Embeddings from {EMBEDDINGS_DIR}")
+        else:
+            EMBEDDINGS_DIR = Path("data/embeddings")
+            logging.info(f"🔵 Selected 35M Embeddings (Fallback/Legacy) from {EMBEDDINGS_DIR}")
+    else:
+        # Default or 650
+        EMBEDDINGS_DIR = Path("data/embeddings") 
+        logging.info(f"🟣 Selected 650M Embeddings from {EMBEDDINGS_DIR}")
+
     train_esm_seq_all()

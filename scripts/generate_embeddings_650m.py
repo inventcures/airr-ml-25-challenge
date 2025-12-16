@@ -263,17 +263,27 @@ def embed_dataset(dataset_name: str, split: str):
             # Continue to next repertoire
             continue
 
-def main():
+    parser = argparse.ArgumentParser(description="Generate ESM Embeddings")
+    parser.add_argument("--include", nargs="+", help="Only process datasets containing these strings (e.g. 'ds1' 'ds7_test'). Default: Process All.")
+    args = parser.parse_args()
+
     try:
-        # PRIORITY: Process Test Datasets FIRST (Critical for Submission)
+        # Helper to check filter
+        def is_included(name):
+            if not args.include: return True
+            return any(f in name for f in args.include)
+
+        # PRIORITY: Process Test Datasets FIRST
         logging.info("🚀 STARTING WITH TEST DATASETS (PRIORITY)...")
         for ds_name in TEST_DATASETS.keys():
-            embed_dataset(ds_name, "test")
+            if is_included(ds_name):
+                embed_dataset(ds_name, "test")
 
-        # Process Train Datasets (Lower Priority if time is tight)
+        # Process Train Datasets
         logging.info("🔄 Processing Train Datasets...")
         for ds_name in TRAIN_DATASETS.keys():
-            embed_dataset(ds_name, "train")
+            if is_included(ds_name):
+                embed_dataset(ds_name, "train")
             
         logging.info("🎉 All Datasets Processed Successfully!")
         

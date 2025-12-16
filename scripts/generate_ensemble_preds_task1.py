@@ -289,7 +289,24 @@ def generate_test_ensemble_preds(ds_name: str, force: bool = False):
 def main():
     parser = argparse.ArgumentParser(description="Generate Ensemble Predictions")
     parser.add_argument("--force", action="store_true", help="Overwrite existing prediction files")
+    parser.add_argument("-m", "--model_size", type=str, choices=["35", "650", "35m", "650m"], default="650",
+                      help="Embedding model size to use: 35 (35M) or 650 (650M). Adjusts INPUT and OUTPUT paths.")
     args = parser.parse_args()
+
+    # Dynamic Configuration
+    if "35" in args.model_size:
+        logging.info("🔵 Selected 35M Workflow")
+        # Default Global Paths apply
+    else:
+        logging.info("🟣 Selected 650M Workflow")
+        global MODELS_DIR, OUTPUT_DIR, EMBEDDINGS_DIR
+        MODELS_DIR = Path("models/esm_seq_ensemble_650m")
+        OUTPUT_DIR = Path("outputs/esm_seq_preds_650m")
+        EMBEDDINGS_DIR = Path("data/embeddings") # Namespaced
+        
+        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        logging.info(f"🟣 Models: {MODELS_DIR}")
+        logging.info(f"🟣 Output: {OUTPUT_DIR}")
 
     # 1. Process Train (OOF)
     for ds_name in TRAIN_DATASETS.keys():

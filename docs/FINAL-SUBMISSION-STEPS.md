@@ -69,7 +69,7 @@ scp -P 10052 ds8_test_pod2.zip root@203.57.40.123:/workspace/airr-ml-25-challeng
 
 **Pod 2 (DS8 Test):**
 ```bash
-scp -P 18332 root@103.196.86.192:/workspace/airr-ml-25-challenge/data/embeddings/ds8_test_pod2.zip .
+scp -P 18332 root@103.196.86.192:/workspace/airr-ml-25-challenge/data/embeddings/pod2_results_ds8_test_1_2.zip .
 ```
 **Pod 3 (DS8 Train/Test):**
 ```bash
@@ -77,11 +77,11 @@ scp -P 14457 root@103.196.86.130:/workspace/airr-ml-25-challenge/data/embeddings
 ```
 **Pod 4 (DS8 Train Shard 0):**
 ```bash
-scp -P 18444 root@213.173.98.86:/workspace/airr-ml-25-challenge/data/embeddings/ds8_train_shard0.zip .
+scp -P 18444 root@213.173.98.86:/workspace/airr-ml-25-challenge/data/embeddings/pod4_results_ds8_train_shard0.zip .
 ```
 **Pod 5 (DS7 Train Shard 1):**
 ```bash
-scp -P 12987 root@213.173.98.90:/workspace/airr-ml-25-challenge/data/embeddings/ds7_train_shard1.zip .
+scp -P 12987 root@213.173.98.90:/workspace/airr-ml-25-challenge/data/embeddings/pod5_results_ds7_train_shard1.zip .
 ```
 
 **B. Unzip & Fix Structure**
@@ -91,21 +91,28 @@ scp -P 12987 root@213.173.98.90:/workspace/airr-ml-25-challenge/data/embeddings/
 cd /workspace/airr-ml-25-challenge/data/embeddings
 
 # 1. Unzip Everything
-unzip -o ds8_test_pod2.zip
+unzip -o pod2_results_ds8_test_1_2.zip
 unzip -o pod3_results.zip
-unzip -o ds8_train_shard0.zip
-unzip -o ds7_train_shard1.zip
+unzip -o pod4_results_ds8_train_shard0.zip
+unzip -o pod5_results_ds7_train_shard1.zip
 
 # 2. 🚨 CRITICAL FIX: Move Flat Folders to Nested Structure 🚨
 # Downstream scripts expect: data/embeddings/ds8/test/3_test
 # Pods likely created:       data/embeddings/ds8_3/test
 
-# Fix DS8
+# Fix DS8 Test
 mkdir -p ds8/test
 [ -d ds8_1/test ] && mv ds8_1/test ds8/test/1_test
 [ -d ds8_2/test ] && mv ds8_2/test ds8/test/2_test
 [ -d ds8_3/test ] && mv ds8_3/test ds8/test/3_test
-# (Shard 0/1 for DS8 Train automatically merge into ds8/train, no fix needed)
+
+# Fix DS8 Train (Merge Pod 3's sharded train data)
+if [ -d "ds8_3/train" ]; then
+    echo "  Merging DS8 Train from Pod 3..."
+    mkdir -p ds8/train
+    # Use rsync to merge large folder safely
+    rsync -a --remove-source-files ds8_3/train/ ds8/train/
+fi
 
 # Fix DS7
 mkdir -p ds7/test
@@ -114,6 +121,7 @@ mkdir -p ds7/test
 
 # 3. Cleanup Empty Shells
 rmdir ds7_1 ds7_2 ds8_1 ds8_2 ds8_3 2>/dev/null || true
+rm -rf ds8_3 # Force remove if rsync left empty dirs
 
 echo "✅ Merge & Repair Complete!"
 ```

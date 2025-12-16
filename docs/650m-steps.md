@@ -6,38 +6,65 @@ This guide details how to switch the pipeline to use the larger **ESM2-650M** em
 All scripts now accept `-m 650`. This isolates all outputs to `*_650m` directories.
 **You do NOT need to delete old models.** Your 35M baseline is safe! 🛡️
 
-## 🕷️ The "Spider-Man" Strategy (Multi-Pod Parallelization)
+## 🕷️ The "Spider-Man" Strategy (5-Pod Parallelization)
 
-To beat the clock, we split the work across 3 Pods.
+To beat the clock, we have split the work across 5 Pods for maximum throughput.
 
-### Pod 1: "The Captain" (DS7 Only)
-*This pod focuses on the massive DS7 dataset.*
+### Pod 1: "The Captain" (DS7 Test + DS1-6)
+*This pod prioritizes the critical DS7 Test set, then handles the smaller datasets.*
+**Phase 1 (DS7 Test Only):**
 ```bash
-python scripts/generate_embeddings_650m.py --include ds7
+python scripts/generate_embeddings_650m.py --include ds7 --only-split test
+```
+**Phase 2 (DS1-6 Clean Sweep - After Phase 1):**
+```bash
+python scripts/generate_embeddings_650m.py --include ds1 ds2 ds3 ds4 ds5 ds6
 ```
 
-### Pod 2: "The Heavy Lifter" (DS8 Part 1 & 2)
-*This pod crunches the bulk of DS8.*
+### Pod 2: "The Heavy Lifter" (DS8 Test Parts 1 & 2)
+*This pod crunches the bulk of DS8 Test.*
 ```bash
 python scripts/generate_embeddings_650m.py --include ds8_1 ds8_2
 ```
 
-### Pod 3: "The Closer" (DS8 Part 3)
-*This pod finishes the rest.*
+### Pod 3: "The Closer" (DS8 Test Part 3)
+*This pod finishes the DS8 Test set.*
 ```bash
 python scripts/generate_embeddings_650m.py --include ds8_3
 ```
 
+### Pod 4: "Train Engine A" (DS8 Train)
+*Focuses purely on the massive DS8 Training set (94M sequences).*
+**Quick Start:**
+```bash
+curl -LsSf https://raw.githubusercontent.com/inventcures/airr-ml-25-challenge/main/start_pod4.sh | bash
+```
+**Manual Command:**
+```bash
+python scripts/generate_embeddings_650m.py --include ds8 --only-split train
+```
+
+### Pod 5: "Train Engine B" (DS7 Train)
+*Focuses purely on the massive DS7 Training set (94M sequences).*
+**Quick Start:**
+```bash
+curl -LsSf https://raw.githubusercontent.com/inventcures/airr-ml-25-challenge/main/start_pod5.sh | bash
+```
+**Manual Command:**
+```bash
+python scripts/generate_embeddings_650m.py --include ds7 --only-split train
+```
+
 ### 🌪️ How to Merge (Tomorrow)
 When all pods finish:
-1.  On Pod 2 and Pod 3, zip up their results:
+1.  On Pods 2-5, zip up their results:
     ```bash
     cd data/embeddings
-    zip -r ds8_embeddings_partX.zip ds8
+    zip -r ds_embeddings_partX.zip .
     ```
 2.  Download these zips.
 3.  Upload/SCP them to **Pod 1**.
-4.  Unzip them on Pod 1 to merge into `data/embeddings/ds8`.
+4.  Unzip them on Pod 1 to merge into `data/embeddings/`.
 
 # 🚨 EMERGENCY PLAN: "Test First" Strategy (Updated Dec 16 03:00 IST)
 

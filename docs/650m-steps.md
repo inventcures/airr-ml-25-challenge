@@ -1,4 +1,3 @@
-
 # 🚀 650M Embeddings Workflow (Namespaced)
 
 This guide details how to switch the pipeline to use the larger **ESM2-650M** embeddings.
@@ -6,6 +5,39 @@ This guide details how to switch the pipeline to use the larger **ESM2-650M** em
 ## ✨ Safe & Isolated
 All scripts now accept `-m 650`. This isolates all outputs to `*_650m` directories.
 **You do NOT need to delete old models.** Your 35M baseline is safe! 🛡️
+
+## 🕷️ The "Spider-Man" Strategy (Multi-Pod Parallelization)
+
+To beat the clock, we split the work across 3 Pods.
+
+### Pod 1: "The Captain" (DS7 Only)
+*This pod focuses on the massive DS7 dataset.*
+```bash
+python scripts/generate_embeddings_650m.py --include ds7
+```
+
+### Pod 2: "The Heavy Lifter" (DS8 Part 1 & 2)
+*This pod crunches the bulk of DS8.*
+```bash
+python scripts/generate_embeddings_650m.py --include ds8_1 ds8_2
+```
+
+### Pod 3: "The Closer" (DS8 Part 3)
+*This pod finishes the rest.*
+```bash
+python scripts/generate_embeddings_650m.py --include ds8_3
+```
+
+### 🌪️ How to Merge (Tomorrow)
+When all pods finish:
+1.  On Pod 2 and Pod 3, zip up their results:
+    ```bash
+    cd data/embeddings
+    zip -r ds8_embeddings_partX.zip ds8
+    ```
+2.  Download these zips.
+3.  Upload/SCP them to **Pod 1**.
+4.  Unzip them on Pod 1 to merge into `data/embeddings/ds8`.
 
 # 🚨 EMERGENCY PLAN: "Test First" Strategy (Updated Dec 16 03:00 IST)
 

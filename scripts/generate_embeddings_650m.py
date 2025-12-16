@@ -58,6 +58,16 @@ def embed_dataset(dataset_name: str, split: str):
         logging.error(f"❌ Failed to load pickle {pkl_path}: {e}")
         return
     
+    # SHARDING FILTER
+    if 'SHARD_TOTAL' in globals() and SHARD_TOTAL > 1:
+        original_count = len(reps)
+        reps = [r for i, r in enumerate(reps) if i % SHARD_TOTAL == SHARD_IDX]
+        logging.info(f"🔪 Applied Shard {SHARD_IDX}/{SHARD_TOTAL}: Process {len(reps)}/{original_count} repertoires.")
+        if len(reps) == 0:
+            logging.warning("🔪 Shard result is empty (dataset too small?)")
+            return
+
+    
     # 2. Setup Output Directory
     # Match documentation structure: data/embeddings/ds1/train/
     # 2. Setup Output Directory
@@ -268,13 +278,29 @@ def main():
     parser = argparse.ArgumentParser(description="Generate ESM Embeddings")
     parser.add_argument("--include", nargs="+", help="Only process datasets containing these strings (e.g. 'ds1' 'ds7_test'). Default: Process All.")
     parser.add_argument("--only-split", choices=["train", "test"], help="Only process this specific split (e.g. 'train'). Default: Process Both.")
+    parser.add_argument("--shard", type=str, default=None, help="Shard processing in format 'index/total' (e.g. '0/2'). Default: None.")
     args = parser.parse_args()
+
+    # Parse Shard Info
+    shard_idx, shard_total = 0, 1
+    if args.shard:
+        parts = args.shard.split("/")
+        if len(parts) != 2:
+             raise ValueError("Shard must be 'index/total' (e.g. 0/2)")
+        shard_idx = int(parts[0])
+        shard_total = int(parts[1])
+        logging.info(f"🔪 SHARDING ACTIVATED: Process {shard_idx} of {shard_total}")
 
     try:
         # Helper to check filter
         def is_included(name):
             if not args.include: return True
             return any(f in name for f in args.include)
+
+        # Helper to apply shard (Monkey Patching embed_dataset context or just passing it?)
+        # Let's use a global for simplicity in this script scope
+        global SHARD_IDX, SHARD_TOTAL
+        SHARD_IDX, SHARD_TOTAL = shard_idx, shard_total
 
         # PRIORITY: Process Test Datasets FIRST (Critical for Submission)
         if args.only_split != "train":

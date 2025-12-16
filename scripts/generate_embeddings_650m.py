@@ -5,6 +5,7 @@ import esm
 import numpy as np
 import pickle
 import logging
+import argparse
 from pathlib import Path
 from tqdm import tqdm
 from typing import List, Tuple

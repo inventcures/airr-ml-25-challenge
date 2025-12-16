@@ -263,6 +263,7 @@ def embed_dataset(dataset_name: str, split: str):
             # Continue to next repertoire
             continue
 
+def main():
     parser = argparse.ArgumentParser(description="Generate ESM Embeddings")
     parser.add_argument("--include", nargs="+", help="Only process datasets containing these strings (e.g. 'ds1' 'ds7_test'). Default: Process All.")
     args = parser.parse_args()

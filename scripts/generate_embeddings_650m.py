@@ -267,6 +267,7 @@ def embed_dataset(dataset_name: str, split: str):
 def main():
     parser = argparse.ArgumentParser(description="Generate ESM Embeddings")
     parser.add_argument("--include", nargs="+", help="Only process datasets containing these strings (e.g. 'ds1' 'ds7_test'). Default: Process All.")
+    parser.add_argument("--only-split", choices=["train", "test"], help="Only process this specific split (e.g. 'train'). Default: Process Both.")
     args = parser.parse_args()
 
     try:
@@ -275,17 +276,19 @@ def main():
             if not args.include: return True
             return any(f in name for f in args.include)
 
-        # PRIORITY: Process Test Datasets FIRST
-        logging.info("🚀 STARTING WITH TEST DATASETS (PRIORITY)...")
-        for ds_name in TEST_DATASETS.keys():
-            if is_included(ds_name):
-                embed_dataset(ds_name, "test")
+        # PRIORITY: Process Test Datasets FIRST (Critical for Submission)
+        if args.only_split != "train":
+            logging.info("🚀 STARTING WITH TEST DATASETS (PRIORITY)...")
+            for ds_name in TEST_DATASETS.keys():
+                if is_included(ds_name):
+                    embed_dataset(ds_name, "test")
 
-        # Process Train Datasets
-        logging.info("🔄 Processing Train Datasets...")
-        for ds_name in TRAIN_DATASETS.keys():
-            if is_included(ds_name):
-                embed_dataset(ds_name, "train")
+        # Process Train Datasets (Lower Priority if time is tight)
+        if args.only_split != "test":
+            logging.info("🔄 Processing Train Datasets...")
+            for ds_name in TRAIN_DATASETS.keys():
+                if is_included(ds_name):
+                    embed_dataset(ds_name, "train")
             
         logging.info("🎉 All Datasets Processed Successfully!")
         

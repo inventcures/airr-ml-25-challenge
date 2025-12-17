@@ -184,5 +184,30 @@ def retrain_and_save_folds():
         del clf_folds
         gc.collect()
 
+
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-m", "--model_size", type=str, choices=["35", "650", "35m", "650m"], default="650",
+                      help="Embedding model size to use: 35 (35M) or 650 (650M).")
+    args = parser.parse_args()
+    
+    # Config
+    if "35" in args.model_size:
+        logging.info("🔵 Training 35M Models...")
+        MODELS_DIR = Path("models/esm_seq_ensemble")
+        # Ensure 35M embeddings path
+        if Path("data/embeddings/35m").exists():
+            EMBEDDINGS_DIR = Path("data/embeddings/35m")
+        else:
+            EMBEDDINGS_DIR = Path("data/embeddings")
+    else:
+        logging.info("🟣 Training 650M Models...")
+        MODELS_DIR = Path("models/esm_seq_ensemble_650m")
+        EMBEDDINGS_DIR = Path("data/embeddings")
+        
+    MODELS_DIR.mkdir(parents=True, exist_ok=True)
+    logging.info(f"  Models Output: {MODELS_DIR}")
+    logging.info(f"  Embeddings Input: {EMBEDDINGS_DIR}")
+    
     retrain_and_save_folds()

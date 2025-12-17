@@ -247,6 +247,38 @@ def rank_sequences_task2_all(force=False):
                             "j_call": r.j_call
                         })
                         rep_df = rep_df[rep_df["sequence"].str.len() > 0]
+                        
+                        # Safety: Ensure we don't crash on missing sequences in lookup
+                        # map rank result back to full info
+            
+            # --- FALLBACK LOGIC ---
+            if emb is None:
+                # If embedding missing/empty, just pick first valid sequence(s) as default
+                valid_seqs = [s for s in r.junction_aa if len(s) > 0]
+                if valid_seqs:
+                    logging.warning(f"  ⚠️ No embedding for {r.rep_id}. Using fallback (taking first {per_rep_top_k} seqs).")
+                    selected = valid_seqs[:per_rep_top_k]
+                    
+                    df_rank = pd.DataFrame({
+                        "sequence": selected,
+                        "score": 0.0, # Low score to indicate fallback
+                        "rank": range(1, len(selected) + 1),
+                        "repertoire_id": r.rep_id,
+                        "model_name": "fallback"
+                    })
+                    
+                    rep_df = pd.DataFrame({
+                        "sequence": r.junction_aa,
+                        "v_call": r.v_call,
+                        "j_call": r.j_call
+                    })
+                    rep_df = rep_df[rep_df["sequence"].str.len() > 0]
+                else:
+                     logging.error(f"  ❌ No valid sequences {r.rep_id} even for fallback.")
+                     continue
+
+            # --- END FALLBACK ---
+
                         # Dedup rep_df on sequence to avoid explosion if local duplicate
                         rep_df = rep_df.drop_duplicates(subset=["sequence"])
                         

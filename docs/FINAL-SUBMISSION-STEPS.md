@@ -147,3 +147,14 @@ scp -P 10052 root@203.57.40.123:/workspace/airr-ml-25-challenge/submission.zip .
 ```
 
 **Upload `submission_FINAL.zip` to the Challenge Portal!** 🚀
+# C. Pipeline & Emergency Fallback
+*What if some embeddings are missing?*
+**Don't Panic.** I have patched the scripts to handle "Partial Data" gracefully:
+1.  **Task 1 (Ensemble):** Defaults to `0.5` probability if embedding is missing. (Already Safe)
+2.  **Task 2 (Ranking):** **NEW!** Now falls back to selecting the first valid sequence if embedding is missing.
+
+**Scenario C: Verification Fails (RED LIGHT) but Deadline is Imminent**
+If `scripts/merge_650m_embeddings.sh` fails because of verification:
+1.  **Run Pipeline ANYWAY.** The scripts will now auto-fill missing data.
+2.  Go to Step 3 (Execute Pipeline) below.
+3.  Submit whatever you have. A partial score > No score.

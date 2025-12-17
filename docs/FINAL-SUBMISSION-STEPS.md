@@ -100,29 +100,53 @@ Run this single command:
 5.  Save a detailed log to `logs/merge_650m_embeddings.log`.
 
 echo "✅ Merge & Repair Complete!"
-```
 
 ---
 
-## 3️⃣ STEP 3: Execution Pipeline (On Pod 1)
+## 3️⃣ STEP 3: Execute Pipeline (On Pod 1)
 
-*These scripts are fast compared to embeddings. You can run them sequentially.*
+*Choose one of the options below. Parallel is faster.*
 
-### A. Task 2 Ranking (Crowd Labeling)
-*   **Input:** DS7/DS8 Embeddings (Train & Test).
-*   **Output:** Ranked submission file.
-*   **Est. Time:** 20-40 Minutes.
+### **OPTION A: PARALLEL EXECUTION (FASTEST - Recommended)**
+*Run Task 1 and Task 2 simultaneously to save ~2 hours.*
 
+1.  **Open Terminal 1** (Task 1):
+    ```bash
+    uv run scripts/generate_ensemble_preds_task1.py -m 650
+    ```
+2.  **Open Terminal 2** (Task 2 - Run IMMEDIATELY):
+    ```bash
+    uv run scripts/rank_sequences_task2_all.py -m 650
+    ```
+3.  **Wait for BOTH to finish.**
+
+4.  **Run Final Assembly (Sequential):**
+    ```bash
+    uv run scripts/aggregate_task1_preds.py -m 650
+    uv run scripts/build_submission.py -m 650
+    ```
+
+---
+
+### **OPTION B: SERIAL EXECUTION (Classic)**
+*Run this if you prefer a simple, linear flow.*
+
+**A. Task 1: Generate Predictions**
 ```bash
-cd /workspace/airr-ml-25-challenge
+uv run scripts/generate_ensemble_preds_task1.py -m 650
+```
+
+**B. Aggregate Task 1**
+```bash
+uv run scripts/aggregate_task1_preds.py -m 650
+```
+
+**C. Task 2: Rank Sequences**
+```bash
 uv run scripts/rank_sequences_task2_all.py -m 650
 ```
 
-### C. Build Final Submission
-*   **Input:** Results from A & B.
-*   **Output:** `submission.zip`.
-*   **Est. Time:** < 1 Minute.
-
+**D. Build Final Submission**
 ```bash
 uv run scripts/build_submission.py -m 650
 ```

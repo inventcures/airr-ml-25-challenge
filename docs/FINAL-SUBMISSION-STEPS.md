@@ -100,24 +100,25 @@ unzip -o pod5_results_ds7_train_shard1.zip
 # Downstream scripts expect: data/embeddings/ds8/test/3_test
 # Pods likely created:       data/embeddings/ds8_3/test
 
-# Fix DS8 Test (Handle standard structure + Pod 3's ds8_3 structure)
+# Fix DS8 Test (Handle Pod 2's ds8_1/ds8_2 and Pod 3's ds8_3)
 mkdir -p ds8/test
 if [ -d "ds8_1/test" ]; then
     mkdir -p ds8/test/1_test
+    # Merge contents of ds8_1/test into ds8/test/1_test
     rsync -a --remove-source-files ds8_1/test/ ds8/test/1_test/
 fi
 if [ -d "ds8_2/test" ]; then
     mkdir -p ds8/test/2_test
+    # Merge contents of ds8_2/test into ds8/test/2_test
     rsync -a --remove-source-files ds8_2/test/ ds8/test/2_test/
 fi
-# Pod 3 outputted 'ds8_3/test', so we move it to 'ds8/test/3_test'
 if [ -d "ds8_3/test" ]; then
     mkdir -p ds8/test/3_test
+    # Merge contents of ds8_3/test into ds8/test/3_test
     rsync -a --remove-source-files ds8_3/test/ ds8/test/3_test/
 fi
 
-# Fix DS8 Train (Pod 3 zip had standard 'ds8/train', so it unzips correctly. No merge needed.)
-# (Keeping cleanup below just in case)
+# Fix DS8 Train (Pod 3 and 4 outputted standard 'ds8/train', so unzip worked correctly. No manual merge needed.)
 
 # Fix DS7
 mkdir -p ds7/test

@@ -84,56 +84,20 @@ scp -P 18444 root@213.173.98.86:/workspace/airr-ml-25-challenge/data/embeddings/
 scp -P 12987 root@213.173.98.90:/workspace/airr-ml-25-challenge/data/embeddings/pod5_results_ds7_train_shard1.zip .
 ```
 
-**B. Unzip & Fix Structure**
-*`unzip -o` is perfectly safe. It merges directories and overwrites identical files.*
+**B. Merge & Fix (Scripted)**
+*The merge logic is now encapsulated in a safe, logging-enabled script.*
 
+Run this single command:
 ```bash
-cd /workspace/airr-ml-25-challenge/data/embeddings
+./scripts/merge_650m_embeddings.sh
+```
 
-# 1. Unzip Everything
-unzip -o pod2_results_ds8_test_1_2.zip
-unzip -o pod3_results.zip
-unzip -o pod4_results_ds8_train_shard0.zip
-unzip -o pod5_results_ds7_train_shard1.zip
-
-# 2. 🚨 CRITICAL FIX: Move Flat Folders to Nested Structure 🚨
-# Downstream scripts expect: data/embeddings/ds8/test/3_test
-# Pods likely created:       data/embeddings/ds8_3/test
-
-# Fix DS8 Test (Handle Pod 2's ds8_1/ds8_2 and Pod 3's ds8_3)
-mkdir -p ds8/test
-if [ -d "ds8_1/test" ]; then
-    mkdir -p ds8/test/1_test
-    # Merge contents of ds8_1/test into ds8/test/1_test
-    rsync -a --remove-source-files ds8_1/test/ ds8/test/1_test/
-fi
-if [ -d "ds8_2/test" ]; then
-    mkdir -p ds8/test/2_test
-    # Merge contents of ds8_2/test into ds8/test/2_test
-    rsync -a --remove-source-files ds8_2/test/ ds8/test/2_test/
-fi
-if [ -d "ds8_3/test" ]; then
-    mkdir -p ds8/test/3_test
-    # Merge contents of ds8_3/test into ds8/test/3_test
-    rsync -a --remove-source-files ds8_3/test/ ds8/test/3_test/
-fi
-
-# Fix DS8 Train (Pod 3 and 4 outputted standard 'ds8/train', so unzip worked correctly. No manual merge needed.)
-
-# Fix DS7
-mkdir -p ds7/test
-if [ -d "ds7_1/test" ]; then
-    mkdir -p ds7/test/1_test
-    rsync -a --remove-source-files ds7_1/test/ ds7/test/1_test/
-fi
-if [ -d "ds7_2/test" ]; then
-    mkdir -p ds7/test/2_test
-    rsync -a --remove-source-files ds7_2/test/ ds7/test/2_test/
-fi
-
-# 3. Cleanup Empty Shells
-rmdir ds7_1 ds7_2 ds8_1 ds8_2 ds8_3 2>/dev/null || true
-rm -rf ds8_3 # Force remove if rsync left empty dirs
+*This script will:*
+1.  Unzip all 4 files.
+2.  Fix the directory structure (merging split folders).
+3.  Clean up empty directories.
+4.  Run the verification scan automatically.
+5.  Save a detailed log to `logs/merge_650m_embeddings.log`.
 
 echo "✅ Merge & Repair Complete!"
 ```

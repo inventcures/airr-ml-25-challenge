@@ -108,23 +108,36 @@ def verify_dataset(ds_name: str, split: str = "train"):
             except Exception as e:
                 logging.error(f"    ❌ CORRUPTION: {rid} could not be loaded: {e}")
 
+    # Return failure status
+    success = (completeness > 90) # Consider Amber light as "Pass" for now, or strict 99.9? User said "Accuracy" is key.
+    # Let's be strict: If Red Light, we fail. Amber is warn.
+    if completeness < 90:
+        return False
+    return True
+
 def main():
     logging.info("🚀 Starting 650M Embedding Sanity Check...")
     
+    failed_datasets = []
+
     # DS1-6 (Train/Test)
     for ds in ["ds1", "ds2", "ds3", "ds4", "ds5", "ds6"]:
-        verify_dataset(ds, "train")
-        verify_dataset(ds, "test")
+        if not verify_dataset(ds, "train"): failed_datasets.append(f"{ds}_train")
+        if not verify_dataset(ds, "test"): failed_datasets.append(f"{ds}_test")
 
     # DS7 (Train/Test)
-    verify_dataset("ds7", "train")
-    verify_dataset("ds7", "test") # Multipart check built-in
+    if not verify_dataset("ds7", "train"): failed_datasets.append("ds7_train")
+    if not verify_dataset("ds7", "test"): failed_datasets.append("ds7_test")
 
     # DS8 (Train/Test)
-    verify_dataset("ds8", "train")
-    verify_dataset("ds8", "test")
+    if not verify_dataset("ds8", "train"): failed_datasets.append("ds8_train")
+    if not verify_dataset("ds8", "test"): failed_datasets.append("ds8_test")
 
-    logging.info("🏁 Sanity Check Complete.")
+    if failed_datasets:
+        logging.error(f"❌ Sanity Check Failed for: {failed_datasets}")
+        sys.exit(1)
+    
+    logging.info("🏁 Sanity Check Complete: ALL GREEN/AMBER.")
 
 if __name__ == "__main__":
     main()

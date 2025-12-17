@@ -118,16 +118,6 @@ cd /workspace/airr-ml-25-challenge
 uv run scripts/rank_sequences_task2_all.py -m 650
 ```
 
-### A. Task 1: Generate Predictions (OOF & Ensemble)
-*This generates probability scores using your trained ESM ensemble.*
-*   **Input:** DS1-8 Embeddings (Train & Test).
-*   **Output:** Predictions for Task 1.
-*   **Est. Time:** 15-30 Minutes.
-
-```bash
-uv run scripts/generate_ensemble_preds_task1.py -m 650
-```
-
 ### C. Build Final Submission
 *   **Input:** Results from A & B.
 *   **Output:** `submission.zip`.

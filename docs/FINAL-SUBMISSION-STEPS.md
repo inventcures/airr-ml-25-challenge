@@ -137,16 +137,18 @@ uv run scripts/build_submission.py -m 650
 ```
 
 ---
+### Step 4: Download & Submit
+1.  Navigate to `outputs/submissions_650m/`
+2.  Find the folder with the latest timestamp (e.g., `submission_20251216...`).
+3.  Download `submission.csv` within it.
+4.  **Zip it** (Warning: Portal creates zip automatically? No, usually you upload CSV or Zip. Zip is safer).
+    ```bash
+    cd outputs/submissions_650m/submission_YYYY...
+    zip -r submission_FINAL.zip submission.csv
+    ```
+5.  Upload `submission_FINAL.zip` to the Challenge Portal!
 
-## 4️⃣ STEP 4: Download & Submit
-
-**📍 Run on your Local Machine (Laptop):**
-
-```bash
-scp -P 10052 root@203.57.40.123:/workspace/airr-ml-25-challenge/submission.zip ./submission_FINAL.zip
-```
-
-**Upload `submission_FINAL.zip` to the Challenge Portal!** 🚀
+---
 # C. Pipeline & Emergency Fallback
 *What if some embeddings are missing?*
 **Don't Panic.** I have patched the scripts to handle "Partial Data" gracefully:
@@ -156,5 +158,5 @@ scp -P 10052 root@203.57.40.123:/workspace/airr-ml-25-challenge/submission.zip .
 **Scenario C: Verification Fails (RED LIGHT) but Deadline is Imminent**
 If `scripts/merge_650m_embeddings.sh` fails because of verification:
 1.  **Run Pipeline ANYWAY.** The scripts will now auto-fill missing data.
-2.  Go to Step 3 (Execute Pipeline) below.
+2.  Go to **Step 3** above and execute normally.
 3.  Submit whatever you have. A partial score > No score.

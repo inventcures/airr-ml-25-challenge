@@ -279,13 +279,20 @@ def rank_sequences_task2_all(force=False):
 
             # --- END FALLBACK ---
 
-                        # Dedup rep_df on sequence to avoid explosion if local duplicate
-                        rep_df = rep_df.drop_duplicates(subset=["sequence"])
-                        
-                        # Merge 
-                        merged = df_rank.merge(rep_df, on="sequence", how="left")
-                        
-                        all_rankings.append(merged)
+            
+            # --- SHARED MERGE LOGIC ---
+            if 'df_rank' in locals() and 'rep_df' in locals():
+                # Dedup rep_df on sequence to avoid explosion if local duplicate
+                rep_df = rep_df.drop_duplicates(subset=["sequence"])
+                
+                # Merge 
+                merged = df_rank.merge(rep_df, on="sequence", how="left")
+                
+                all_rankings.append(merged)
+                
+                # Cleanup for next loop
+                del df_rank
+                del rep_df
             
             # Update State
             processed_ids.add(r.rep_id)

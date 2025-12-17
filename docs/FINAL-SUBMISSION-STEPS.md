@@ -100,24 +100,35 @@ unzip -o pod5_results_ds7_train_shard1.zip
 # Downstream scripts expect: data/embeddings/ds8/test/3_test
 # Pods likely created:       data/embeddings/ds8_3/test
 
-# Fix DS8 Test
+# Fix DS8 Test (Handle standard structure + Pod 3's ds8_3 structure)
 mkdir -p ds8/test
-[ -d ds8_1/test ] && mv ds8_1/test ds8/test/1_test
-[ -d ds8_2/test ] && mv ds8_2/test ds8/test/2_test
-[ -d ds8_3/test ] && mv ds8_3/test ds8/test/3_test
-
-# Fix DS8 Train (Merge Pod 3's sharded train data)
-if [ -d "ds8_3/train" ]; then
-    echo "  Merging DS8 Train from Pod 3..."
-    mkdir -p ds8/train
-    # Use rsync to merge large folder safely
-    rsync -a --remove-source-files ds8_3/train/ ds8/train/
+if [ -d "ds8_1/test" ]; then
+    mkdir -p ds8/test/1_test
+    rsync -a --remove-source-files ds8_1/test/ ds8/test/1_test/
 fi
+if [ -d "ds8_2/test" ]; then
+    mkdir -p ds8/test/2_test
+    rsync -a --remove-source-files ds8_2/test/ ds8/test/2_test/
+fi
+# Pod 3 outputted 'ds8_3/test', so we move it to 'ds8/test/3_test'
+if [ -d "ds8_3/test" ]; then
+    mkdir -p ds8/test/3_test
+    rsync -a --remove-source-files ds8_3/test/ ds8/test/3_test/
+fi
+
+# Fix DS8 Train (Pod 3 zip had standard 'ds8/train', so it unzips correctly. No merge needed.)
+# (Keeping cleanup below just in case)
 
 # Fix DS7
 mkdir -p ds7/test
-[ -d ds7_1/test ] && mv ds7_1/test ds7/test/1_test
-[ -d ds7_2/test ] && mv ds7_2/test ds7/test/2_test
+if [ -d "ds7_1/test" ]; then
+    mkdir -p ds7/test/1_test
+    rsync -a --remove-source-files ds7_1/test/ ds7/test/1_test/
+fi
+if [ -d "ds7_2/test" ]; then
+    mkdir -p ds7/test/2_test
+    rsync -a --remove-source-files ds7_2/test/ ds7/test/2_test/
+fi
 
 # 3. Cleanup Empty Shells
 rmdir ds7_1 ds7_2 ds8_1 ds8_2 ds8_3 2>/dev/null || true

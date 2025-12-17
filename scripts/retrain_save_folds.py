@@ -179,7 +179,11 @@ if __name__ == "__main__":
             train_order = list(labeled_reps)
             random.shuffle(train_order)
             
-            batch_iter = tqdm(chunk_list(train_order, BATCH_SIZE), total=(len(train_order)//BATCH_SIZE)+1, desc="Batches", leave=False)
+            # Reduce batch size for heavy datasets to avoid OOM/Hang
+            current_bs = 1 if ds_name in ["ds7", "ds8"] else BATCH_SIZE
+            logging.info(f"  Using Batch Size: {current_bs} for {ds_name}")
+
+            batch_iter = tqdm(chunk_list(train_order, current_bs), total=(len(train_order)//current_bs)+1, desc="Batches", leave=False)
             
             for batch_reps in batch_iter:
                 batch_ids = [r.rep_id for r in batch_reps]

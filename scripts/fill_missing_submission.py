@@ -139,12 +139,37 @@ def main():
     if new_rows:
         logging.info(f"Injecting {len(new_rows)} missing datasets...")
         filled_df = pd.concat([df] + new_rows, ignore_index=True)
-        filled_df.to_csv(args.out, index=False)
-        logging.info(f"✅ Saved filled submission to {args.out}")
     else:
         logging.info("✅ No missing datasets found. File is complete.")
-        # Save copy anyway
-        df.to_csv(args.out, index=False)
+        filled_df = df
+
+    # --- FINAL SAFETY: REMOVE ALL NULLS ---
+    logging.info("🧹 Performing final Null check and fill...")
+    
+    # 1. Probability -> 0.5
+    null_probs = filled_df["label_positive_probability"].isnull().sum()
+    if null_probs > 0:
+        logging.warning(f"  Found {null_probs} NULL probabilities. Filling with 0.5.")
+        filled_df["label_positive_probability"] = filled_df["label_positive_probability"].fillna(0.5)
+
+    # 2. String Columns -> "unknown" or "-999.0" depending on logic, but "unknown" is safer than NaN
+    for col in ["junction_aa", "v_call", "j_call", "dataset", "ID"]:
+        null_strs = filled_df[col].isnull().sum()
+        if null_strs > 0:
+             logging.warning(f"  Found {null_strs} NULLs in {col}. Filling with 'unknown'/-999.0.")
+             # If it's a test row, ideally -999.0, but 'unknown' is better than crash.
+             # Let's simple fill with -999.0 for sequence columns if they look like test data?
+             # Just fill with string "unknown" for robustness.
+             filled_df[col] = filled_df[col].fillna("unknown")
+
+    # 3. Enforce Test Set Masking Rule again just in case concatenation broke it
+    test_mask = filled_df['dataset'].str.contains('test', na=False)
+    mask_cols = ['junction_aa', 'v_call', 'j_call']
+    # Ensure they are -999.0
+    filled_df.loc[test_mask, mask_cols] = "-999.0"
+
+    filled_df.to_csv(args.out, index=False)
+    logging.info(f"✅ Saved filled submission to {args.out}")
 
 if __name__ == "__main__":
     main()

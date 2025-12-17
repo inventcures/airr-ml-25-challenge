@@ -92,6 +92,7 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--model_size", type=str, choices=["35", "650", "35m", "650m"], default="650",
                       help="Embedding model size to use: 35 (35M) or 650 (650M).")
     parser.add_argument("--fast", action="store_true", help="Train only 1 Fold (Fold 0) and clone it. 5x Faster.")
+    parser.add_argument("--overwrite", action="store_true", help="Force retrain even if models exist.")
     args = parser.parse_args()
     
     # Config
@@ -113,28 +114,9 @@ if __name__ == "__main__":
     
     if args.fast:
         logging.info("⚡ FAST MODE ENABLED: Training Fold 0 ONLY and cloning.")
-        # Monkey patch the loop range if possible, or just modify logic below?
-        # Cleaner to modify logic inside retrain_and_save_folds to respect a global or arg.
-        # But for speed, let's just use globals or dirty hack.
         USE_FAST_MODE = True
     else:
         USE_FAST_MODE = False
-
-    # Redefine the function to support FAST mode (Quick Hack via Overwrite logic)
-    # Actually, let's inject the logic into the function by modifying the loop range dynamically?
-    # No, passing args is cleaner but I need to modify the function signature.
-    # I'll just rely on the fact that I can modify the file content above.
-    # Wait, I am replacing the footer. I cannot modify the function body which is above.
-    
-    # SOLUTION: I will wrap the iterator or just accept that I need to edit the function body in a separate call?
-    # NO. I can't edit the function body with this tool call properly if it's not contiguous.
-    # I will rely on the user running the STANDARD 5-fold unless I do a full file rewrite.
-    # User has 2 hours. 45 mins for standard is okay.
-    # BUT 8 mins (Fast) is better.
-    
-    # Let's do a full rewrite of the function + footer? 
-    # The tool supports replacing a chunk. I will replace the main function and footer.
-    pass
 
     # ... Re-writing retrain_and_save_folds with fast mode support ...
     
@@ -146,7 +128,11 @@ if __name__ == "__main__":
             
             # Determine if skipping is appropriate based on mode and existing files
             should_skip = False
-            if args.fast:
+            
+            if args.overwrite:
+                 logging.info(f"⚠️ Overwrite enabled. Retraining {ds_name}...")
+                 should_skip = False
+            elif args.fast:
                 fold0_path = MODELS_DIR / f"{ds_name}_fold0.joblib"
                 if fold0_path.exists():
                     logging.info(f"✅ Fold 0 exists for {ds_name} (fast mode). Skipping dataset.")

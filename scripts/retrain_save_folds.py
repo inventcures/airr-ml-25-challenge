@@ -144,16 +144,25 @@ if __name__ == "__main__":
         for ds_name in ds_iterator:
             ds_iterator.set_description(f"Retraining {ds_name}")
             
-            # Check exist
-            all_folds_exist = True
-            for k in range(5):
-                fold_path = MODELS_DIR / f"{ds_name}_fold{k}.joblib"
-                if not fold_path.exists():
-                    all_folds_exist = False
-                    break
-            
-            if all_folds_exist and not args.fast: # Re-check for fast?
-                logging.info(f"✅ All 5 folds exist for {ds_name}. Skipping.")
+            # Determine if skipping is appropriate based on mode and existing files
+            should_skip = False
+            if args.fast:
+                fold0_path = MODELS_DIR / f"{ds_name}_fold0.joblib"
+                if fold0_path.exists():
+                    logging.info(f"✅ Fold 0 exists for {ds_name} (fast mode). Skipping dataset.")
+                    should_skip = True
+            else: # Standard 5-fold training
+                all_folds_exist = True
+                for k in range(5):
+                    fold_path = MODELS_DIR / f"{ds_name}_fold{k}.joblib"
+                    if not fold_path.exists():
+                        all_folds_exist = False
+                        break
+                if all_folds_exist:
+                    logging.info(f"✅ All 5 folds exist for {ds_name}. Skipping dataset.")
+                    should_skip = True
+
+            if should_skip:
                 continue
                 
             logging.info(f"🔄 Retraining folds for {ds_name}...")

@@ -260,18 +260,19 @@ def generate_test_ensemble_preds(ds_name: str, force: bool = False):
         models.append(ESMSequenceClassifier.load(m_path))
         
     if not models:
-        logging.warning(f"  ⚠️ No models found for {base_ds}. USING FALLBACK: Generating dummy preds (0.5).")
-        # FALLBACK LOOP
-        batch_iter = tqdm(chunk_list(reps_to_process, BATCH_SIZE), total=(len(reps_to_process)//BATCH_SIZE)+1, desc=f"Fallback {ds_name}")
-        for batch_reps in batch_iter:
-            batch_results = []
-            for r in batch_reps:
-                batch_results.append({"repertoire_id": r.rep_id, "p_esm": 0.5})
-            
-            df_batch = pd.DataFrame(batch_results)
-            header = not out_path.exists()
-            df_batch.to_csv(out_path, mode='a', header=header, index=False)
+        logging.warning(f"  ⚠️ No models found for {base_ds}. Skipping {ds_name} to allow partial completion.")
         return
+        # FALLBACK LOOP REMOVED TO PREVENT BAD DATA IN PARTIAL RUNS
+        # batch_iter = tqdm(chunk_list(reps_to_process, BATCH_SIZE), total=(len(reps_to_process)//BATCH_SIZE)+1, desc=f"Fallback {ds_name}")
+        # for batch_reps in batch_iter:
+        #    batch_results = []
+        #    for r in batch_reps:
+        #        batch_results.append({"repertoire_id": r.rep_id, "p_esm": 0.5})
+        #    
+        #    df_batch = pd.DataFrame(batch_results)
+        #    header = not out_path.exists()
+        #    df_batch.to_csv(out_path, mode='a', header=header, index=False)
+        # return
 
     logging.info(f"  Processing {len(reps_to_process)} remaining items for {ds_name}...")
 

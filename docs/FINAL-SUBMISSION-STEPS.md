@@ -118,8 +118,9 @@ cd /workspace/airr-ml-25-challenge
 uv run scripts/rank_sequences_task2_all.py -m 650
 ```
 
-### B. Task 1 Ensemble Prediction (Binding)
-*   **Input:** DS1-6 & DS8 Embeddings.
+### A. Task 1: Generate Predictions (OOF & Ensemble)
+*This generates probability scores using your trained ESM ensemble.*
+*   **Input:** DS1-8 Embeddings (Train & Test).
 *   **Output:** Predictions for Task 1.
 *   **Est. Time:** 15-30 Minutes.
 

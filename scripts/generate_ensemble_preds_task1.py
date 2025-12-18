@@ -292,6 +292,12 @@ def generate_test_ensemble_preds(ds_name: str, force: bool = False):
                 continue
                 
             emb = emb_map[r.rep_id]
+            
+            # Sanitize
+            if not np.isfinite(emb).all():
+                 # logging.warning(f"  ⚠️ Embeddings for {r.rep_id} contain NaNs/Inf. Zeroing.")
+                 emb = np.nan_to_num(emb, nan=0.0, posinf=0.0, neginf=0.0)
+            
             p_avg = predict_repertoire_ensemble(models, emb)
             
             batch_results.append({"repertoire_id": r.rep_id, "p_esm": p_avg})

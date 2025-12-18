@@ -219,6 +219,11 @@ def rank_sequences_task2_all(force=False):
                          continue
             
             if emb is not None:
+                # Sanitize: Check for NaNs or Inf
+                if not np.isfinite(emb).all():
+                    logging.warning(f"  ⚠️ Embeddings for {r.rep_id} contain NaNs/Inf. Replacing with zeros.")
+                    emb = np.nan_to_num(emb, nan=0.0, posinf=0.0, neginf=0.0)
+
                 if emb.ndim == 1:
                     if len(emb) > 0:
                         emb = emb.reshape(1, -1)

@@ -182,10 +182,25 @@ def rank_sequences_task2_all(force=False):
         # Checkpoint Setup - Separate checkpoint for each task type
         ckpt_path = OUTPUT_DIR / f"{ds_name}_{ds_type}_checkpoint.pkl"
         
+        processed_ids = set()
+        all_rankings = []
+        
+        # Resumption Logic
         if ckpt_path.exists():
-            logging.warning(f"  ⚠️ Deleting old checkpoint {ckpt_path} to ensure clean run.")
-            ckpt_path.unlink()
-            
+            if force:
+                logging.warning(f"  ⚠️ Force enabled: Deleting old checkpoint {ckpt_path}.")
+                ckpt_path.unlink()
+            else:
+                try:
+                    logging.info(f"  🔄 Found checkpoint {ckpt_path}. Loading state...")
+                    state = joblib.load(ckpt_path)
+                    processed_ids = state.get('processed_ids', set())
+                    all_rankings = state.get('all_rankings', [])
+                    logging.info(f"  ✅ Resumed from {len(processed_ids)} repertoires.")
+                except Exception as e:
+                    logging.error(f"  ❌ Corrupt checkpoint {ckpt_path}: {e}. Starting fresh.")
+                    ckpt_path.unlink()
+        
         per_rep_top_k = 1
         target_total_rows = task["target_rows"]
         
@@ -207,6 +222,9 @@ def rank_sequences_task2_all(force=False):
         pbar_reps = tqdm(reps, desc=f"  Ranking {ds_name}", leave=False)
         
         for i, r in enumerate(pbar_reps):
+            if r.rep_id in processed_ids:
+                continue
+
             # Find embedding
             emb = None
             for root in valid_roots:

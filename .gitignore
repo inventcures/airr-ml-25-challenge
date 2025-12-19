@@ -15,11 +15,16 @@ outputs/
 
 # Allow syncing prediction CSVs (User Request)
 !outputs/esm_seq_preds/
+!outputs/esm_seq_preds_650m/
 !outputs/deeprc_cv_preds/
 !outputs/cluster_preds_lancedb/
 !outputs/stats_preds/
 !outputs/task2_ranking/
+!outputs/task2_ranking_650m/
 !outputs/submission/
+!outputs/submission_650m/
+!outputs/submissions/
+!outputs/submissions_650m/
 
 # Python
 __pycache__/

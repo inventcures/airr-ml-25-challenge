@@ -97,3 +97,97 @@ Name: ID, dtype: object
 4217    train_dataset_1_seq_top_4
 Name: ID, dtype: object
 2025-12-14 06:48:32,026 - INFO - Final Row Count: 404213
+2025-12-17 06:49:53,082 - INFO - 🟣 Selected 650M Workflow
+2025-12-17 06:49:53,082 - INFO - 🟣 Inputs: Task1=outputs/submission_650m/submission.csv, Task2=outputs/task2_ranking_650m
+2025-12-17 06:49:53,083 - INFO - 🟣 Output: submission_650m.csv
+2025-12-17 06:49:53,084 - INFO - [Build Submission] Generating final submission file...
+2025-12-17 06:49:53,091 - INFO - Loaded Task 1 results: 2400 rows (Repertoires)
+2025-12-17 06:49:53,104 - INFO - Found 1 Task 2 ranking files.
+2025-12-17 06:49:53,182 - INFO - Loaded Task 2 Results: 400 rows total.
+2025-12-17 06:49:53,187 - INFO - Merged Data Shape: (400, 8)
+2025-12-17 06:49:53,188 - INFO - Merged Columns: ['repertoire_id', 'junction_aa', 'score', 'v_call', 'j_call', 'dataset', 'p_esm', 'label']
+2025-12-17 06:49:53,191 - INFO -   Processed test_dataset_1 (Test): kept 400 rows (1 per rep).
+2025-12-17 06:49:53,260 - INFO - [DEBUG] Final DF Head:
+                      repertoire_id        junction_aa     score    v_call   j_call         dataset  p_esm  label                                ID
+0  1afbf51fe1439f71b23da87d311702f2       CASSEVPGTSRF  0.999871   TRBV6-1  TRBJ2-7  test_dataset_1    NaN    NaN  1afbf51fe1439f71b23da87d311702f2
+1  4004d4d2319a04ca536aa2cefa5ffa92     CAYLGGGYGYGYTF  0.999871    TRBV30  TRBJ1-2  test_dataset_1    NaN    NaN  4004d4d2319a04ca536aa2cefa5ffa92
+2  cad973814f3225f412e1fb68b3102724   CATGSDRVWANAEAFF  0.999871  TRBV10-3  TRBJ1-1  test_dataset_1    NaN    NaN  cad973814f3225f412e1fb68b3102724
+3  96eb5992829f3ca99d52fd1d0ad4f66b  CASSAGTGHPGANVLTF  0.999825     TRBV2  TRBJ2-6  test_dataset_1    NaN    NaN  96eb5992829f3ca99d52fd1d0ad4f66b
+4  ff574bac34edc5ad86bb4b40b803e02e     CASSEMGGGYEQFF  0.999801  TRBV25-1  TRBJ2-1  test_dataset_1    NaN    NaN  ff574bac34edc5ad86bb4b40b803e02e
+2025-12-17 06:49:53,261 - INFO - [DEBUG] Final DF Columns: ['repertoire_id', 'junction_aa', 'score', 'v_call', 'j_call', 'dataset', 'p_esm', 'label', 'ID']
+2025-12-17 06:49:53,262 - WARNING -   Column label_positive_probability missing, filling with default.
+2025-12-17 06:49:53,265 - INFO - Masking 400 test rows with -999.0 for columns ['junction_aa', 'v_call', 'j_call']
+2025-12-17 06:49:53,269 - WARNING -   Found 400 rows with NULL probability. Filling with 0.5.
+2025-12-17 06:49:53,273 - INFO - Final Row Count: 400
+2025-12-17 06:49:53,293 - INFO - ✅ Saved final submission to outputs/submissions_650m/submission_20251217_064953/submission.csv
+2025-12-17 06:49:53,293 - INFO - ✅ Also saved to submission_650m.csv
+2025-12-17 06:49:53,294 - INFO - 
+[Validation] Starting strict checks...
+2025-12-17 06:49:53,295 - INFO - ✅ Columns check passed.
+2025-12-17 06:49:53,295 - INFO - ✅ Null check passed.
+2025-12-17 06:49:53,297 - INFO - ✅ Probability range check passed.
+2025-12-17 06:49:53,298 - INFO - Click 'Submit'! 🚀
+2025-12-19 09:19:36,285 - INFO - 🟣 Selected 650M Workflow
+2025-12-19 09:19:36,286 - INFO - 🟣 Inputs: Task1=outputs/submission_650m/submission.csv, Task2=outputs/task2_ranking_650m
+2025-12-19 09:19:36,286 - INFO - 🟣 Output: submission_650m.csv
+2025-12-19 09:19:36,287 - INFO - [Build Submission] Generating final submission file...
+2025-12-19 09:19:36,309 - INFO - Loaded Task 1 results: 7823 rows (Repertoires)
+2025-12-19 09:19:36,323 - INFO - Found 19 Task 2 ranking files.
+2025-12-19 09:19:38,596 - INFO - Loaded Task 2 Results: 404213 rows total.
+2025-12-19 09:19:38,699 - INFO - Merged Data Shape: (404213, 8)
+2025-12-19 09:19:38,702 - INFO - Merged Columns: ['repertoire_id', 'junction_aa', 'score', 'v_call', 'j_call', 'dataset', 'p_esm', 'label']
+2025-12-19 09:19:38,746 - INFO -   Processed test_dataset_1 (Test): kept 400 rows (1 per rep).
+2025-12-19 09:19:38,747 - INFO -   Processed test_dataset_2 (Test): kept 400 rows (1 per rep).
+2025-12-19 09:19:38,749 - INFO -   Processed test_dataset_3 (Test): kept 400 rows (1 per rep).
+2025-12-19 09:19:38,750 - INFO -   Processed test_dataset_4 (Test): kept 400 rows (1 per rep).
+2025-12-19 09:19:38,751 - INFO -   Processed test_dataset_5 (Test): kept 400 rows (1 per rep).
+2025-12-19 09:19:38,752 - INFO -   Processed test_dataset_6 (Test): kept 400 rows (1 per rep).
+2025-12-19 09:19:38,753 - INFO -   Processed test_dataset_7_1 (Test): kept 76 rows (1 per rep).
+2025-12-19 09:19:38,754 - INFO -   Processed test_dataset_7_2 (Test): kept 100 rows (1 per rep).
+2025-12-19 09:19:38,756 - INFO -   Processed test_dataset_8_1 (Test): kept 390 rows (1 per rep).
+2025-12-19 09:19:38,757 - INFO -   Processed test_dataset_8_2 (Test): kept 857 rows (1 per rep).
+2025-12-19 09:19:38,758 - INFO -   Processed test_dataset_8_3 (Test): kept 390 rows (1 per rep).
+2025-12-19 09:19:38,764 - INFO -   Processed train_dataset_1 (Train): kept 50000 rows with synthetic IDs.
+2025-12-19 09:19:38,777 - INFO -   [DEBUG-VEC] train_dataset_1 first ID: train_dataset_1_seq_top_0
+2025-12-19 09:19:38,784 - INFO -   Processed train_dataset_2 (Train): kept 50000 rows with synthetic IDs.
+2025-12-19 09:19:38,804 - INFO -   Processed train_dataset_3 (Train): kept 50000 rows with synthetic IDs.
+2025-12-19 09:19:38,823 - INFO -   Processed train_dataset_4 (Train): kept 50000 rows with synthetic IDs.
+2025-12-19 09:19:38,843 - INFO -   Processed train_dataset_5 (Train): kept 50000 rows with synthetic IDs.
+2025-12-19 09:19:38,863 - INFO -   Processed train_dataset_6 (Train): kept 50000 rows with synthetic IDs.
+2025-12-19 09:19:38,878 - INFO -   Processed train_dataset_7 (Train): kept 50000 rows with synthetic IDs.
+2025-12-19 09:19:38,894 - INFO -   Processed train_dataset_8 (Train): kept 50000 rows with synthetic IDs.
+2025-12-19 09:19:38,926 - INFO - [DEBUG] Final DF Head:
+                      repertoire_id        junction_aa     score   v_call   j_call         dataset     p_esm  label                                ID
+0  f70a88cb488fb0e0cbc1e1aaecc46534  CASSLYLAGGVSYEQYF  0.995215  TRBV5-4  TRBJ2-7  test_dataset_1  0.996443    NaN  f70a88cb488fb0e0cbc1e1aaecc46534
+1  e5a41392c09f8b1a1d2227129e23b952     CASSLEISYNEQFF  0.995215  TRBV5-1  TRBJ2-1  test_dataset_1  0.996146    NaN  e5a41392c09f8b1a1d2227129e23b952
+2  2cf04e27271e2d54d60533ab475553d0   CASSIVQGSGANVLTF  0.995036  TRBV7-8  TRBJ2-6  test_dataset_1  0.995965    NaN  2cf04e27271e2d54d60533ab475553d0
+3  2e82de4f43b0bf479c588f51aa667254    CASSPGLAGPYEQYF  0.993933    TRBV7  TRBJ2-7  test_dataset_1  0.995580    NaN  2e82de4f43b0bf479c588f51aa667254
+4  bce2bf4178b7d564530f00c2da406b39     CASSRSRGTGELFF  0.993768   TRBV18  TRBJ2-2  test_dataset_1  0.995754    NaN  bce2bf4178b7d564530f00c2da406b39
+2025-12-19 09:19:38,927 - INFO - [DEBUG] Final DF Columns: ['repertoire_id', 'junction_aa', 'score', 'v_call', 'j_call', 'dataset', 'p_esm', 'label', 'ID']
+2025-12-19 09:19:38,954 - WARNING -   Column label_positive_probability missing, filling with default.
+2025-12-19 09:19:39,040 - INFO - Masking 4213 test rows with -999.0 for columns ['junction_aa', 'v_call', 'j_call']
+2025-12-19 09:19:39,063 - INFO - [DEBUG-FINAL] train_dataset_1 Head ID:
+4213    train_dataset_1_seq_top_0
+4214    train_dataset_1_seq_top_1
+4215    train_dataset_1_seq_top_2
+4216    train_dataset_1_seq_top_3
+4217    train_dataset_1_seq_top_4
+Name: ID, dtype: object
+2025-12-19 09:19:39,137 - WARNING -   Found 404213 rows with NULL probability. Filling with 0.5.
+2025-12-19 09:19:39,173 - INFO - Final Row Count: 404213
+2025-12-19 09:19:41,025 - INFO - ✅ Saved final submission to outputs/submissions_650m/submission_20251219_091939/submission.csv
+2025-12-19 09:19:41,026 - INFO - ✅ Also saved to submission_650m.csv
+2025-12-19 09:19:41,027 - INFO - 
+[Validation] Starting strict checks...
+2025-12-19 09:19:41,027 - INFO - ✅ Columns check passed.
+2025-12-19 09:19:41,039 - INFO - ✅ Null check passed.
+2025-12-19 09:19:41,054 - INFO - ✅ train_dataset_8: 50,000 rows (Perfect).
+2025-12-19 09:19:41,055 - INFO - ✅ train_dataset_1: 50,000 rows (Perfect).
+2025-12-19 09:19:41,055 - INFO - ✅ train_dataset_7: 50,000 rows (Perfect).
+2025-12-19 09:19:41,056 - INFO - ✅ train_dataset_6: 50,000 rows (Perfect).
+2025-12-19 09:19:41,056 - INFO - ✅ train_dataset_5: 50,000 rows (Perfect).
+2025-12-19 09:19:41,057 - INFO - ✅ train_dataset_4: 50,000 rows (Perfect).
+2025-12-19 09:19:41,058 - INFO - ✅ train_dataset_3: 50,000 rows (Perfect).
+2025-12-19 09:19:41,059 - INFO - ✅ train_dataset_2: 50,000 rows (Perfect).
+2025-12-19 09:19:41,060 - INFO - ✅ Probability range check passed.
+2025-12-19 09:19:41,062 - INFO - Click 'Submit'! 🚀

@@ -546,3 +546,261 @@
 2025-12-14 06:02:09,478 - INFO -   [Limit] Train: 50k Goal. Using top_k=56 per rep.
 2025-12-14 06:34:14,344 - INFO -   trimmed 50848 -> 50000 rows (Exact 50k target).
 2025-12-14 06:34:14,563 - INFO -   Saved rankings to outputs/task2_ranking/ds8_train_ranking.csv
+2025-12-17 06:06:31,942 - INFO - Arguments: Namespace(force=False, model_size='650')
+2025-12-17 06:06:31,943 - INFO - 🟣 Selected 650M Embeddings from data/embeddings
+2025-12-17 06:06:31,943 - INFO - 🟣 Outputs redirected to: outputs/task2_ranking_650m
+2025-12-17 06:06:31,944 - INFO - 🟣 Loading models from: models/esm_seq_ensemble_650m (or models/esm_seq_650m)
+2025-12-17 06:06:31,946 - INFO - 
+[Task 2] Processing ds1 (test)...
+2025-12-17 06:06:31,949 - INFO -   🚀 Found 5/5 Ensemble Folds for ds1! Using Ensemble.
+2025-12-17 06:06:33,846 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-17 06:06:33,850 - INFO -   [Limit] Test: 1 per rep.
+2025-12-17 06:38:03,051 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds1_test_ranking.csv
+2025-12-17 06:38:03,055 - INFO - 
+[Task 2] Processing ds2 (test)...
+2025-12-17 06:38:03,057 - INFO -   🚀 Found 5/5 Ensemble Folds for ds2! Using Ensemble.
+2025-12-17 06:38:05,016 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-17 06:38:05,021 - INFO -   [Limit] Test: 1 per rep.
+2025-12-17 07:06:43,680 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds2_test_ranking.csv
+2025-12-17 07:06:43,682 - INFO - 
+[Task 2] Processing ds3 (test)...
+2025-12-17 07:06:43,685 - INFO -   🚀 Found 5/5 Ensemble Folds for ds3! Using Ensemble.
+2025-12-17 07:06:45,469 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-17 07:06:45,473 - INFO -   [Limit] Test: 1 per rep.
+2025-12-17 07:34:07,108 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds3_test_ranking.csv
+2025-12-17 07:34:07,111 - INFO - 
+[Task 2] Processing ds4 (test)...
+2025-12-17 07:34:07,113 - INFO -   🚀 Found 5/5 Ensemble Folds for ds4! Using Ensemble.
+2025-12-17 07:34:08,222 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-17 07:34:08,226 - INFO -   [Limit] Test: 1 per rep.
+2025-12-17 08:01:40,270 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds4_test_ranking.csv
+2025-12-17 08:01:40,272 - INFO - 
+[Task 2] Processing ds5 (test)...
+2025-12-17 08:01:40,275 - INFO -   🚀 Found 5/5 Ensemble Folds for ds5! Using Ensemble.
+2025-12-17 08:01:41,645 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-17 08:01:41,649 - INFO -   [Limit] Test: 1 per rep.
+2025-12-17 08:28:56,597 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds5_test_ranking.csv
+2025-12-17 08:28:56,605 - INFO - 
+[Task 2] Processing ds6 (test)...
+2025-12-17 08:28:56,608 - INFO -   🚀 Found 5/5 Ensemble Folds for ds6! Using Ensemble.
+2025-12-17 08:28:58,030 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-17 08:28:58,034 - INFO -   [Limit] Test: 1 per rep.
+2025-12-17 08:56:21,675 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds6_test_ranking.csv
+2025-12-17 08:56:21,677 - INFO - 
+[Task 2] Processing ds7_1 (test)...
+2025-12-17 08:56:21,678 - INFO -   🚀 Found 5/5 Ensemble Folds for ds7! Using Ensemble.
+2025-12-17 08:56:24,530 - INFO -   Loaded 76 repertoires. Ranking with 5 models...
+2025-12-17 08:56:24,535 - INFO -   [Limit] Test: 1 per rep.
+2025-12-17 09:58:14,853 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds7_1_test_ranking.csv
+2025-12-17 09:58:14,855 - INFO - 
+[Task 2] Processing ds7_2 (test)...
+2025-12-17 09:58:14,857 - INFO -   🚀 Found 5/5 Ensemble Folds for ds7! Using Ensemble.
+2025-12-17 09:58:16,658 - INFO -   Loaded 100 repertoires. Ranking with 5 models...
+2025-12-17 09:58:16,663 - INFO -   [Limit] Test: 1 per rep.
+2025-12-17 10:40:51,960 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds7_2_test_ranking.csv
+2025-12-17 10:40:51,962 - INFO - 
+[Task 2] Processing ds8_1 (test)...
+2025-12-17 10:40:51,964 - INFO -   🚀 Found 5/5 Ensemble Folds for ds8! Using Ensemble.
+2025-12-17 10:40:58,159 - INFO -   Loaded 390 repertoires. Ranking with 5 models...
+2025-12-17 10:40:58,164 - INFO -   [Limit] Test: 1 per rep.
+2025-12-17 12:23:48,973 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds8_1_test_ranking.csv
+2025-12-17 12:23:48,977 - INFO - 
+[Task 2] Processing ds8_2 (test)...
+2025-12-17 12:23:48,983 - INFO -   🚀 Found 5/5 Ensemble Folds for ds8! Using Ensemble.
+2025-12-17 12:23:56,265 - INFO -   Loaded 857 repertoires. Ranking with 5 models...
+2025-12-17 12:23:56,275 - INFO -   [Limit] Test: 1 per rep.
+2025-12-17 14:11:21,942 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds8_2_test_ranking.csv
+2025-12-17 14:11:21,945 - INFO - 
+[Task 2] Processing ds8_3 (test)...
+2025-12-17 14:11:21,948 - INFO -   🚀 Found 5/5 Ensemble Folds for ds8! Using Ensemble.
+2025-12-17 14:11:29,077 - INFO -   Loaded 390 repertoires. Ranking with 5 models...
+2025-12-17 14:11:29,083 - INFO -   [Limit] Test: 1 per rep.
+2025-12-17 16:07:30,687 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds8_3_test_ranking.csv
+2025-12-17 16:07:30,693 - INFO - 
+[Task 2] Processing ds1 (train)...
+2025-12-17 16:07:30,703 - INFO -   🚀 Found 5/5 Ensemble Folds for ds1! Using Ensemble.
+2025-12-17 16:07:32,357 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-17 16:07:32,363 - INFO -   [Limit] Train: 50k Goal. Using top_k=125 per rep.
+2025-12-17 16:35:24,770 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds1_train_ranking.csv
+2025-12-17 16:35:24,776 - INFO - 
+[Task 2] Processing ds2 (train)...
+2025-12-17 16:35:24,782 - INFO -   🚀 Found 5/5 Ensemble Folds for ds2! Using Ensemble.
+2025-12-17 16:35:26,352 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-17 16:35:26,360 - INFO -   [Limit] Train: 50k Goal. Using top_k=125 per rep.
+2025-12-17 17:03:22,934 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds2_train_ranking.csv
+2025-12-17 17:03:22,937 - INFO - 
+[Task 2] Processing ds3 (train)...
+2025-12-17 17:03:22,940 - INFO -   🚀 Found 5/5 Ensemble Folds for ds3! Using Ensemble.
+2025-12-17 17:03:24,520 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-17 17:03:24,528 - INFO -   [Limit] Train: 50k Goal. Using top_k=125 per rep.
+2025-12-17 17:31:07,333 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds3_train_ranking.csv
+2025-12-17 17:31:07,336 - INFO - 
+[Task 2] Processing ds4 (train)...
+2025-12-17 17:31:07,338 - INFO -   🚀 Found 5/5 Ensemble Folds for ds4! Using Ensemble.
+2025-12-17 17:31:09,313 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-17 17:31:09,318 - INFO -   [Limit] Train: 50k Goal. Using top_k=125 per rep.
+2025-12-17 17:58:40,814 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds4_train_ranking.csv
+2025-12-17 17:58:40,820 - INFO - 
+[Task 2] Processing ds5 (train)...
+2025-12-17 17:58:40,828 - INFO -   🚀 Found 5/5 Ensemble Folds for ds5! Using Ensemble.
+2025-12-17 17:58:42,563 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-17 17:58:42,569 - INFO -   [Limit] Train: 50k Goal. Using top_k=125 per rep.
+2025-12-17 18:26:23,651 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds5_train_ranking.csv
+2025-12-17 18:26:23,654 - INFO - 
+[Task 2] Processing ds6 (train)...
+2025-12-17 18:26:23,659 - INFO -   🚀 Found 5/5 Ensemble Folds for ds6! Using Ensemble.
+2025-12-17 18:26:25,434 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-17 18:26:25,441 - INFO -   [Limit] Train: 50k Goal. Using top_k=125 per rep.
+2025-12-17 18:54:15,532 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds6_train_ranking.csv
+2025-12-17 18:54:15,537 - INFO - 
+[Task 2] Processing ds7 (train)...
+2025-12-17 18:54:15,543 - INFO -   🚀 Found 5/5 Ensemble Folds for ds7! Using Ensemble.
+2025-12-17 18:54:31,681 - INFO -   Loaded 302 repertoires. Ranking with 5 models...
+2025-12-17 18:54:31,687 - INFO -   [Limit] Train: 50k Goal. Using top_k=166 per rep.
+2025-12-18 09:07:10,826 - INFO - Arguments: Namespace(force=False, model_size='650')
+2025-12-18 09:07:10,827 - INFO - 🟣 Selected 650M Embeddings from data/embeddings
+2025-12-18 09:07:10,828 - INFO - 🟣 Outputs redirected to: outputs/task2_ranking_650m
+2025-12-18 09:07:10,830 - INFO - 🟣 Loading models from: models/esm_seq_ensemble_650m (or models/esm_seq_650m)
+2025-12-18 09:07:10,835 - INFO -   ✅ Ranking file exists for ds1. Skipping.
+2025-12-18 09:07:10,836 - INFO -   ✅ Ranking file exists for ds2. Skipping.
+2025-12-18 09:07:10,838 - INFO -   ✅ Ranking file exists for ds3. Skipping.
+2025-12-18 09:07:10,839 - INFO -   ✅ Ranking file exists for ds4. Skipping.
+2025-12-18 09:07:10,840 - INFO -   ✅ Ranking file exists for ds5. Skipping.
+2025-12-18 09:07:10,841 - INFO -   ✅ Ranking file exists for ds6. Skipping.
+2025-12-18 09:07:10,843 - INFO -   ✅ Ranking file exists for ds7_1. Skipping.
+2025-12-18 09:07:10,844 - INFO -   ✅ Ranking file exists for ds7_2. Skipping.
+2025-12-18 09:07:10,845 - INFO -   ✅ Ranking file exists for ds8_1. Skipping.
+2025-12-18 09:07:10,846 - INFO -   ✅ Ranking file exists for ds8_2. Skipping.
+2025-12-18 09:07:10,848 - INFO -   ✅ Ranking file exists for ds8_3. Skipping.
+2025-12-18 09:07:10,849 - INFO -   ✅ Ranking file exists for ds1. Skipping.
+2025-12-18 09:07:10,850 - INFO -   ✅ Ranking file exists for ds2. Skipping.
+2025-12-18 09:07:10,851 - INFO -   ✅ Ranking file exists for ds3. Skipping.
+2025-12-18 09:07:10,852 - INFO -   ✅ Ranking file exists for ds4. Skipping.
+2025-12-18 09:07:10,853 - INFO -   ✅ Ranking file exists for ds5. Skipping.
+2025-12-18 09:07:10,854 - INFO -   ✅ Ranking file exists for ds6. Skipping.
+2025-12-18 09:07:10,855 - INFO - 
+[Task 2] Processing ds7 (train)...
+2025-12-18 09:07:10,859 - INFO -   🚀 Found 5/5 Ensemble Folds for ds7! Using Ensemble.
+2025-12-18 09:07:35,774 - INFO -   Loaded 302 repertoires. Ranking with 5 models...
+2025-12-18 09:07:35,779 - WARNING -   ⚠️ Deleting old checkpoint outputs/task2_ranking_650m/ds7_train_checkpoint.pkl to ensure clean run.
+2025-12-18 09:07:35,780 - INFO -   [Limit] Train: 50k Goal. Using top_k=166 per rep.
+2025-12-18 09:20:36,209 - INFO - Arguments: Namespace(force=True, model_size='650')
+2025-12-18 09:20:36,211 - INFO - 🟣 Selected 650M Embeddings from data/embeddings
+2025-12-18 09:20:36,212 - INFO - 🟣 Outputs redirected to: outputs/task2_ranking_650m
+2025-12-18 09:20:36,213 - INFO - 🟣 Loading models from: models/esm_seq_ensemble_650m (or models/esm_seq_650m)
+2025-12-18 09:20:36,217 - INFO - 
+[Task 2] Processing ds1 (test)...
+2025-12-18 09:20:36,227 - INFO -   🚀 Found 5/5 Ensemble Folds for ds1! Using Ensemble.
+2025-12-18 09:20:38,873 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-18 09:20:38,886 - INFO -   [Limit] Test: 1 per rep.
+2025-12-18 09:53:25,608 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds1_test_ranking.csv
+2025-12-18 09:53:25,618 - INFO - 
+[Task 2] Processing ds2 (test)...
+2025-12-18 09:53:25,629 - INFO -   🚀 Found 5/5 Ensemble Folds for ds2! Using Ensemble.
+2025-12-18 09:53:28,474 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-18 09:53:28,484 - INFO -   [Limit] Test: 1 per rep.
+2025-12-18 10:24:01,206 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds2_test_ranking.csv
+2025-12-18 10:24:01,212 - INFO - 
+[Task 2] Processing ds3 (test)...
+2025-12-18 10:24:01,219 - INFO -   🚀 Found 5/5 Ensemble Folds for ds3! Using Ensemble.
+2025-12-18 10:24:03,504 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-18 10:24:03,513 - INFO -   [Limit] Test: 1 per rep.
+2025-12-18 10:53:05,954 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds3_test_ranking.csv
+2025-12-18 10:53:05,957 - INFO - 
+[Task 2] Processing ds4 (test)...
+2025-12-18 10:53:05,961 - INFO -   🚀 Found 5/5 Ensemble Folds for ds4! Using Ensemble.
+2025-12-18 10:53:07,907 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-18 10:53:07,910 - INFO -   [Limit] Test: 1 per rep.
+2025-12-18 11:22:11,923 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds4_test_ranking.csv
+2025-12-18 11:22:11,926 - INFO - 
+[Task 2] Processing ds5 (test)...
+2025-12-18 11:22:11,931 - INFO -   🚀 Found 5/5 Ensemble Folds for ds5! Using Ensemble.
+2025-12-18 11:22:13,784 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-18 11:22:13,787 - INFO -   [Limit] Test: 1 per rep.
+2025-12-18 11:51:43,179 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds5_test_ranking.csv
+2025-12-18 11:51:43,187 - INFO - 
+[Task 2] Processing ds6 (test)...
+2025-12-18 11:51:43,198 - INFO -   🚀 Found 5/5 Ensemble Folds for ds6! Using Ensemble.
+2025-12-18 11:51:45,133 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-18 11:51:45,144 - INFO -   [Limit] Test: 1 per rep.
+2025-12-18 12:21:14,706 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds6_test_ranking.csv
+2025-12-18 12:21:14,712 - INFO - 
+[Task 2] Processing ds7_1 (test)...
+2025-12-18 12:21:14,719 - INFO -   🚀 Found 5/5 Ensemble Folds for ds7! Using Ensemble.
+2025-12-18 12:21:18,546 - INFO -   Loaded 76 repertoires. Ranking with 5 models...
+2025-12-18 12:21:18,560 - INFO -   [Limit] Test: 1 per rep.
+2025-12-18 13:38:14,660 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds7_1_test_ranking.csv
+2025-12-18 13:38:14,664 - INFO - 
+[Task 2] Processing ds7_2 (test)...
+2025-12-18 13:38:14,668 - INFO -   🚀 Found 5/5 Ensemble Folds for ds7! Using Ensemble.
+2025-12-18 13:38:18,039 - INFO -   Loaded 100 repertoires. Ranking with 5 models...
+2025-12-18 13:38:18,044 - INFO -   [Limit] Test: 1 per rep.
+2025-12-18 14:32:39,635 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds7_2_test_ranking.csv
+2025-12-18 14:32:39,638 - INFO - 
+[Task 2] Processing ds8_1 (test)...
+2025-12-18 14:32:39,645 - INFO -   🚀 Found 5/5 Ensemble Folds for ds8! Using Ensemble.
+2025-12-18 14:32:50,460 - INFO -   Loaded 390 repertoires. Ranking with 5 models...
+2025-12-18 14:32:50,470 - INFO -   [Limit] Test: 1 per rep.
+2025-12-18 16:30:48,521 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds8_1_test_ranking.csv
+2025-12-18 16:30:48,526 - INFO - 
+[Task 2] Processing ds8_2 (test)...
+2025-12-18 16:30:48,532 - INFO -   🚀 Found 5/5 Ensemble Folds for ds8! Using Ensemble.
+2025-12-18 16:30:57,856 - INFO -   Loaded 857 repertoires. Ranking with 5 models...
+2025-12-18 16:30:57,861 - INFO -   [Limit] Test: 1 per rep.
+2025-12-18 18:29:00,425 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds8_2_test_ranking.csv
+2025-12-18 18:29:00,430 - INFO - 
+[Task 2] Processing ds8_3 (test)...
+2025-12-18 18:29:00,436 - INFO -   🚀 Found 5/5 Ensemble Folds for ds8! Using Ensemble.
+2025-12-18 18:29:07,979 - INFO -   Loaded 390 repertoires. Ranking with 5 models...
+2025-12-18 18:29:07,986 - INFO -   [Limit] Test: 1 per rep.
+2025-12-18 20:24:07,793 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds8_3_test_ranking.csv
+2025-12-18 20:24:07,804 - INFO - 
+[Task 2] Processing ds1 (train)...
+2025-12-18 20:24:07,812 - INFO -   🚀 Found 5/5 Ensemble Folds for ds1! Using Ensemble.
+2025-12-18 20:24:09,407 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-18 20:24:09,414 - INFO -   [Limit] Train: 50k Goal. Using top_k=125 per rep.
+2025-12-18 20:54:37,139 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds1_train_ranking.csv
+2025-12-18 20:54:37,141 - INFO - 
+[Task 2] Processing ds2 (train)...
+2025-12-18 20:54:37,143 - INFO -   🚀 Found 5/5 Ensemble Folds for ds2! Using Ensemble.
+2025-12-18 20:54:39,010 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-18 20:54:39,013 - INFO -   [Limit] Train: 50k Goal. Using top_k=125 per rep.
+2025-12-18 21:24:45,608 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds2_train_ranking.csv
+2025-12-18 21:24:45,616 - INFO - 
+[Task 2] Processing ds3 (train)...
+2025-12-18 21:24:45,623 - INFO -   🚀 Found 5/5 Ensemble Folds for ds3! Using Ensemble.
+2025-12-18 21:24:47,965 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-18 21:24:47,973 - INFO -   [Limit] Train: 50k Goal. Using top_k=125 per rep.
+2025-12-18 21:54:01,437 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds3_train_ranking.csv
+2025-12-18 21:54:01,443 - INFO - 
+[Task 2] Processing ds4 (train)...
+2025-12-18 21:54:01,450 - INFO -   🚀 Found 5/5 Ensemble Folds for ds4! Using Ensemble.
+2025-12-18 21:54:03,275 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-18 21:54:03,279 - INFO -   [Limit] Train: 50k Goal. Using top_k=125 per rep.
+2025-12-18 22:23:18,648 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds4_train_ranking.csv
+2025-12-18 22:23:18,654 - INFO - 
+[Task 2] Processing ds5 (train)...
+2025-12-18 22:23:18,661 - INFO -   🚀 Found 5/5 Ensemble Folds for ds5! Using Ensemble.
+2025-12-18 22:23:20,976 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-18 22:23:20,991 - INFO -   [Limit] Train: 50k Goal. Using top_k=125 per rep.
+2025-12-18 22:52:33,646 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds5_train_ranking.csv
+2025-12-18 22:52:33,648 - INFO - 
+[Task 2] Processing ds6 (train)...
+2025-12-18 22:52:33,651 - INFO -   🚀 Found 5/5 Ensemble Folds for ds6! Using Ensemble.
+2025-12-18 22:52:35,876 - INFO -   Loaded 400 repertoires. Ranking with 5 models...
+2025-12-18 22:52:35,883 - INFO -   [Limit] Train: 50k Goal. Using top_k=125 per rep.
+2025-12-18 23:21:39,915 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds6_train_ranking.csv
+2025-12-18 23:21:39,920 - INFO - 
+[Task 2] Processing ds7 (train)...
+2025-12-18 23:21:39,924 - INFO -   🚀 Found 5/5 Ensemble Folds for ds7! Using Ensemble.
+2025-12-18 23:21:57,456 - INFO -   Loaded 302 repertoires. Ranking with 5 models...
+2025-12-18 23:21:57,460 - INFO -   [Limit] Train: 50k Goal. Using top_k=166 per rep.
+2025-12-19 03:55:13,769 - INFO -   trimmed 50132 -> 50000 rows (Exact 50k target).
+2025-12-19 03:55:14,024 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds7_train_ranking.csv
+2025-12-19 03:55:14,030 - INFO - 
+[Task 2] Processing ds8 (train)...
+2025-12-19 03:55:14,039 - INFO -   🚀 Found 5/5 Ensemble Folds for ds8! Using Ensemble.
+2025-12-19 03:55:31,363 - INFO -   Loaded 908 repertoires. Ranking with 5 models...
+2025-12-19 03:55:31,368 - INFO -   [Limit] Train: 50k Goal. Using top_k=56 per rep.
+2025-12-19 08:02:07,814 - INFO -   trimmed 50848 -> 50000 rows (Exact 50k target).
+2025-12-19 08:02:07,977 - INFO -   Saved rankings to outputs/task2_ranking_650m/ds8_train_ranking.csv

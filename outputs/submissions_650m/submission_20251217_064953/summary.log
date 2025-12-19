@@ -1,0 +1,22 @@
+Submission Generated: 20251217_064953
+========================================
+Total Rows: 400
+Columns: ['ID', 'dataset', 'label_positive_probability', 'junction_aa', 'v_call', 'j_call']
+
+Dataset Breakdown:
+dataset
+test_dataset_1    400
+Name: count, dtype: int64
+
+Missing Values:
+ID                            0
+dataset                       0
+label_positive_probability    0
+junction_aa                   0
+v_call                        0
+j_call                        0
+dtype: int64
+
+
+Validation Report:
+✅ All Checks Passed.

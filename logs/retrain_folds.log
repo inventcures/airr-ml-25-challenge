@@ -46,3 +46,176 @@
 2025-12-13 17:23:07,064 - INFO -   Saved fold 2 to models/esm_seq_ensemble/ds8_fold2.joblib
 2025-12-13 17:23:07,075 - INFO -   Saved fold 3 to models/esm_seq_ensemble/ds8_fold3.joblib
 2025-12-13 17:23:07,119 - INFO -   Saved fold 4 to models/esm_seq_ensemble/ds8_fold4.joblib
+2025-12-17 04:49:32,008 - INFO - 🟣 Training 650M Models...
+2025-12-17 04:49:32,009 - INFO -   Models Output: models/esm_seq_ensemble_650m
+2025-12-17 04:49:32,010 - INFO -   Embeddings Input: data/embeddings
+2025-12-17 04:49:32,011 - INFO - 🔄 Retraining folds for ds1...
+2025-12-17 04:51:34,564 - INFO - 🟣 Training 650M Models...
+2025-12-17 04:51:34,565 - INFO -   Models Output: models/esm_seq_ensemble_650m
+2025-12-17 04:51:34,565 - INFO -   Embeddings Input: data/embeddings
+2025-12-17 04:51:34,566 - INFO - ⚡ FAST MODE ENABLED: Training Fold 0 ONLY and cloning.
+2025-12-17 04:51:34,568 - INFO - 🔄 Retraining folds for ds1...
+2025-12-17 05:00:20,529 - INFO -   Saved fold 0 to models/esm_seq_ensemble_650m/ds1_fold0.joblib
+2025-12-17 05:00:20,530 - INFO -   ⚡ Cloning Fold 0 to Folds 1-4 for compatibility...
+2025-12-17 05:00:20,540 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds1_fold1.joblib
+2025-12-17 05:00:20,547 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds1_fold2.joblib
+2025-12-17 05:00:20,555 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds1_fold3.joblib
+2025-12-17 05:00:20,561 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds1_fold4.joblib
+2025-12-17 05:00:20,710 - INFO - 🔄 Retraining folds for ds2...
+2025-12-17 05:08:58,893 - INFO -   Saved fold 0 to models/esm_seq_ensemble_650m/ds2_fold0.joblib
+2025-12-17 05:08:58,894 - INFO -   ⚡ Cloning Fold 0 to Folds 1-4 for compatibility...
+2025-12-17 05:08:58,906 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds2_fold1.joblib
+2025-12-17 05:08:58,914 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds2_fold2.joblib
+2025-12-17 05:08:58,921 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds2_fold3.joblib
+2025-12-17 05:08:58,929 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds2_fold4.joblib
+2025-12-17 05:08:59,110 - INFO - 🔄 Retraining folds for ds3...
+2025-12-17 05:17:24,250 - INFO -   Saved fold 0 to models/esm_seq_ensemble_650m/ds3_fold0.joblib
+2025-12-17 05:17:24,251 - INFO -   ⚡ Cloning Fold 0 to Folds 1-4 for compatibility...
+2025-12-17 05:17:24,260 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds3_fold1.joblib
+2025-12-17 05:17:24,267 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds3_fold2.joblib
+2025-12-17 05:17:24,275 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds3_fold3.joblib
+2025-12-17 05:17:24,282 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds3_fold4.joblib
+2025-12-17 05:17:24,431 - INFO - 🔄 Retraining folds for ds4...
+2025-12-17 05:25:40,271 - INFO -   Saved fold 0 to models/esm_seq_ensemble_650m/ds4_fold0.joblib
+2025-12-17 05:25:40,271 - INFO -   ⚡ Cloning Fold 0 to Folds 1-4 for compatibility...
+2025-12-17 05:25:40,281 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds4_fold1.joblib
+2025-12-17 05:25:40,288 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds4_fold2.joblib
+2025-12-17 05:25:40,295 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds4_fold3.joblib
+2025-12-17 05:25:40,306 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds4_fold4.joblib
+2025-12-17 05:25:40,470 - INFO - 🔄 Retraining folds for ds5...
+2025-12-17 05:34:01,460 - INFO -   Saved fold 0 to models/esm_seq_ensemble_650m/ds5_fold0.joblib
+2025-12-17 05:34:01,460 - INFO -   ⚡ Cloning Fold 0 to Folds 1-4 for compatibility...
+2025-12-17 05:34:01,468 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds5_fold1.joblib
+2025-12-17 05:34:01,475 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds5_fold2.joblib
+2025-12-17 05:34:01,481 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds5_fold3.joblib
+2025-12-17 05:34:01,488 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds5_fold4.joblib
+2025-12-17 05:34:01,644 - INFO - 🔄 Retraining folds for ds6...
+2025-12-17 05:42:19,829 - INFO -   Saved fold 0 to models/esm_seq_ensemble_650m/ds6_fold0.joblib
+2025-12-17 05:42:19,830 - INFO -   ⚡ Cloning Fold 0 to Folds 1-4 for compatibility...
+2025-12-17 05:42:19,840 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds6_fold1.joblib
+2025-12-17 05:42:19,850 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds6_fold2.joblib
+2025-12-17 05:42:19,859 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds6_fold3.joblib
+2025-12-17 05:42:19,867 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds6_fold4.joblib
+2025-12-17 05:42:20,016 - INFO - 🔄 Retraining folds for ds7...
+2025-12-17 05:57:51,298 - INFO - 🟣 Training 650M Models...
+2025-12-17 05:57:51,299 - INFO -   Models Output: models/esm_seq_ensemble_650m
+2025-12-17 05:57:51,302 - INFO -   Embeddings Input: data/embeddings
+2025-12-17 05:57:51,303 - INFO - ⚡ FAST MODE ENABLED: Training Fold 0 ONLY and cloning.
+2025-12-17 05:57:51,306 - INFO - 🔄 Retraining folds for ds1...
+2025-12-17 05:57:52,880 - INFO -   Using Batch Size: 5 for ds1
+2025-12-17 05:59:16,605 - INFO - 🟣 Training 650M Models...
+2025-12-17 05:59:16,606 - INFO -   Models Output: models/esm_seq_ensemble_650m
+2025-12-17 05:59:16,607 - INFO -   Embeddings Input: data/embeddings
+2025-12-17 05:59:16,607 - INFO - ⚡ FAST MODE ENABLED: Training Fold 0 ONLY and cloning.
+2025-12-17 05:59:16,609 - INFO - ✅ Fold 0 exists for ds1 (fast mode). Skipping dataset.
+2025-12-17 05:59:16,610 - INFO - ✅ Fold 0 exists for ds2 (fast mode). Skipping dataset.
+2025-12-17 05:59:16,610 - INFO - ✅ Fold 0 exists for ds3 (fast mode). Skipping dataset.
+2025-12-17 05:59:16,611 - INFO - ✅ Fold 0 exists for ds4 (fast mode). Skipping dataset.
+2025-12-17 05:59:16,611 - INFO - ✅ Fold 0 exists for ds5 (fast mode). Skipping dataset.
+2025-12-17 05:59:16,612 - INFO - ✅ Fold 0 exists for ds6 (fast mode). Skipping dataset.
+2025-12-17 05:59:16,613 - INFO - 🔄 Retraining folds for ds7...
+2025-12-17 05:59:31,588 - INFO -   Using Batch Size: 1 for ds7
+2025-12-17 06:02:44,620 - INFO - 🟣 Training 650M Models...
+2025-12-17 06:02:44,621 - INFO -   Models Output: models/esm_seq_ensemble_650m
+2025-12-17 06:02:44,621 - INFO -   Embeddings Input: data/embeddings
+2025-12-17 06:02:44,621 - INFO - ⚡ FAST MODE ENABLED: Training Fold 0 ONLY and cloning.
+2025-12-17 06:02:44,623 - INFO - ✅ Fold 0 exists for ds1 (fast mode). Skipping dataset.
+2025-12-17 06:02:44,624 - INFO - ✅ Fold 0 exists for ds2 (fast mode). Skipping dataset.
+2025-12-17 06:02:44,625 - INFO - ✅ Fold 0 exists for ds3 (fast mode). Skipping dataset.
+2025-12-17 06:02:44,625 - INFO - ✅ Fold 0 exists for ds4 (fast mode). Skipping dataset.
+2025-12-17 06:02:44,626 - INFO - ✅ Fold 0 exists for ds5 (fast mode). Skipping dataset.
+2025-12-17 06:02:44,626 - INFO - ✅ Fold 0 exists for ds6 (fast mode). Skipping dataset.
+2025-12-17 06:02:44,627 - INFO - 🔄 Retraining folds for ds7...
+2025-12-17 06:02:57,826 - INFO -   Using Batch Size: 1 for ds7
+2025-12-17 07:46:33,993 - INFO -   Saved fold 0 to models/esm_seq_ensemble_650m/ds7_fold0.joblib
+2025-12-17 07:46:33,994 - INFO -   ⚡ Cloning Fold 0 to Folds 1-4 for compatibility...
+2025-12-17 07:46:34,007 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds7_fold1.joblib
+2025-12-17 07:46:34,015 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds7_fold2.joblib
+2025-12-17 07:46:34,124 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds7_fold3.joblib
+2025-12-17 07:46:34,134 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds7_fold4.joblib
+2025-12-17 07:46:35,843 - INFO - 🔄 Retraining folds for ds8...
+2025-12-17 07:46:54,889 - INFO -   Using Batch Size: 1 for ds8
+2025-12-17 09:31:13,944 - INFO -   Saved fold 0 to models/esm_seq_ensemble_650m/ds8_fold0.joblib
+2025-12-17 09:31:13,944 - INFO -   ⚡ Cloning Fold 0 to Folds 1-4 for compatibility...
+2025-12-17 09:31:13,954 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds8_fold1.joblib
+2025-12-17 09:31:13,961 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds8_fold2.joblib
+2025-12-17 09:31:13,969 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds8_fold3.joblib
+2025-12-17 09:31:13,978 - INFO -   ⚡ Cloned to models/esm_seq_ensemble_650m/ds8_fold4.joblib
+2025-12-17 12:41:58,952 - INFO - 🟣 Training 650M Models...
+2025-12-17 12:41:58,954 - INFO -   Models Output: models/esm_seq_ensemble_650m
+2025-12-17 12:41:58,955 - INFO -   Embeddings Input: data/embeddings
+2025-12-17 12:41:58,959 - INFO - ✅ All 5 folds exist for ds1. Skipping dataset.
+2025-12-17 12:41:58,963 - INFO - ✅ All 5 folds exist for ds2. Skipping dataset.
+2025-12-17 12:41:58,967 - INFO - ✅ All 5 folds exist for ds3. Skipping dataset.
+2025-12-17 12:41:58,970 - INFO - ✅ All 5 folds exist for ds4. Skipping dataset.
+2025-12-17 12:41:58,973 - INFO - ✅ All 5 folds exist for ds5. Skipping dataset.
+2025-12-17 12:41:58,976 - INFO - ✅ All 5 folds exist for ds6. Skipping dataset.
+2025-12-17 12:41:58,979 - INFO - ✅ All 5 folds exist for ds7. Skipping dataset.
+2025-12-17 12:41:58,983 - INFO - ✅ All 5 folds exist for ds8. Skipping dataset.
+2025-12-17 14:39:05,029 - INFO - 🟣 Training 650M Models...
+2025-12-17 14:39:05,030 - INFO -   Models Output: models/esm_seq_ensemble_650m
+2025-12-17 14:39:05,031 - INFO -   Embeddings Input: data/embeddings
+2025-12-17 14:39:05,065 - INFO - ⚠️ Overwrite enabled. Retraining ds1...
+2025-12-17 14:39:05,065 - INFO - 🔄 Retraining folds for ds1...
+2025-12-17 14:39:06,932 - INFO -   Using Batch Size: 5 for ds1
+2025-12-17 15:27:51,303 - INFO -   Saved fold 0 to models/esm_seq_ensemble_650m/ds1_fold0.joblib
+2025-12-17 15:27:51,446 - INFO -   Saved fold 1 to models/esm_seq_ensemble_650m/ds1_fold1.joblib
+2025-12-17 15:27:51,455 - INFO -   Saved fold 2 to models/esm_seq_ensemble_650m/ds1_fold2.joblib
+2025-12-17 15:27:51,465 - INFO -   Saved fold 3 to models/esm_seq_ensemble_650m/ds1_fold3.joblib
+2025-12-17 15:27:51,475 - INFO -   Saved fold 4 to models/esm_seq_ensemble_650m/ds1_fold4.joblib
+2025-12-17 15:27:51,662 - INFO - ⚠️ Overwrite enabled. Retraining ds2...
+2025-12-17 15:27:51,662 - INFO - 🔄 Retraining folds for ds2...
+2025-12-17 15:27:53,929 - INFO -   Using Batch Size: 5 for ds2
+2025-12-17 16:08:08,798 - INFO -   Saved fold 0 to models/esm_seq_ensemble_650m/ds2_fold0.joblib
+2025-12-17 16:08:08,914 - INFO -   Saved fold 1 to models/esm_seq_ensemble_650m/ds2_fold1.joblib
+2025-12-17 16:08:08,966 - INFO -   Saved fold 2 to models/esm_seq_ensemble_650m/ds2_fold2.joblib
+2025-12-17 16:08:08,973 - INFO -   Saved fold 3 to models/esm_seq_ensemble_650m/ds2_fold3.joblib
+2025-12-17 16:08:08,979 - INFO -   Saved fold 4 to models/esm_seq_ensemble_650m/ds2_fold4.joblib
+2025-12-17 16:08:09,167 - INFO - ⚠️ Overwrite enabled. Retraining ds3...
+2025-12-17 16:08:09,167 - INFO - 🔄 Retraining folds for ds3...
+2025-12-17 16:08:10,980 - INFO -   Using Batch Size: 5 for ds3
+2025-12-17 16:53:03,073 - INFO -   Saved fold 0 to models/esm_seq_ensemble_650m/ds3_fold0.joblib
+2025-12-17 16:53:03,085 - INFO -   Saved fold 1 to models/esm_seq_ensemble_650m/ds3_fold1.joblib
+2025-12-17 16:53:03,095 - INFO -   Saved fold 2 to models/esm_seq_ensemble_650m/ds3_fold2.joblib
+2025-12-17 16:53:03,110 - INFO -   Saved fold 3 to models/esm_seq_ensemble_650m/ds3_fold3.joblib
+2025-12-17 16:53:03,118 - INFO -   Saved fold 4 to models/esm_seq_ensemble_650m/ds3_fold4.joblib
+2025-12-17 16:53:03,306 - INFO - ⚠️ Overwrite enabled. Retraining ds4...
+2025-12-17 16:53:03,306 - INFO - 🔄 Retraining folds for ds4...
+2025-12-17 16:53:05,302 - INFO -   Using Batch Size: 5 for ds4
+2025-12-17 17:38:16,099 - INFO -   Saved fold 0 to models/esm_seq_ensemble_650m/ds4_fold0.joblib
+2025-12-17 17:38:16,111 - INFO -   Saved fold 1 to models/esm_seq_ensemble_650m/ds4_fold1.joblib
+2025-12-17 17:38:16,117 - INFO -   Saved fold 2 to models/esm_seq_ensemble_650m/ds4_fold2.joblib
+2025-12-17 17:38:16,123 - INFO -   Saved fold 3 to models/esm_seq_ensemble_650m/ds4_fold3.joblib
+2025-12-17 17:38:16,128 - INFO -   Saved fold 4 to models/esm_seq_ensemble_650m/ds4_fold4.joblib
+2025-12-17 17:38:16,304 - INFO - ⚠️ Overwrite enabled. Retraining ds5...
+2025-12-17 17:38:16,305 - INFO - 🔄 Retraining folds for ds5...
+2025-12-17 17:38:17,972 - INFO -   Using Batch Size: 5 for ds5
+2025-12-17 18:23:30,681 - INFO -   Saved fold 0 to models/esm_seq_ensemble_650m/ds5_fold0.joblib
+2025-12-17 18:23:30,691 - INFO -   Saved fold 1 to models/esm_seq_ensemble_650m/ds5_fold1.joblib
+2025-12-17 18:23:30,699 - INFO -   Saved fold 2 to models/esm_seq_ensemble_650m/ds5_fold2.joblib
+2025-12-17 18:23:30,714 - INFO -   Saved fold 3 to models/esm_seq_ensemble_650m/ds5_fold3.joblib
+2025-12-17 18:23:30,723 - INFO -   Saved fold 4 to models/esm_seq_ensemble_650m/ds5_fold4.joblib
+2025-12-17 18:23:31,073 - INFO - ⚠️ Overwrite enabled. Retraining ds6...
+2025-12-17 18:23:31,074 - INFO - 🔄 Retraining folds for ds6...
+2025-12-17 18:23:32,882 - INFO -   Using Batch Size: 5 for ds6
+2025-12-17 19:13:09,950 - INFO -   Saved fold 0 to models/esm_seq_ensemble_650m/ds6_fold0.joblib
+2025-12-17 19:13:09,958 - INFO -   Saved fold 1 to models/esm_seq_ensemble_650m/ds6_fold1.joblib
+2025-12-17 19:13:10,132 - INFO -   Saved fold 2 to models/esm_seq_ensemble_650m/ds6_fold2.joblib
+2025-12-17 19:13:10,266 - INFO -   Saved fold 3 to models/esm_seq_ensemble_650m/ds6_fold3.joblib
+2025-12-17 19:13:10,280 - INFO -   Saved fold 4 to models/esm_seq_ensemble_650m/ds6_fold4.joblib
+2025-12-17 19:13:10,617 - INFO - ⚠️ Overwrite enabled. Retraining ds7...
+2025-12-17 19:13:10,618 - INFO - 🔄 Retraining folds for ds7...
+2025-12-17 19:13:26,906 - INFO -   Using Batch Size: 1 for ds7
+2025-12-18 01:20:28,508 - INFO -   Saved fold 0 to models/esm_seq_ensemble_650m/ds7_fold0.joblib
+2025-12-18 01:20:28,556 - INFO -   Saved fold 1 to models/esm_seq_ensemble_650m/ds7_fold1.joblib
+2025-12-18 01:20:28,564 - INFO -   Saved fold 2 to models/esm_seq_ensemble_650m/ds7_fold2.joblib
+2025-12-18 01:20:28,572 - INFO -   Saved fold 3 to models/esm_seq_ensemble_650m/ds7_fold3.joblib
+2025-12-18 01:20:28,580 - INFO -   Saved fold 4 to models/esm_seq_ensemble_650m/ds7_fold4.joblib
+2025-12-18 01:20:30,020 - INFO - ⚠️ Overwrite enabled. Retraining ds8...
+2025-12-18 01:20:30,021 - INFO - 🔄 Retraining folds for ds8...
+2025-12-18 01:20:53,864 - INFO -   Using Batch Size: 1 for ds8
+2025-12-18 07:14:50,409 - INFO -   Saved fold 0 to models/esm_seq_ensemble_650m/ds8_fold0.joblib
+2025-12-18 07:14:50,418 - INFO -   Saved fold 1 to models/esm_seq_ensemble_650m/ds8_fold1.joblib
+2025-12-18 07:14:50,426 - INFO -   Saved fold 2 to models/esm_seq_ensemble_650m/ds8_fold2.joblib
+2025-12-18 07:14:50,433 - INFO -   Saved fold 3 to models/esm_seq_ensemble_650m/ds8_fold3.joblib
+2025-12-18 07:14:50,442 - INFO -   Saved fold 4 to models/esm_seq_ensemble_650m/ds8_fold4.joblib

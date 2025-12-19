@@ -38,3 +38,4 @@ misc.md
 
 #dont push keys
 docs/*.sh
+transfer-to-b2.sh
